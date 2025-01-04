@@ -3,6 +3,17 @@
 Schematic Data Types
 #####################
 
+.. _SchRecord:
+Schematic Record
+****************************
+
+A `Schematic Record` represents a strcture similar to :ref:`Block`. The length is given by the first 2 bytes and the record type is given by the next 2 bytes. There are two different record types identified
+
+- :code:`0x01` as ASCII type, which can be read using :ref:`ParameterCollection`
+- :code:`0x02` as binary Type
+
+The binary type is so far only used for schematic pins and is described in :ref:`SchBinaryPin`
+
 .. _SchCommonParameter:
 Schematic Common Parameter
 ****************************
@@ -55,10 +66,125 @@ For graphical records, there are additional parameters:
      - :ref:`Color`
      - Fill Color
 
+
+.. _SchBinaryPin:
+Schematic Binary Pin
+****************************
+Schematic binary pin record (record type :code:`0x02`):
+
+.. list-table:: 
+   :header-rows: 1
+
+   * - Parameter
+     - Size (Bytes)
+     - Datatype
+     - Description
+   * - Record
+     - 4
+     - :ref:`UInt32`
+     - Record ID
+   * - *unknown*
+     - 1
+     - :ref:`Byte`
+     - 
+   * - OwnerPartId
+     - 1
+     - :ref:`Byte`
+     - 
+   * - OwnerPartDisplayMode
+     - 1
+     - :ref:`Byte`
+     - 
+   * - Symbol_InnerEdge
+     - 1
+     - :ref:`Byte`
+     - 
+   * - Symbol_OuterEdge
+     - 1
+     - :ref:`Byte`
+     - 
+   * - Symbol_Inside
+     - 1
+     - :ref:`Byte`
+     - 
+   * - Symbol_Outside
+     - 1
+     - :ref:`Byte`
+     - 
+   * - Symbol_Linewidth
+     - 
+     - 
+     - Not implemented?
+   * - Description Length
+     - 1
+     - :ref:`Byte`
+     - 
+   * - Description
+     - Variable
+     - :ref:`String`
+     - 
+   * - Electrical_Type
+     - 1
+     - :ref:`Byte`
+     - 
+   * - Rotated
+     - 1 (Bit 0)
+     - :ref:`Boolean`
+     - 
+   * - Flipped
+     - 1 (Bit 1)
+     - :ref:`Boolean`
+     - 
+   * - Hide
+     - 1 (Bit 2)
+     - :ref:`Boolean`
+     - 
+   * - Show_Name
+     - 1 (Bit 3)
+     - :ref:`Boolean`
+     - 
+   * - Show_Designator
+     - 1 (Bit 4)
+     - :ref:`Boolean`
+     - 
+   * - Graphically_Locked
+     - 1 (Bit 6)
+     - :ref:`Boolean`
+     - 
+   * - Length
+     - 2
+     - :ref:`Int16`
+     - 
+   * - Location
+     - 4
+     - :ref:`SchCoordinate`
+     - 
+   * - Color
+     - 4
+     - :ref:`Color`
+     - 
+   * - Name Length
+     - 1
+     - :ref:`Byte`
+     - 
+   * - Name
+     - Variable
+     - :ref:`String`
+     - 
+   * - Designator Length
+     - 1
+     - :ref:`Byte`
+     - 
+   * - Designator
+     - Variable
+     - :ref:`String`
+     - 
+
+
 .. _SchCoordinate:
 Schematic Coordinate Point
 ****************************
- A singular coordinate based on two parameter for each tuple from a :ref:`ParameterCollection`. The parameters from this tuple are :code:`num`, which represents the number, and :code:`frac` represents the fraction. If one of the tuples is not given, the value is zero. Each of this tuples is calucated to a decimal value using :code:`num * 10.0 + frac / 10000.0`
+ A singular coordinate based on two parameter for each tuple from a :ref:`ParameterCollection`. The parameters from this tuple are :code:`num`, which represents the number, and :code:`frac` represents the fraction. If one of the tuples is not given, the value is zero. Each of this tuples is calucated to a decimal value using :code:`num + frac / 1000.0`
 
 **Example of a Schematic Coordinate:**
 
@@ -68,12 +194,10 @@ Schematic Coordinate Point
 
 - **Coordinate:** 100.05 mil  
 
-
-
 .. _SchCoordinatePoint:
 Schematic Coordinate Point
 ****************************
- A pair of (x, y)-coordinate :ref:`SchCoordinate` based on two parameter for each tuple from a :ref:`ParameterCollection`. The parameters from this tuple are :code:`num`, which represents the number, and :code:`frac` represents the fraction. If one of the tuples is not given, the value is zero. Each of this tuples is calucated to a decimal value using :code:`num * 10.0 + frac / 10000.0`
+ A pair of (x, y)-coordinate :ref:`SchCoordinate` based on two parameter for each tuple from a :ref:`ParameterCollection`. The parameters from this tuple are :code:`num`, which represents the number, and :code:`frac` represents the fraction. If one of the tuples is not given, the value is zero. Each of this tuples is calucated to a decimal value using :code:`num + frac / 1000.0`
 
 **Example of a Schematic Coordinate Point:**
 
@@ -123,14 +247,13 @@ Schematic Pin Flags
 ****************************
  Flags defining some properties of the schematic pin using :ref:`Byte`
 
-- bit<0>: None
-- bit<1>: Rotated
-- bit<2>: Flipped
-- bit<3>: Hide
-- bit<4>: Display Name Visible
-- bit<5>: Desginator Visible
-- bit<6>: *unknown*
-- bit<7>: Graphically Locked
+- bit<0>: Rotated
+- bit<1>: Flipped
+- bit<2>: Hide
+- bit<3>: Display Name Visible
+- bit<4>: Desginator Visible
+- bit<5>: *unknown*
+- bit<6>: Graphically Locked
 
 .. _SchPinElectricalType:
 Schematic Pin Electrical Type

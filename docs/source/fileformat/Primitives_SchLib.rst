@@ -6,7 +6,7 @@ ID 1 - Component
 ****************************
 Set up schematic component part. Other objects, such as lines, pins and labels exist, which are “owned” by the component. The component object seems to occur before any of its child objects.
 
-The parameters of this record are given a :ref:`ParameterCollection`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
 
 .. list-table:: 
    :header-rows: 1
@@ -35,7 +35,10 @@ ID 2 - Pin
 ****************************
 Component pin, including line, name and number.
 
-The parameters of this record are given a :ref:`ParameterCollection`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` as binary type :ref:`SchBinaryPin`. Some additional parameter are stored in a seperate
+
+
+ and the following parameters:
 
 .. list-table:: 
    :header-rows: 1
@@ -85,7 +88,7 @@ ID 3 - IEEE Symbol
 ****************************
 Located near some component pins (see ID 2 - Pin)
 
-The parameters of this record are given a :ref:`ParameterCollection`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
 
 .. list-table:: 
    :header-rows: 1
@@ -112,7 +115,7 @@ ID 4 - Label
 ****************************
 Text Note
 
-The parameters of this record are given a :ref:`ParameterCollection`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
 
 .. list-table:: 
    :header-rows: 1
@@ -143,7 +146,7 @@ ID 5 - Bezier
 ****************************
 Bezier curve for component symbol. Similar structure as ID 6 - Polyline.
 
-The parameters of this record are given a :ref:`ParameterCollection`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
 
 .. list-table:: 
    :header-rows: 1
@@ -174,7 +177,7 @@ ID 6 - Polyline
 ****************************
 Polyline for component symbol. Similar structure as ID 5 - Bezier.
 
-The parameters of this record are given a :ref:`ParameterCollection`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
 
 .. list-table:: 
    :header-rows: 1
@@ -214,7 +217,7 @@ ID 7 - Polygon
 ****************************
 Polygon for component symbol. Similar structure as ID 6 - Polyline.
 
-The parameters of this record are given a :ref:`ParameterCollection`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
 
 .. list-table:: 
    :header-rows: 1
@@ -242,7 +245,7 @@ ID 8 - Ellipse
 ****************************
 Ellipse for component symbol. Inherits Circle/Pie properties
 
-The parameters of this record are given a :ref:`ParameterCollection`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
 
 .. list-table:: 
    :header-rows: 1
@@ -278,7 +281,7 @@ ID 10 - Rounded Rectangle
 ****************************
 Similar to Rectangle for component symbol. One corner radius paraneter added
 
-The parameters of this record are given a :ref:`ParameterCollection`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
 
 .. list-table:: 
    :header-rows: 1
@@ -309,7 +312,7 @@ ID 11 - Elliptical Arc
 ****************************
 Elliptical Arc for component symbol. Inherits Arc properties.
 
-The parameters of this record are given a :ref:`ParameterCollection`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
 
 .. list-table:: 
    :header-rows: 1
@@ -341,7 +344,7 @@ ID 12 - Arc
 ****************************
 Arc for component symbol.
 
-The parameters of this record are given a :ref:`ParameterCollection`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
 
 .. list-table:: 
    :header-rows: 1
@@ -369,7 +372,7 @@ ID 13 - Line
 ****************************
 Line for component symbol
 
-The parameters of this record are given a :ref:`ParameterCollection`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
 
 .. list-table:: 
    :header-rows: 1
@@ -392,7 +395,7 @@ ID 14 - Rectangle
 ****************************
 Rectangle for component symbol.
 
-The parameters of this record are given a :ref:`ParameterCollection`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
 
 .. list-table:: 
    :header-rows: 1

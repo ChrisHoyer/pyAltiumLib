@@ -52,7 +52,7 @@ The format follows a structured hierarchy, with several storage containers and d
 This list is incomplete and is limited to the essentials for reading and displaying footprints.
 
 Container Library
-************
+******************
 
 Contains common elements used in the library as well as a table of contents (TOC)
 

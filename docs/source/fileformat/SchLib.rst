@@ -9,6 +9,10 @@ The `.schlib` file format stores schematic symbols. It is based on OLE (Object L
    ├── FileHeader
    ├── Storage
    ├── <symbol>/
+   │   ├── PinFrac
+   │   ├── PinSymbolLineWidth
+   │   ├── PinWideText
+   │   ├── PinTextData
    │   └── Data
    └── ...
 
@@ -27,3 +31,16 @@ A container for each individual symbol. The naming of this container has some li
    #. List of Records/Primitives
 
       #. Records/Primitive as :ref:`SchPrimitives`
+
+
+*Work in Progess*:
+
+Optional structures: only available if symbol has specific element of structure.
+
+- Structure of :code:`<symbol>/PinFrac`:
+
+- Structure of :code:`<symbol>/PinSymbolLineWidth`:
+
+- Structure of :code:`<symbol>/PinWideText`:
+
+- Structure of :code:`<symbol>/PinTextData`:
