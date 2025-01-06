@@ -1,6 +1,8 @@
 """
 Schematic Data Types for Records
 """
+from pyaltiumlib.datatypes import SchCoord, SchCoordPoint
+
 
 class _SchCommonParam:
     
@@ -17,14 +19,14 @@ class _SchCommonParam:
         self.unique_id = self.rawdata.get('uniqueid', '')
 
 
-        self.location = _SchCoordPoint(_SchCoord("location.x", self.rawdata),
-                                       _SchCoord("location.y", self.rawdata))
+        self.location = SchCoordPoint(SchCoord.parse_dpx("location.x", self.rawdata),
+                                       SchCoord.parse_dpx("location.y", self.rawdata, scale=-1.0))
         
         
         self.color = _SchColor(self.rawdata.get('color', 0))
         self.areacolor = _SchColor(self.rawdata.get('areacolor', 0))
-
-
+        
+        
 # =============================================================================
 #     Colors
 # =============================================================================   
@@ -48,137 +50,3 @@ class _SchColor:
         
     def to_hex(self):
         return f"#{self.red:02X}{self.green:02X}{self.blue:02X}"
-
-
-# =============================================================================
-#     Coordinates
-# =============================================================================   
- 
-
-class _SchCoord:
-    
-    def __init__(self, key, data):
-        
-        num = int(data.get(key, 0))
-        frac = int(data.get(key + "_frac", 0))
-        
-        self.value =  num + frac / 1000.0;
-        
-    def __repr__(self):
-        return f"{self.value}"       
-
-
-class _SchCoordPoint:
-    
-    def __init__(self, x, y):
-        if not isinstance(x, _SchCoord) or not isinstance(y, _SchCoord):
-            raise TypeError("x and y must be instances of Coordinate")
-            
-        self.x = x
-        self.y = y
-
-    def __repr__(self):
-        return f"({self.x};{self.y})"    
-    
-# =============================================================================
-#     Mapping Datatypes
-# =============================================================================   
-
-class _SchMappingBase:
-    
-    def __init__(self, value: int):
-        if int(value) not in self._map:
-            raise ValueError(f"Invalid value: {value}")
-        self.value = int(value)
-        self.name = self._map[int(value)]
-
-    def __repr__(self):
-        return f"{self.name}"
-
-    def to_int(self):
-        return self.value
-
-
-class _SchLineWidth(_SchMappingBase):
-    _map = {
-        0: "Smallest",
-        1: "Small",
-        2: "Medium",
-        3: "Large"
-    }
-
-class _SchLineStyle(_SchMappingBase):
-    _map = {
-        0: "Solid",
-        1: "Dashed",
-        2: "Dotted"
-    }
-
-class _SchLineShape(_SchMappingBase):
-    _map = {
-        0: "None",
-        1: "Arrow",
-        2: "SolidArrow",
-        3: "Tail",
-        4: "SolidTail",
-        5: "Circle",
-        6: "Square"
-    }
-    
-class _SchPinSymbol(_SchMappingBase):
-    _map = {
-        0: "NoneType",
-        1: "Dot",
-        2: "RightLeftSignalFlow",
-        3: "Clock",
-        4: "ActiveLowInput",
-        5: "AnalogSignalIn",
-        6: "NotLogicConnection",
-        8: "PostponedOutput",
-        9: "OpenCollector",
-        10: "HiZ",
-        11: "HighCurrent",
-        12: "Pulse",
-        13: "Schmitt",
-        17: "ActiveLowOutput",
-        22: "OpenCollectorPullUp",
-        23: "OpenEmitter",
-        24: "OpenEmitterPullUp",
-        25: "DigitalSignalIn",
-        30: "ShiftLeft",
-        32: "OpenOutput",
-        33: "LeftRightSignalFlow",
-        34: "BidirectionalSignalFlow"
-    }
-
-class _SchPinElectricalType(_SchMappingBase):
-    _map = {
-        0: "Input",
-        1: "InputOutput",
-        2: "Output",
-        3: "OpenCollector",
-        4: "Passive",
-        5: "HiZ",
-        6: "OpenEmitter",
-        7: "Power"
-    }
-    
-class _SchTextOrientation(_SchMappingBase):
-    _map = {
-        0: "None",
-        1: "Rotated",
-        2: "Flipped",
-    }
-
-class _SchTextJustification(_SchMappingBase):
-    _map = {
-        0: "BottomLeft",
-        1: "BottomCenter",
-        2: "BottomRight",
-        3: "MiddleLeft",
-        4: "MiddleCenter",
-        5: "MiddleRight",
-        6: "TopLeft",
-        7: "TopCenter",
-        8: "TopRight"
-    }

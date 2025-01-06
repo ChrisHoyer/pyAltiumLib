@@ -4,10 +4,8 @@ Schematic Pin Record
 
 """
 
-
-from pyaltiumlib.schlib.records.base import (
-    _SchCommonParam, _SchTextOrientation
-    )
+from pyaltiumlib.schlib.records.base import _SchCommonParam
+from pyaltiumlib.datatypes import SchematicTextOrientation
 
 
 class SchComponent(_SchCommonParam):
@@ -18,8 +16,7 @@ class SchComponent(_SchCommonParam):
         
         if not( self.record == 1 ):
             raise TypeError("Incorrect assigned schematic record")
-            
-        
+                        
         self.libreference = self.rawdata.get("libreference") or self.rawdata.get("designitemid", "")
         self.component_description = self.rawdata.get("componentdescription", "")
 
@@ -43,7 +40,7 @@ class SchComponent(_SchCommonParam):
         self.component_kind = int(self.rawdata.get("componentkind", 0))
         
         self.alias_list = self.rawdata.get("aliaslist", "")
-        self.orientation = _SchTextOrientation( self.rawdata.get("orientation", 0))
+        self.orientation = SchematicTextOrientation( self.rawdata.get("orientation", 0))
             
         
     def __repr__(self):

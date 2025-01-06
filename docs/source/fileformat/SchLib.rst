@@ -13,6 +13,7 @@ The `.schlib` file format stores schematic symbols. It is based on OLE (Object L
    │   ├── PinSymbolLineWidth
    │   ├── PinWideText
    │   ├── PinTextData
+   │   ├── PinFunctionData
    │   └── Data
    └── ...
 
@@ -44,3 +45,5 @@ Optional structures: only available if symbol has specific element of structure.
 - Structure of :code:`<symbol>/PinWideText`:
 
 - Structure of :code:`<symbol>/PinTextData`:
+
+- Structure of :code:`<symbol>/PinFunctionData`:

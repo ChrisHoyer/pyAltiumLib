@@ -4,11 +4,8 @@ Schematic Pin Record
 
 """
 
-
-from pyaltiumlib.schlib.records.base import (
-    _SchCommonParam, _SchTextOrientation, _SchTextJustification
-    )
-
+from pyaltiumlib.schlib.records.base import _SchCommonParam
+from pyaltiumlib.datatypes import SchematicTextOrientation, SchematicTextJustification
 
 class SchLabel(_SchCommonParam):
     
@@ -20,8 +17,8 @@ class SchLabel(_SchCommonParam):
             raise TypeError("Incorrect assigned schematic record")
             
 
-        self.orientation = _SchTextOrientation( self.rawdata.get("orientation", 0))
-        self.justification = _SchTextJustification( self.rawdata.get("justification", 0))
+        self.orientation = SchematicTextOrientation( self.rawdata.get("orientation", 0))
+        self.justification = SchematicTextJustification( self.rawdata.get("justification", 0))
         
         self.font_id = int(self.rawdata.get("fontid", 0))
         self.text = self.rawdata.get("text", "")

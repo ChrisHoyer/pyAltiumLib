@@ -13,3 +13,4 @@ build/
 build/*
 
 
+/tests/local/

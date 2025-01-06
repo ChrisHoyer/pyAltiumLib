@@ -1,1 +1,1 @@
-from .pcblib import PcbLib
+from .base import PcbLib

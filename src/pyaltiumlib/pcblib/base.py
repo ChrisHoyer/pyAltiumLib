@@ -4,9 +4,9 @@
 
 """
 
-from pyaltiumlib.base import AltiumLib
+from pyaltiumlib.base import GenericLib
 
-class PcbLib(AltiumLib):
+class PcbLib(GenericLib):
     
     def __init__(self, filepath):
         

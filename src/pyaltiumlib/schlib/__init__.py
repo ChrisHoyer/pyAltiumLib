@@ -1,1 +1,1 @@
-from .schlib import SchLib
+from .lib import SchLib
