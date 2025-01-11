@@ -212,7 +212,7 @@ Schematic Coordinate Point
 .. _SchLineWidth:
 Schematic Line Width
 ****************************
- Defining the line width of schematic elements
+ Defining the line width of schematic elements.
 
 - 0: Smallest
 - 1: Small
@@ -222,19 +222,19 @@ Schematic Line Width
 .. _SchLineStyle:
 Schematic Line Style
 ****************************
- Defining the line style of schematic elements
+ Defining the line style of schematic elements. This parameter is given by a :ref:`ParameterCollection` using the key :code:`linestyle` or :code:`linestyleext`.
 
-- 0: Solid
+- 0: Solid (default)
 - 1: Dashed
 - 2: Dotted
-- 3: Large
+- 3: Dash Dotted
 
 .. _SchLineShape:
 Schematic Line Shape
 ****************************
- Defining the line shape of schematic elements
+ Defining the line shape of schematic elements. This parameter is given by a :ref:`ParameterCollection` using the key :code:`endlineshape` or :code:`startlineshape`.
 
-- 0: None
+- 0: None (default)
 - 1: Arrow
 - 2: Solid Arrow
 - 3: Tail
@@ -300,11 +300,12 @@ Schematic Pin Symbol
 .. _SchTextOrientation:
 Schematic Text Orientation
 ****************************
- Defining the orientation of a schematic text
+ Defining the orientation of a schematic text. This parameter is given by a :ref:`ParameterCollection` using the key :code:`Orientation`.
 
 - 0: None
-- 1: Rotated
-- 2: Flipped
+- 1: Rotated 90 degrees
+- 2: Rotated 180 degrees (Flipped)
+- 3: Rotated 270 degrees (Flipped)
 
 .. _SchTextJustification:
 Schematic Text Justification

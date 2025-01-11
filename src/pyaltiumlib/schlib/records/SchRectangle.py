@@ -1,18 +1,20 @@
-from pyaltiumlib.datatypes import SchCoord, SchCoordPoint, SchematicLineWidth
+from pyaltiumlib.datatypes import SchCoord, SchCoordPoint, SchematicLineWidth, SchematicLineStyle
 from pyaltiumlib.schlib.records.base import _SchCommonParam
 
 class SchRectangle(_SchCommonParam):
     
-    def __init__(self, data):
-        
-        super().__init__(data)
+    def __init__(self, data, parent):
+       
+        super().__init__(data, parent)
         
         if not( self.record == 14 ):
             raise TypeError("Incorrect assigned schematic record")
             
         self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0))             
-        self.transparent = bool( self.rawdata.get("transparent", "F").upper() == "T" )
-        self.issolid = bool( self.rawdata.get("issolid", "F").upper() == "T" )
+        self.transparent = self.rawdata.get_bool("transparent") 
+        self.issolid = self.rawdata.get_bool("issolid")
+        self.linestyle = SchematicLineStyle(self.rawdata.get('linestyle', 0))
+        self.linestyle_ext = SchematicLineStyle(self.rawdata.get('linestyleext', 0))
         
         self.corner =  SchCoordPoint(SchCoord.parse_dpx("corner.x", self.rawdata),
                                      SchCoord.parse_dpx("corner.y", self.rawdata, scale=-1.0))               
@@ -24,35 +26,41 @@ class SchRectangle(_SchCommonParam):
 #     Drawing related
 # =============================================================================   
          
-    def get_bounding_box(self, InvertY=False):
+    def get_bounding_box(self):
         """
-        Return bounding box
-        """            
+        Return bounding box for the object
+        """
+         
         return [self.location, self.corner]
 
     
-    def draw(self, graphic, offset, zoom):
+    def draw_svg(self, dwg, offset, zoom):
         """
-        Draw Element using ImageDraw Module of Pillow with support for zoom and offsetting.
+        Draw element using svgwrite
+        Args:
+            dwg: svg Drawing
+            offset (int): SchematicCoordinate with drawing center point
+            zoom (float): Scaling Factor for all elements
+        Returns:
+            None
         """
+        
+        start = (self.location * zoom) + offset
+        end = (self.corner * zoom) + offset
+        
+        # start is lower left corner -> needs to be upper right
+        size = start - end
+        start.y = start.y - size.y
 
-        loc_x = (self.location.x * zoom) + offset.x
-        loc_y = (self.location.y * zoom) + offset.y
-        corner_x = (self.corner.x * zoom) + offset.x
-        corner_y = (self.corner.y * zoom) + offset.y
-            
-        top_left_x = min(float(loc_x), float(corner_x))
-        top_left_y = min(float(loc_y), float(corner_y))
-        bottom_right_x = max(float(loc_x), float(corner_x))
-        bottom_right_y = max(float(loc_y), float(corner_y))
-    
-        graphic.rectangle(
-            [top_left_x, top_left_y, bottom_right_x, bottom_right_y],
-            outline=self.color.to_hex(),
-            width= int(self.linewidth),
-            fill=self.areacolor.to_hex(),
-        )
-
+        dwg.add(dwg.rect(insert = start.get_int(),
+                         size = [ abs(x) for x in size.get_int() ],
+                         fill = self.areacolor.to_hex() if self.issolid else "none",
+                         stroke = self.color.to_hex(),
+                         stroke_dasharray = self.get_linestyle(),
+                         stroke_width = int(self.linewidth),
+                         stroke_linejoin="round",
+                         stroke_linecap="round"
+                         ))
 
 
 

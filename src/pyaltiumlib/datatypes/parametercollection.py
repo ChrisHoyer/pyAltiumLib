@@ -1,7 +1,3 @@
-"""
-
-"""
-
 from ._utils import ReadBlock
 
 class ParameterCollection:
@@ -35,6 +31,17 @@ class ParameterCollection:
         """
         return  self.collection[0] if self.num_blocks == 1 else self.collection
  
+    
+    def get_record(self):
+        """
+          Returns:
+                int | None: The record id stored in the collection.
+        """
+        if self.num_blocks == 1:
+            return self.get("record", None)
+            
+        return None
+
        
     def get(self, keys, default=None):
         """
@@ -58,11 +65,15 @@ class ParameterCollection:
 
         keys = [key.lower() for key in keys]
         result = {}
+        
         for key in keys:
             values = []
+            
             for record in self.collection:
-                if key in record:
-                    values.append(record[key])
+                lower_record = {k.lower(): v for k, v in record.items()}
+                if key in lower_record:
+                    values.append(lower_record[key])
+                    
             if values:
                 result[key] = values if len(values) > 1 else values[0]
             else:
@@ -70,7 +81,35 @@ class ParameterCollection:
                 
         return result if len(keys) > 1 else result.get(keys[0], default)   
 
+
+    def get_bool(self, key):
+        """
+        Retrieves value corresponding to the given key as boolean
+        
+        Args:
+            key (str): A key to search for in the collection.
     
+        Returns:
+            bool: The corresponding boolean value.
+        """
+        
+        value = self.get( key, None)
+        
+        if isinstance(value, list):
+            raise TypeError("The `keys` argument must be a string.")
+                
+        if isinstance(value, str):
+            value = value.strip().upper()
+            if value == "T":
+                return True
+            else:
+                return False
+            
+        else:
+            return False
+            
+            
+            
     def _parse(self, data):
         """
         Parses a block containing separated parameters as data, each 0x00 terminated.
@@ -101,9 +140,9 @@ class ParameterCollection:
             for entry in block.split("|"):
                 if "=" in entry:
                     key, value = entry.split("=", 1)
-                    if key.lower() in record:
+                    if key in record:
                         raise ValueError("Invalid data. Record {key} already exists!")
-                    record[key.lower()] = value
+                    record[key] = value
     
             self.collection.append(record)
             

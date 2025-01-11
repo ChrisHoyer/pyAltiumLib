@@ -30,9 +30,9 @@ class SchematicLineWidth(_SchMappingBase):
         elif self.value == 1:
             return 4
         elif self.value == 2:
-            return 6
+            return 8
         elif self.value == 3:
-            return 10
+            return 15
         else:
             return 2
     
@@ -41,7 +41,8 @@ class SchematicLineStyle(_SchMappingBase):
     _map = {
         0: "Solid",
         1: "Dashed",
-        2: "Dotted"
+        2: "Dotted",
+        3: "Unknown"
     }
 
 class SchematicLineShape(_SchMappingBase):
@@ -54,6 +55,61 @@ class SchematicLineShape(_SchMappingBase):
         5: "Circle",
         6: "Square"
     }
+    
+    def draw_marker(self, dwg, size_shape, color, end=False):
+               
+        marker = dwg.marker(insert=(0, 0), size=(10*size_shape, 10*size_shape), orient="auto", style="overflow:visible")
+            
+        arrow_x = size_shape * 0.75
+        arrow_y = size_shape * 0.5
+        arrow_tail = size_shape * 0.75
+        circ_sqr = size_shape * 0.5
+        
+        if self.name == "Arrow":
+            arrow_path = f"M{arrow_x},{arrow_y} 0,0 {arrow_x},{-arrow_y}"
+            path = dwg.path(d=arrow_path, fill="none", stroke=color, 
+                            stroke_linejoin="round", stroke_linecap="round")
+            if end: path['transform'] = "rotate(180)"
+            marker.add(path)
+
+        if self.name == "Tail":
+            arrow_path = f"M{-arrow_x},{-arrow_y} 0,0 {-arrow_x},{arrow_y}"
+            path = dwg.path(d=arrow_path, fill="none", stroke=color, 
+                            stroke_linejoin="round", stroke_linecap="round")
+            if end: path['transform'] = "rotate(180)"
+            marker.add(path)
+            
+            second_path = dwg.path(d=arrow_path, fill="none", stroke=color,
+                                   stroke_linejoin="round", stroke_linecap="round", transform=f"translate({arrow_tail}, 0)")
+            if end: second_path['transform'] = f"translate({-arrow_tail}, 0) rotate(180)"
+            marker.add(second_path)
+
+        if self.name == "SolidTail":
+            arrow_path = f"M{-arrow_x},{-arrow_y} 0,0 {-arrow_x},{arrow_y} {-arrow_x+arrow_tail},{arrow_y} {arrow_tail},{0} {-arrow_x+arrow_tail},{-arrow_y} Z"
+            path = dwg.path(d=arrow_path, fill=color, stroke=color,
+                            stroke_linejoin="round", stroke_linecap="round")
+            if end: path['transform'] = "rotate(180)"
+            marker.add(path)
+                        
+        if self.name == "SolidArrow":
+            arrow_path = f"M{arrow_x},{arrow_y} 0,0 {arrow_x},{-arrow_y} Z"
+            path = dwg.path(d=arrow_path, fill=color, stroke=color, 
+                            stroke_linejoin="round", stroke_linecap="round")
+            if end: path['transform'] = "rotate(180)"
+            marker.add(path)
+            
+        if self.name == "Circle":
+            marker.add(dwg.circle((0, 0), r=circ_sqr, fill=color))
+ 
+        if self.name == "Square":
+            marker.add(dwg.rect((-circ_sqr, -circ_sqr), (2*circ_sqr, 2*circ_sqr), fill=color))
+            
+        # Add to definitions
+        dwg.defs.add(marker)     
+        
+        return marker   
+    
+    
     
 class SchematicPinSymbol(_SchMappingBase):
     _map = {
@@ -96,19 +152,30 @@ class SchematicPinElectricalType(_SchMappingBase):
 class SchematicTextOrientation(_SchMappingBase):
     _map = {
         0: "None",
-        1: "Rotated",
-        2: "Flipped",
+        1: "Rotated 90 degrees",
+        2: "Rotated 180 degrees",
+        3: "Rotated 270 degrees",
     }
 
 class SchematicTextJustification(_SchMappingBase):
     _map = {
-        0: "BottomLeft",
-        1: "BottomCenter",
-        2: "BottomRight",
-        3: "MiddleLeft",
-        4: "MiddleCenter",
-        5: "MiddleRight",
-        6: "TopLeft",
-        7: "TopCenter",
-        8: "TopRight"
+        0: {"name": "BottomLeft", "vertical": "text-after-edge", "horizontal": "start"},
+        1: {"name": "BottomCenter", "vertical": "text-after-edge", "horizontal": "middle"},
+        2: {"name": "BottomRight", "vertical": "text-after-edge", "horizontal": "end"},
+        3: {"name": "MiddleLeft", "vertical": "central", "horizontal": "start"},
+        4: {"name": "MiddleCenter", "vertical": "central", "horizontal": "middle"},
+        5: {"name": "MiddleRight", "vertical": "central", "horizontal": "end"},
+        6: {"name": "TopLeft", "vertical": "text-before-edge", "horizontal": "start"},
+        7: {"name": "TopCenter", "vertical": "text-before-edge", "horizontal": "middle"},
+        8: {"name": "TopRight", "vertical": "text-before-edge", "horizontal": "end"},
     }
+    
+    def get_name(self):
+        return self._map[self.value]["name"]
+
+    def get_vertical(self):
+        return self._map[self.value]["vertical"]
+    
+    def get_horizontal(self):
+        return self._map[self.value]["horizontal"]
+    

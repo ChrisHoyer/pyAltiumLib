@@ -1,19 +1,14 @@
-from PIL import ImageFont
-
 from pyaltiumlib.schlib.records.base import _SchCommonParam
-from pyaltiumlib.datatypes import (
-     SchematicLineWidth, SchematicPinSymbol, SchematicPinElectricalType
-    )
+from pyaltiumlib.datatypes import SchematicLineWidth, SchematicPinSymbol, SchematicPinElectricalType
 
 class SchPin(_SchCommonParam):
     
-    def __init__(self, data):
+    def __init__(self, data, parent):
         
-        super().__init__(data)
+        super().__init__(data, parent)
         
         if not( self.record == 2 ):
             raise TypeError("Incorrect assigned schematic record")
-        
         
         self.symbol_inneredge = SchematicPinSymbol(self.rawdata.get('symbol_inneredge', 0))
         self.symbol_outeredge = SchematicPinSymbol(self.rawdata.get('symbol_outeredge', 0))
@@ -30,8 +25,8 @@ class SchPin(_SchCommonParam):
         self.rotated = self.rawdata.get('rotated', 0)
         self.flipped = self.rawdata.get('flipped', 0)
         self.hide = self.rawdata.get('hide', 0)
-        self.show_name = self.rawdata.get('show_name', 0)
-        self.show_designator = self.rawdata.get('show_designator', 0) 
+        self.show_name = bool( self.rawdata.get('show_name', 0) )
+        self.show_designator = bool( self.rawdata.get('show_designator', 0) )
         
         self.graphically_locked = self.rawdata.get('graphically_locked', 0) 
         
@@ -47,49 +42,105 @@ class SchPin(_SchCommonParam):
          
     def get_bounding_box(self):
         """
-        Return bounding box
+        Return bounding box for the object
         """
 
         self.end = self.location.copy()
+        self.label_name = {
+            "vertical": "middle",
+            "horizontal": "end",
+            "rotation": 0,
+            "position" : self.location.copy()
+            }
+
+        self.label_designator = {
+            "vertical": "auto",
+            "horizontal": "middle",
+            "rotation": 0,
+            "position" : self.location.copy()
+            }
                 
         if self.rotated and self.flipped:
             self.end.y = self.end.y + self.pinlength
-            
+            self.label_name["horizontal"] = "start" 
+            self.label_name["rotation"] = -90 
+            self.label_name["position"].y = self.label_name["position"].y - self.spacing_label_name
+            self.label_designator["rotation"] = -90 
+            self.label_designator["position"].y = self.label_designator["position"].y + 0.5 * self.pinlength
+            self.label_designator["position"].x = self.label_designator["position"].x - self.spacing_label_designator
+           
         if self.rotated and not self.flipped:
             self.end.y = self.end.y - self.pinlength
-            
+            self.label_name["horizontal"] = "end" 
+            self.label_name["rotation"] = -90 
+            self.label_name["position"].y = self.label_name["position"].y + self.spacing_label_name
+            self.label_designator["rotation"] = -90 
+            self.label_designator["position"].y = self.label_designator["position"].y - 0.5 * self.pinlength
+            self.label_designator["position"].x = self.label_designator["position"].x - self.spacing_label_designator
+                        
         if not self.rotated and self.flipped:
             self.end.x = self.end.x - self.pinlength
+            self.label_name["horizontal"] = "start" 
+            self.label_name["position"].x = self.label_name["position"].x + self.spacing_label_name
+            self.label_designator["position"].x = self.label_designator["position"].x - 0.5 * self.pinlength
+            self.label_designator["position"].y = self.label_designator["position"].y - self.spacing_label_designator
             
         if not self.rotated and not self.flipped:
             self.end.x = self.end.x + self.pinlength
- 
-        # print("SchPin - BoundingBox")
-        # print(f"Start: {self.location}")
-        # print(f"End: {self.end}")
-         
+            self.label_name["horizontal"] = "end"
+            self.label_name["position"].x = self.label_name["position"].x - self.spacing_label_name
+            self.label_designator["position"].x = self.label_designator["position"].x + 0.5 * self.pinlength
+            self.label_designator["position"].y = self.label_designator["position"].y - self.spacing_label_designator
+          
         return [self.location, self.end]
 
     
-    def draw(self, graphic, offset, zoom):
+    def draw_svg(self, dwg, offset, zoom):
         """
-        Draw Element using ImageDraw Module of Pillow with support for zoom and offsetting.
+        Draw element using svgwrite
+        Args:
+            dwg: svg Drawing
+            offset (int): SchematicCoordinate with drawing center point
+            zoom (float): Scaling Factor for all elements
+        Returns:
+            None
         """
+        
+        start = (self.location * zoom) + offset
+        stop = (self.end * zoom) + offset
+        position_name = (self.label_name["position"] * zoom) + offset
+        position_designator = (self.label_designator["position"] * zoom) + offset
+        
+        if self.show_name:
+            dwg.add(dwg.text(self.name,
+                             font_size = self.Symbol.LibFile.Fonts[self.Symbol.LibFile.SystemFontID].size * zoom,
+                             font_family = self.Symbol.LibFile.Fonts[self.Symbol.LibFile.SystemFontID].font,
+                             insert = position_name.get_int(),
+                             fill = self.color.to_hex(),
+                             dominant_baseline = self.label_name["vertical"], 
+                             text_anchor = self.label_name["horizontal"],
+                             transform=f"rotate({self.label_name['rotation']} {int(position_name.x)} {int(position_name.y)})"
+                             ))
 
-        loc_x = float( (self.location.x * zoom) + offset.x )
-        loc_y = float( (self.location.y * zoom) + offset.y )
-        corner_x = float( (self.end.x * zoom) + offset.x )
-        corner_y = float( (self.end.y * zoom) + offset.y )
+        if self.show_designator:
+            dwg.add(dwg.text(self.designator,
+                             font_size = self.Symbol.LibFile.Fonts[self.Symbol.LibFile.SystemFontID].size * zoom,
+                             font_family = self.Symbol.LibFile.Fonts[self.Symbol.LibFile.SystemFontID].font,
+                             insert = position_designator.get_int(),
+                             fill = self.color.to_hex(),
+                             dominant_baseline = self.label_designator["vertical"], 
+                             text_anchor = self.label_designator["horizontal"],
+                             transform=f"rotate({self.label_designator['rotation']} {int(position_designator.x)} {int(position_designator.y)})"
+                             ))
+            
+        dwg.add(dwg.line(start = start.get_int(),
+                         end = stop.get_int(),
+                         stroke= self.color.to_hex(),
+                         stroke_width=4,
+                         stroke_linecap="round"
+                         ))
         
-        font = ImageFont.truetype("arial.ttf", size=12)
-        graphic.text( (corner_x, corner_y), self.name, font=font, 
-                     fill=self.color.to_hex(), align="left")
         
-        graphic.line(
-            [loc_x, loc_y, corner_x, corner_y],
-            fill=self.color.to_hex(),
-            width=4,
-        )
 
         
         

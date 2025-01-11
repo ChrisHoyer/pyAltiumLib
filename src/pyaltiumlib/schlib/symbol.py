@@ -5,9 +5,8 @@
 """
 import json
 
-from pyaltiumlib.datatypes import (
-    ParameterCollection, SchematicPin, SchCoord, SchCoordPoint 
-    )
+from pyaltiumlib.datatypes import ParameterCollection
+from pyaltiumlib.datatypes import SchematicPin, SchCoord, SchCoordPoint 
 from pyaltiumlib.schlib.records import *
 
 
@@ -15,12 +14,13 @@ class SchLibSymbol:
     
     def __init__(self, parent, name, description="", partcount = 0):
 
-        self._parent = parent
+        self.LibFile = parent
         self.Name = name
         self.Description = description
         self.PartCount = int(partcount) - 1 if partcount else 0
                     
-        self.Records = []       
+        self.Records = [] 
+        self._BoundingBoxes = []
         self._ReadSymbolData()
         
         
@@ -39,22 +39,33 @@ class SchLibSymbol:
 # =============================================================================   
  
     
-    def draw(self, graphic, size_x, size_y):
-        
-        #print()
-        #print(self.Name)
-        
+    def draw_svg(self, graphic, size_x, size_y, draw_bbox=False):
+               
         validObj = []
         for obj in self.Records:
-            if hasattr(obj, 'draw') and callable(getattr(obj, 'draw')):
+            if hasattr(obj, 'draw_svg') and callable(getattr(obj, 'draw_svg')):
                 validObj.append( obj )
+            else:
+                print(f" object: {obj} has no drawing function")
 
         # Get Bounding box
         offset, zoom = self._autoscale( validObj, size_x, size_y)
+        
+        # background color
+        graphic.add(graphic.rect(insert=(0, 0),
+                                 size=[size_x, size_y],
+                                 fill=self.LibFile.background.to_hex()))
 
+
+        if draw_bbox:
+            for obj in validObj:
+                    obj.draw_bounding_box( graphic, offset, zoom)
+            
+        # Draw Primitives
         for obj in validObj:
-            obj.draw( graphic, offset, zoom)
+            obj.draw_svg( graphic, offset, zoom)
                    
+
 
     def _autoscale(self, elements, target_width, target_height, margin=10.0):
         """
@@ -72,7 +83,11 @@ class SchLibSymbol:
         
         for element in elements:
             bbox = element.get_bounding_box()
-        
+            if bbox is None:
+                continue;
+                
+            self._BoundingBoxes.append(bbox)
+
             point1 = bbox[0]
             point2 = bbox[1]
             
@@ -99,20 +114,12 @@ class SchLibSymbol:
     
         offset_x += margin * zoom
         offset_y += margin * zoom
-        
-        # print("Autozoom")
-        # print(f"BoundingBox: {min_point}; {max_point}")
-        # print(f"BoundingBox Size: {bbox_width}; {bbox_height}")
-        # print(f"Offset: {offset_x}; {offset_y}")
-        
+                
         return SchCoordPoint(SchCoord(offset_x), SchCoord(offset_y)), zoom
 
 
 
 
-
-        
-        
 
                 
 # =============================================================================
@@ -127,51 +134,54 @@ class SchLibSymbol:
         
     def _CreateRecord(self, record):
         
-        RecordId = next((v for k, v in record.items() if k.lower() == "record"), None)
+        RecordId = record.get_record()
         if RecordId is None:
             raise ValueError("No 'recordid' found.")
                 
         if int(RecordId) == 1:
-            self.Records.append( SchComponent(record) )
+            self.Records.append( SchComponent(record, self) )
             
         elif int(RecordId) == 2:
-            self.Records.append( SchPin(record) )
+            self.Records.append( SchPin(record, self) )
 
         elif int(RecordId) == 4:
-            self.Records.append( SchLabel(record) )  
+            self.Records.append( SchLabel(record, self) )  
 
         elif int(RecordId) == 5:
-            self.Records.append( SchBezier(record) )  
+            self.Records.append( SchBezier(record, self) )  
             
         elif int(RecordId) == 6:
-            self.Records.append( SchPolyline(record) )    
+            self.Records.append( SchPolyline(record, self) )    
 
         elif int(RecordId) == 7:
-            self.Records.append( SchPolygon(record) )   
+            self.Records.append( SchPolygon(record, self) )   
 
         elif int(RecordId) == 8:
-            self.Records.append( SchEllipse(record) ) 
+            self.Records.append( SchEllipse(record, self) ) 
+
+        elif int(RecordId) == 10:
+            self.Records.append( SchRoundRectangle(record, self) )
             
         elif int(RecordId) == 11:
-            self.Records.append( SchEllipticalArc(record) )   
+            self.Records.append( SchEllipticalArc(record, self) )   
             
         elif int(RecordId) == 12:
-            self.Records.append( SchArc(record) )            
+            self.Records.append( SchArc(record, self) )            
 
         elif int(RecordId) == 13:
-            self.Records.append( SchLine(record) ) 
+            self.Records.append( SchLine(record, self) ) 
             
         elif int(RecordId) == 14:
-            self.Records.append( SchRectangle(record) )
+            self.Records.append( SchRectangle(record, self) )
 
         elif int(RecordId) == 34:
-            self.Records.append( SchDesignator(record) )
+            self.Records.append( SchDesignator(record, self) )
             
         elif int(RecordId) == 41:
-            self.Records.append( SchParameter(record) )
+            self.Records.append( SchParameter(record, self) )
 
         elif int(RecordId) == 44:
-            self.Records.append( SchImplementationList(record) )
+            self.Records.append( SchImplementationList(record, self) )
             
         else:
              print(f"Unsupported record id value: {RecordId}")
@@ -179,7 +189,7 @@ class SchLibSymbol:
 
     def _ReadSymbolData(self):
         
-        olestream = self._parent._OpenStream(self.Name,  "data")
+        olestream = self.LibFile._OpenStream(self.Name,  "data")
             
         StreamOnGoing = True
         
@@ -202,7 +212,7 @@ class SchLibSymbol:
                 raise ValueError(f"Record type: { RecordType } unknown!")                
                 
             if Record:
-                self._CreateRecord( Record() )
+                self._CreateRecord( Record )
                 
 
                 

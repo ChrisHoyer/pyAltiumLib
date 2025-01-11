@@ -1,21 +1,17 @@
 from pyaltiumlib.schlib.records.base import _SchCommonParam
-from pyaltiumlib.datatypes import ( SchCoord, SchCoordPoint, 
-                                   SchematicLineWidth, SchematicLineStyle, 
-                                   SchematicLineShape )
-
-from ._render_helpers import generate_bezier_points
+from pyaltiumlib.datatypes import SchCoord, SchCoordPoint, SchematicLineWidth, SchematicLineStyle
 
 class SchBezier(_SchCommonParam):
     
-    def __init__(self, data):
-        
-        super().__init__(data)
+    def __init__(self, data, parent):
+       
+        super().__init__(data, parent)
         
         if not( self.record == 5 ):
             raise TypeError("Incorrect assigned schematic record")
 
-        self.transparent = bool( self.rawdata.get("transparent", "F").upper() == "T" )
-        self.issolid = bool( self.rawdata.get("issolid", "F").upper() == "T" )
+        self.transparent = self.rawdata.get_bool("transparent")
+        self.issolid = self.rawdata.get_bool("issolid")
         self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0))  
             
         self.num_vertices = int( self.rawdata.get('locationcount', 0) )
@@ -29,6 +25,7 @@ class SchBezier(_SchCommonParam):
             self.vertices.append( xy )
                        
         self.linestyle = SchematicLineStyle(self.rawdata.get('linestyle', 0))
+        self.linestyle_ext = SchematicLineStyle(self.rawdata.get('linestyleext', 0))
       
         
     def __repr__(self):
@@ -36,13 +33,13 @@ class SchBezier(_SchCommonParam):
         
 # =============================================================================
 #     Drawing related
-# =============================================================================   
-         
+# ============================================================================= 
+  
     def get_bounding_box(self):
         """
-        Return bounding box for the object, including all coordinates from
-        self.location and self.vertices.
+        Return bounding box for the object
         """
+        
         min_x = float("inf")
         min_y = float("inf")
         max_x = float("-inf")
@@ -53,47 +50,65 @@ class SchBezier(_SchCommonParam):
         max_x = max(max_x, float(self.location.x))
         max_y = max(max_y, float(self.location.y))
         
-        # print( )
-        # print( self.rawdata )
-        # print( )
-        
-        # print("SchBezier - BoundingBox")
-        # print(f"Start: {self.location}")
-    
         for vertex in self.vertices:
             min_x = min(min_x, float(vertex.x))
             min_y = min(min_y, float(vertex.y))
             max_x = max(max_x, float(vertex.x))
             max_y = max(max_y, float(vertex.y))
-            
-            # print(f"Vertex: {vertex}")
-    
-        # print(f"Bounding: {min_x};{min_y} - {max_x};{max_y}")
 
         return [SchCoordPoint(SchCoord(min_x), SchCoord(min_y)),
                 SchCoordPoint(SchCoord(max_x), SchCoord(max_y))]
 
 
     
-    def draw(self, graphic, offset, zoom):
+    def draw_svg(self, dwg, offset, zoom):
         """
-        Draw Element using ImageDraw Module of Pillow with support for zoom and offsetting.
+        Draw element using svgwrite
+        Args:
+            dwg: svg Drawing
+            offset (int): SchematicCoordinate with drawing center point
+            zoom (float): Scaling Factor for all elements
+        Returns:
+            None
         """
 
-        scaled_vertices = []
+        points = []
+        #points.append( (self.location * zoom) + offset )
         for vertex in self.vertices:
-            loc_x = (vertex.x * zoom) + offset.x
-            loc_y = (vertex.y * zoom) + offset.y
-            scaled_vertices.append((loc_x, loc_y))
+            points.append( (vertex * zoom) + offset )
+            
+        points = [x.get_int() for x in points]
+        interp_points = self.bezier_interpolate(points, steps=100)
 
-        bezier_points = generate_bezier_points(scaled_vertices, num_points=100)
-    
-        graphic.line(bezier_points,
-                     fill=self.color.to_hex(),
-                     width=int(self.linewidth),
-                     joint="curve")
+            
+        dwg.add(dwg.polyline(interp_points,
+                             fill = "none",
+                             stroke_dasharray = self.get_linestyle(),
+                             stroke = self.color.to_hex(),
+                             stroke_width = int(self.linewidth),
+                             stroke_linejoin="round",
+                             stroke_linecap="round"
+                             ))
         
     
-
+    
+    def bezier_interpolate(self, control_points, steps=20):
+        interpolated_points = []
+        
+        # Bezier curve using De Casteljau's algorithm
+        for t in range(steps + 1):
+            t /= steps
+            points = control_points[:]
+            while len(points) > 1:
+                points = [
+                    (
+                        (1 - t) * p0[0] + t * p1[0],
+                        (1 - t) * p0[1] + t * p1[1],
+                    )
+                    for p0, p1 in zip(points[:-1], points[1:])
+                ]
+            interpolated_points.append(points[0])
+    
+        return interpolated_points
 
 

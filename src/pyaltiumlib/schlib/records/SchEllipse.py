@@ -1,19 +1,19 @@
 from pyaltiumlib.schlib.records.base import _SchCommonParam
-from pyaltiumlib.datatypes import SchCoord, SchematicLineWidth
-
+from pyaltiumlib.datatypes import SchCoord, SchCoordPoint, SchematicLineWidth
 
 class SchEllipse(_SchCommonParam):
     
-    def __init__(self, data):
-        
-        super().__init__(data)
+    def __init__(self, data, parent):
+       
+        super().__init__(data, parent)
         
         if not( self.record == 8 ):
             raise TypeError("Incorrect assigned schematic record")
             
         self.radius_x = SchCoord.parse_dpx("radius", self.rawdata)
         self.radius_y = SchCoord.parse_dpx("secondaryradius", self.rawdata)                   
-        self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0)) 
+        self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0))
+        self.issolid = self.rawdata.get_bool('issolid')
         
     def __repr__(self):
         return f"SchEllipse "        
@@ -21,9 +21,9 @@ class SchEllipse(_SchCommonParam):
 # =============================================================================
 #     Drawing related
 # ============================================================================= 
-    def get_bounding_box(self, InvertY=False):
+    def get_bounding_box(self):
         """
-        Return bounding box
+        Return bounding box for the object
         """
 
         start_x = self.location.x - self.radius_x
@@ -36,49 +36,32 @@ class SchEllipse(_SchCommonParam):
         min_y = min(self.location.y, start_y, end_y)
         max_y = max(self.location.y, start_y, end_y)
         
-        self.location.x = min_x
-        self.location.y = min_y
-
-        self.corner = self.location.copy()
-        self.corner.x = max_x
-        self.corner.y = max_y
-
-        # print( )
-        # print( self.rawdata )
-        # print( )
-        
-        # print("SchEllipse - BoundingBox")
-        # print(f"Start: {self.location}")
-        # print(f"Radius: {self.radius_x} - {self.radius_y}")
-        # print(f"Angle: {self.angle_start} - {self.angle_end}")
-        
-        # print(f"Bounding: {min_x};{min_y} - {max_x};{max_y}")
-            
-        return [self.location, self.corner]
+        return [SchCoordPoint(min_x, min_y), SchCoordPoint(max_x, max_y)]
 
     
-    def draw(self, graphic, offset, zoom):
+    def draw_svg(self, dwg, offset, zoom):
         """
-        Draw Element using ImageDraw Module of Pillow with support for zoom and offsetting.
+        Draw element using svgwrite
+        Args:
+            dwg: svg Drawing
+            offset (int): SchematicCoordinate with drawing center point
+            zoom (float): Scaling Factor for all elements
+        Returns:
+            None
         """
 
-        loc_x = (self.location.x * zoom) + offset.x
-        loc_y = (self.location.y * zoom) + offset.y
-        corner_x = (self.corner.x * zoom) + offset.x
-        corner_y = (self.corner.y * zoom) + offset.y
-            
-        top_left_x = min(float(loc_x), float(corner_x))
-        top_left_y = min(float(loc_y), float(corner_y))
-        bottom_right_x = max(float(loc_x), float(corner_x))
-        bottom_right_y = max(float(loc_y), float(corner_y))
-    
-        graphic.arc(
-            [top_left_x, top_left_y, bottom_right_x, bottom_right_y],
-            start = 0.0,
-            end = 360.0,
-            fill=self.color.to_hex(),
-            width= int(self.linewidth),
-        )
+        center = (self.location * zoom) + offset
+        radius_x = self.radius_x * zoom
+        radius_y = self.radius_y * zoom
+        
+        dwg.add(dwg.ellipse(center = center.get_int(),
+                            r = (int(radius_x), int(radius_y)),
+                            fill = self.areacolor.to_hex() if self.issolid else "none",
+                            stroke = self.color.to_hex(),
+                            stroke_width = int(self.linewidth),
+                            stroke_linejoin="round",
+                            stroke_linecap="round"
+                            ))
 
 
         

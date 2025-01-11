@@ -1,21 +1,20 @@
-import math
 from pyaltiumlib.schlib.records.base import _SchCommonParam
-from pyaltiumlib.datatypes import SchCoord, SchematicLineWidth
-
+from pyaltiumlib.datatypes import SchCoord, SchCoordPoint, SchematicLineWidth
+import math
 
 class SchArc(_SchCommonParam):
     
-    def __init__(self, data):
-        
-        super().__init__(data)
+    def __init__(self, data, parent):
+       
+        super().__init__(data, parent)
         
         if not( self.record == 12 ):
             raise TypeError("Incorrect assigned schematic record")
             
         self.radius = SchCoord.parse_dpx("radius", self.rawdata)
         
-        self.angle_start = float( self.rawdata.get('startangle', 0) )            
-        self.angle_end = float( self.rawdata.get('endangle', 0) )             
+        self.angle_start = float( self.rawdata.get('startangle', 0) )           
+        self.angle_end = float( self.rawdata.get('endangle', 0) )          
         self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0)) 
         
     def __repr__(self):
@@ -24,9 +23,9 @@ class SchArc(_SchCommonParam):
 # =============================================================================
 #     Drawing related
 # ============================================================================= 
-    def get_bounding_box(self, InvertY=False):
+    def get_bounding_box(self):
         """
-        Return bounding box
+        Return bounding box for the object
         """
 
         start_x = self.location.x - self.radius
@@ -39,53 +38,66 @@ class SchArc(_SchCommonParam):
         min_y = min(self.location.y, start_y, end_y)
         max_y = max(self.location.y, start_y, end_y)
         
-        self.location.x = min_x
-        self.location.y = min_y
+        return [SchCoordPoint(min_x, min_y), SchCoordPoint(max_x, max_y)]
 
-        self.corner = self.location.copy()
-        self.corner.x = max_x
-        self.corner.y = max_y
-
-        # print( )
-        # print( self.rawdata )
-        # print( )
-        
-        # print("SchArc - BoundingBox")
-        # print(f"Start: {self.location}")
-        # print(f"Radius: {self.radius}")
-        # print(f"Angle: {self.angle_start} - {self.angle_end}")
-        
-        # print(f"Bounding: {min_x};{min_y} - {max_x};{max_y}")
-            
-        return [self.location, self.corner]
 
     
-    def draw(self, graphic, offset, zoom):
+    def draw_svg(self, dwg, offset, zoom):
         """
-        Draw Element using ImageDraw Module of Pillow with support for zoom and offsetting.
+        Draw element using svgwrite
+        Args:
+            dwg: svg Drawing
+            offset (int): SchematicCoordinate with drawing center point
+            zoom (float): Scaling Factor for all elements
+        Returns:
+            None
         """
 
-        loc_x = (self.location.x * zoom) + offset.x
-        loc_y = (self.location.y * zoom) + offset.y
-        corner_x = (self.corner.x * zoom) + offset.x
-        corner_y = (self.corner.y * zoom) + offset.y
-            
-        top_left_x = min(float(loc_x), float(corner_x))
-        top_left_y = min(float(loc_y), float(corner_y))
-        bottom_right_x = max(float(loc_x), float(corner_x))
-        bottom_right_y = max(float(loc_y), float(corner_y))
-    
-        graphic.arc(
-            [top_left_x, top_left_y, bottom_right_x, bottom_right_y],
-            start = self.angle_start + 180.0,
-            end = self.angle_end  + 180.0,
-            fill=self.color.to_hex(),
-            width= int(self.linewidth),
-        )
-
-
+        center = (self.location * zoom) + offset
+        radius = self.radius * zoom
         
+        arc_path = self.get_arc_path(center.get_int(), int(radius), int(radius))
+
+        dwg.add(dwg.path(d = arc_path,
+                         fill = "none",
+                         stroke = self.color.to_hex(),
+                         stroke_width = int(self.linewidth),
+                         stroke_linejoin="round",
+                         stroke_linecap="round"
+                         ))
+
+
+
     
+    def get_arc_path(self, center, radius_x, radius_y):
+ 
+        def degrees_to_radians(degrees):
+            radians = degrees * math.pi / 180
+            return radians % (2*math.pi)       
+         
+        angle_start = degrees_to_radians(self.angle_start)
+        angle_stop = degrees_to_radians(self.angle_end)
+        
+        if angle_start == angle_stop:
+                angle_stop -= 0.001
+            
+        start_x = center[0] + radius_x * math.cos(-angle_start)
+        start_y = center[1] + radius_y * math.sin(-angle_start)
+        end_x = center[0] + radius_x * math.cos(-angle_stop)
+        end_y = center[1] + radius_y * math.sin(-angle_stop)
+        
+        # Set large_arc_flag based on the angle difference
+        large_arc_flag = 1 if (angle_stop - angle_start) % (2 * math.pi) > math.pi else 0
+        
+        # Set sweep_flag to 0 for counterclockwise
+        sweep_flag = 0
+        
+        path_data = (
+            f"M {start_x},{start_y} "
+            f"A {radius_x},{radius_y} 0 {large_arc_flag},{sweep_flag} {end_x},{end_y}"
+            )
+        return path_data        
+        
 
 
 

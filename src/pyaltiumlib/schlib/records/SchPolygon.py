@@ -1,17 +1,17 @@
 from pyaltiumlib.schlib.records.base import _SchCommonParam
-from pyaltiumlib.datatypes import ( SchCoord, SchCoordPoint, SchematicLineWidth)
+from pyaltiumlib.datatypes import SchCoord, SchCoordPoint, SchematicLineWidth
 
 class SchPolygon(_SchCommonParam):
     
-    def __init__(self, data):
-        
-        super().__init__(data)
+    def __init__(self, data, parent):
+       
+        super().__init__(data, parent)
         
         if not( self.record == 7 ):
             raise TypeError("Incorrect assigned schematic record")
 
-        self.transparent = bool( self.rawdata.get("transparent", "F").upper() == "T" )
-        self.issolid = bool( self.rawdata.get("issolid", "F").upper() == "T" )
+        self.transparent = self.rawdata.get_bool("transparent")
+        self.issolid = self.rawdata.get_bool("issolid")
         self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0))  
             
         self.num_vertices = int( self.rawdata.get('locationcount', 0) )        
@@ -34,9 +34,9 @@ class SchPolygon(_SchCommonParam):
          
     def get_bounding_box(self):
         """
-        Return bounding box for the object, including all coordinates from
-        self.location and self.vertices.
+        Return bounding box for the object
         """
+        
         min_x = float("inf")
         min_y = float("inf")
         max_x = float("-inf")
@@ -47,44 +47,40 @@ class SchPolygon(_SchCommonParam):
         max_x = max(max_x, float(self.location.x))
         max_y = max(max_y, float(self.location.y))
         
-        # print( )
-        # print( self.rawdata )
-        # print( )
-        
-        # print("SchPolygon - BoundingBox")
-        # print(f"Start: {self.location}")
-    
         for vertex in self.vertices:
             min_x = min(min_x, float(vertex.x))
             min_y = min(min_y, float(vertex.y))
             max_x = max(max_x, float(vertex.x))
             max_y = max(max_y, float(vertex.y))
-            
-            # print(f"Vertex: {vertex}")
-    
-        # print(f"Bounding: {min_x};{min_y} - {max_x};{max_y}")
 
         return [SchCoordPoint(SchCoord(min_x), SchCoord(min_y)),
                 SchCoordPoint(SchCoord(max_x), SchCoord(max_y))]
 
-
     
-    def draw(self, graphic, offset, zoom):
+    def draw_svg(self, dwg, offset, zoom):
         """
-        Draw Element using ImageDraw Module of Pillow with support for zoom and offsetting.
+        Draw element using svgwrite
+        Args:
+            dwg: svg Drawing
+            offset (int): SchematicCoordinate with drawing center point
+            zoom (float): Scaling Factor for all elements
+        Returns:
+            None
         """
 
-        scaled_vertices = []
+        points = []
         for vertex in self.vertices:
-            loc_x = (vertex.x * zoom) + offset.x
-            loc_y = (vertex.y * zoom) + offset.y
-            scaled_vertices.append((float(loc_x), float(loc_y)))
-    
-
-        graphic.polygon(scaled_vertices,
-                        fill=self.areacolor.to_hex(),
-                        outline=self.color.to_hex(),
-                        width=int(self.linewidth))
+            points.append( (vertex * zoom) + offset )
+        # Close Polygon
+        points.append( points[0] )
+                
+        dwg.add(dwg.polyline( [x.get_int() for x in points],
+                             fill = self.areacolor.to_hex() if self.issolid else "none",
+                             stroke = self.color.to_hex(),
+                             stroke_width = int(self.linewidth),
+                             stroke_linejoin="round",
+                             stroke_linecap="round"
+                             ))
         
 
     

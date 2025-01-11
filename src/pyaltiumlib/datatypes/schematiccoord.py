@@ -85,7 +85,10 @@ class SchCoordPoint:
         self.y = y
 
     def __repr__(self):
-        return f"({self.x};{self.y})"    
+        return f"({self.x};{self.y})" 
+    
+    def get_int(self):
+        return ( int(self.x), int(self.y))
 
     def __add__(self, other):
         if isinstance(other, SchCoordPoint):

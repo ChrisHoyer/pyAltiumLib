@@ -3,6 +3,8 @@
 """
 
 from .parametercollection import ParameterCollection
+from .parametercolor import ParameterColor
+from .parameterfont import ParameterFont
 from .schematicpin import SchematicPin
 from .schematiccoord import SchCoordPoint, SchCoord
 from .schematicmapping import (
@@ -12,8 +14,11 @@ from .schematicmapping import (
     )
 
 
+
 __all__ = [
     "ParameterCollection",
+    "ParameterColor",
+    "ParameterFont",
     "SchematicPin",
     "SchCoordPoint",
     "SchCoord",

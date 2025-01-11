@@ -18,6 +18,7 @@ from .SchLine import SchLine
 from .SchDesignator import SchDesignator
 from .SchParameter import SchParameter
 from .SchImplementationList import SchImplementationList
+from.SchRoundRectangle import SchRoundRectangle
 
 
 __all__ = [
@@ -27,6 +28,7 @@ __all__ = [
     "SchBezier",
     "SchPolyline",
     "SchRectangle",
+    "SchRoundRectangle",
     "SchPolygon",
     "SchEllipse",
     "SchEllipticalArc",
