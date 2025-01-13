@@ -1,5 +1,6 @@
 from pyaltiumlib.schlib.records.base import _SchCommonParam
-from pyaltiumlib.datatypes import SchCoord, SchCoordPoint, SchematicLineWidth, SchematicLineStyle
+from pyaltiumlib.datatypes import SchematicLineWidth, SchematicLineStyle
+from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 
 class SchBezier(_SchCommonParam):
     
@@ -19,8 +20,8 @@ class SchBezier(_SchCommonParam):
         self.vertices = []
         for i in range(self.num_vertices):
             
-            xy = SchCoordPoint(SchCoord.parse_dpx(f"x{i+1}", self.rawdata),
-                                SchCoord.parse_dpx(f"y{i+1}", self.rawdata, scale=-1.0))
+            xy = CoordinatePoint(Coordinate.parse_dpx(f"x{i+1}", self.rawdata),
+                                 Coordinate.parse_dpx(f"y{i+1}", self.rawdata, scale=-1.0))
             
             self.vertices.append( xy )
                        
@@ -56,8 +57,8 @@ class SchBezier(_SchCommonParam):
             max_x = max(max_x, float(vertex.x))
             max_y = max(max_y, float(vertex.y))
 
-        return [SchCoordPoint(SchCoord(min_x), SchCoord(min_y)),
-                SchCoordPoint(SchCoord(max_x), SchCoord(max_y))]
+        return [CoordinatePoint(Coordinate(min_x), Coordinate(min_y)),
+                CoordinatePoint(Coordinate(max_x), Coordinate(max_y))]
 
 
     
@@ -83,9 +84,9 @@ class SchBezier(_SchCommonParam):
             
         dwg.add(dwg.polyline(interp_points,
                              fill = "none",
-                             stroke_dasharray = self.get_linestyle(),
+                             stroke_dasharray = self.draw_linestyle(),
                              stroke = self.color.to_hex(),
-                             stroke_width = int(self.linewidth),
+                             stroke_width = int(self.linewidth) * zoom,
                              stroke_linejoin="round",
                              stroke_linecap="round"
                              ))

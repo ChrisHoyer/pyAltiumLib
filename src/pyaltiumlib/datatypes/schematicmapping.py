@@ -1,22 +1,6 @@
-"""
-Schematic Data Types for Records
-"""
-class _SchMappingBase:
-    
-    def __init__(self, value: int):
-        if int(value) not in self._map:
-            raise ValueError(f"Invalid value: {value}")
-        self.value = int(value)
-        self.name = self._map[int(value)]
+from .mapping import _MappingBase
 
-    def __repr__(self):
-        return f"{self.name}"
-
-    def to_int(self):
-        return self.value
-
-
-class SchematicLineWidth(_SchMappingBase):
+class SchematicLineWidth(_MappingBase):
     _map = {
         0: "Smallest",
         1: "Small",
@@ -26,26 +10,28 @@ class SchematicLineWidth(_SchMappingBase):
     
     def __int__(self):
         if self.value == 0:
-            return 2
+            return 1
         elif self.value == 1:
-            return 4
+            return 1
         elif self.value == 2:
-            return 8
+            return 3
         elif self.value == 3:
-            return 15
+            return 5
         else:
-            return 2
+            return 1
     
 
-class SchematicLineStyle(_SchMappingBase):
+class SchematicLineStyle(_MappingBase):
     _map = {
         0: "Solid",
         1: "Dashed",
         2: "Dotted",
         3: "Unknown"
     }
+    
 
-class SchematicLineShape(_SchMappingBase):
+
+class SchematicLineShape(_MappingBase):
     _map = {
         0: "None",
         1: "Arrow",
@@ -111,7 +97,7 @@ class SchematicLineShape(_SchMappingBase):
     
     
     
-class SchematicPinSymbol(_SchMappingBase):
+class SchematicPinSymbol(_MappingBase):
     _map = {
         0: "NoneType",
         1: "Dot",
@@ -137,7 +123,7 @@ class SchematicPinSymbol(_SchMappingBase):
         34: "BidirectionalSignalFlow"
     }
 
-class SchematicPinElectricalType(_SchMappingBase):
+class SchematicPinElectricalType(_MappingBase):
     _map = {
         0: "Input",
         1: "InputOutput",
@@ -149,7 +135,7 @@ class SchematicPinElectricalType(_SchMappingBase):
         7: "Power"
     }
     
-class SchematicTextOrientation(_SchMappingBase):
+class SchematicTextOrientation(_MappingBase):
     _map = {
         0: "None",
         1: "Rotated 90 degrees",
@@ -157,7 +143,7 @@ class SchematicTextOrientation(_SchMappingBase):
         3: "Rotated 270 degrees",
     }
 
-class SchematicTextJustification(_SchMappingBase):
+class SchematicTextJustification(_MappingBase):
     _map = {
         0: {"name": "BottomLeft", "vertical": "text-after-edge", "horizontal": "start"},
         1: {"name": "BottomCenter", "vertical": "text-after-edge", "horizontal": "middle"},

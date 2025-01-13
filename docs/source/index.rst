@@ -4,9 +4,8 @@
 
 PyAltiumLib is a tool designed to be able to parse Altium library files.
 
-**Quick links:** `GitHub Issues <https://github.com/ChrisHoyer/pyAltiumLib/issues>`__ -
-`Download/Install <https://pyaltiumlib.readthedocs.io/en/latest/usage/index.html#installation>`__ -
-`Documentation <https://pyaltiumlib.readthedocs.io/en/latest/>`__ -
+**Quick links:** `GitHub <https://github.com/ChrisHoyer/pyAltiumLib>`__ -
+`Documentation <https://pyaltiumlib.readthedocs.io/latest/>`__
 
 .. toctree::
    :caption: Table of Contents

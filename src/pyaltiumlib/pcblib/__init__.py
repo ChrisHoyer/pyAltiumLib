@@ -1,1 +1,1 @@
-from .base import PcbLib
+from .lib import PcbLib

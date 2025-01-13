@@ -1,5 +1,6 @@
 from pyaltiumlib.schlib.records.base import _SchCommonParam
-from pyaltiumlib.datatypes import SchCoord, SchCoordPoint, SchematicLineWidth
+from pyaltiumlib.datatypes import SchematicLineWidth
+from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 import math
 
 
@@ -12,8 +13,8 @@ class SchEllipticalArc(_SchCommonParam):
         if not( self.record == 11 ):
             raise TypeError("Incorrect assigned schematic record")
             
-        self.radius_x = SchCoord.parse_dpx("radius", self.rawdata)
-        self.radius_y = SchCoord.parse_dpx("secondaryradius", self.rawdata)        
+        self.radius_x = Coordinate.parse_dpx("radius", self.rawdata)
+        self.radius_y = Coordinate.parse_dpx("secondaryradius", self.rawdata)        
         self.angle_start = float( self.rawdata.get('startangle', 0) )            
         self.angle_end = float( self.rawdata.get('endangle', 0) )            
         self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0)) 
@@ -39,7 +40,7 @@ class SchEllipticalArc(_SchCommonParam):
         min_y = min(self.location.y, start_y, end_y)
         max_y = max(self.location.y, start_y, end_y)
         
-        return [SchCoordPoint(min_x, min_y), SchCoordPoint(max_x, max_y)]
+        return [CoordinatePoint(min_x, min_y), CoordinatePoint(max_x, max_y)]
 
     
     def draw_svg(self, dwg, offset, zoom):
@@ -62,7 +63,7 @@ class SchEllipticalArc(_SchCommonParam):
         dwg.add(dwg.path(d = arc_path,
                          fill = "none",
                          stroke = self.color.to_hex(),
-                         stroke_width = int(self.linewidth)
+                         stroke_width = int(self.linewidth) * zoom
                          ))
 
 

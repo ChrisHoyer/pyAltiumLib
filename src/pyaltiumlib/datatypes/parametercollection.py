@@ -1,5 +1,3 @@
-from ._utils import ReadBlock
-
 class ParameterCollection:
     
     def __init__(self, data = None):
@@ -19,7 +17,12 @@ class ParameterCollection:
         Alternate constructor to create a ParameterCollection from a block.
         Parses an ole stream block containing a parameter collection
         """ 
-        _, data = ReadBlock( olestream,  sizelength=sizelength)
+        length = int.from_bytes( olestream.read( sizelength ), "little" )
+        
+        data = olestream.read( length )
+        
+        if len(data) != length:
+            raise ValueError("Stream does not match the declared block length.") 
                 
         return cls( data )
 
@@ -131,8 +134,10 @@ class ParameterCollection:
         if not decoded_data.endswith("\x00"):
             raise ValueError("Data does not end with 0x00.")
             
-        # Split by line breaks to handle separate blocks
-        blocks = decoded_data[:-1].split("\n")
+        # Split by line breaks or "RECORD" to handle separate blocks
+        decoded_data = decoded_data[:-1].replace("|RECORD", "\n|RECORD")
+        blocks = [block for block in decoded_data.splitlines() if block]
+    
         self.num_blocks = len(blocks)
 
         for block in blocks:
@@ -141,10 +146,11 @@ class ParameterCollection:
                 if "=" in entry:
                     key, value = entry.split("=", 1)
                     if key in record:
-                        raise ValueError("Invalid data. Record {key} already exists!")
+                        raise ValueError(f"Invalid data. Record {key} already exists in parsed data!")
                     record[key] = value
-    
-            self.collection.append(record)
+                    
+            if len(record):
+                self.collection.append(record)
             
         if len(self.collection) != self.num_blocks:
             raise ValueError("Invalid data. Length of parameter collection not expected!")

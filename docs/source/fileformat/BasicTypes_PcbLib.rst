@@ -15,16 +15,16 @@ A fixed primitive header with a size of 13 :ref:`Byte` that contains layer (1 by
 - **Layer (1 bytes):** This represents the layer used for this primitive,
 
 - **Flag (2 byte):**  
-   -  bit<0>: None
-   -  bit<1>: *Unknown2*
-   -  bit<2>: Unlocked
-   -  bit<3>: *Unknown8*
-   -  bit<4>: *Unknown16*
-   -  bit<5>: TentingTop
-   -  bit<6>: TentingBottom
-   -  bit<7>: FabricationTop
-   -  bit<8>: FabricationBottom
-   -  bit<9>: KeepOut
+
+    - bit<0>: *Unknown2*
+    - bit<1>: Unlocked
+    - bit<2>: *Unknown8*
+    - bit<3>: *Unknown16*
+    - bit<4>: TentingTop
+    - bit<5>: TentingBottom
+    - bit<6>: FabricationTop
+    - bit<7>: FabricationBottom
+    - bit<8>: KeepOut
 
 - **Spacer (10 bytes):** `FF FF FF FF FF FF FF FF FF FF`  
 

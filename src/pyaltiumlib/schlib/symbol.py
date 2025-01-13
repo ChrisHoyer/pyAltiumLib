@@ -1,12 +1,8 @@
-"""
-
-
-
-"""
 import json
 
 from pyaltiumlib.datatypes import ParameterCollection
-from pyaltiumlib.datatypes import SchematicPin, SchCoord, SchCoordPoint 
+from pyaltiumlib.datatypes import SchematicPin
+from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 from pyaltiumlib.schlib.records import *
 
 
@@ -21,6 +17,7 @@ class SchLibSymbol:
                     
         self.Records = [] 
         self._BoundingBoxes = []
+        
         self._ReadSymbolData()
         
         
@@ -54,7 +51,7 @@ class SchLibSymbol:
         # background color
         graphic.add(graphic.rect(insert=(0, 0),
                                  size=[size_x, size_y],
-                                 fill=self.LibFile.background.to_hex()))
+                                 fill=self.LibFile._BackgroundColor.to_hex()))
 
 
         if draw_bbox:
@@ -78,8 +75,8 @@ class SchLibSymbol:
             tuple: (offset, zoom)
         """
 
-        min_point = SchCoordPoint(SchCoord(float("inf")), SchCoord(float("inf")))
-        max_point = SchCoordPoint(SchCoord(float("-inf")), SchCoord(float("-inf")))
+        min_point = CoordinatePoint(Coordinate(float("inf")), Coordinate(float("inf")))
+        max_point = CoordinatePoint(Coordinate(float("-inf")), Coordinate(float("-inf")))
         
         for element in elements:
             bbox = element.get_bounding_box()
@@ -115,7 +112,7 @@ class SchLibSymbol:
         offset_x += margin * zoom
         offset_y += margin * zoom
                 
-        return SchCoordPoint(SchCoord(offset_x), SchCoord(offset_y)), zoom
+        return CoordinatePoint(Coordinate(offset_x), Coordinate(offset_y)), zoom
 
 
 
@@ -192,7 +189,6 @@ class SchLibSymbol:
         olestream = self.LibFile._OpenStream(self.Name,  "data")
             
         StreamOnGoing = True
-        
         while StreamOnGoing: 
             
             RecordLength = int.from_bytes( olestream.read(2), "little" )

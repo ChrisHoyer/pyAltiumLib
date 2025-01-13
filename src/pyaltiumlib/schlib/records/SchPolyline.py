@@ -1,5 +1,6 @@
 from pyaltiumlib.schlib.records.base import _SchCommonParam
-from pyaltiumlib.datatypes import SchCoord, SchCoordPoint, SchematicLineWidth, SchematicLineStyle, SchematicLineShape
+from pyaltiumlib.datatypes import SchematicLineWidth, SchematicLineStyle, SchematicLineShape
+from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 
 class SchPolyline(_SchCommonParam):
     
@@ -19,8 +20,8 @@ class SchPolyline(_SchCommonParam):
         self.vertices = []
         for i in range(self.num_vertices):
             
-            xy = SchCoordPoint(SchCoord.parse_dpx(f"x{i+1}", self.rawdata),
-                                SchCoord.parse_dpx(f"y{i+1}", self.rawdata, scale=-1.0))
+            xy = CoordinatePoint(Coordinate.parse_dpx(f"x{i+1}", self.rawdata),
+                                Coordinate.parse_dpx(f"y{i+1}", self.rawdata, scale=-1.0))
             
             self.vertices.append( xy )
                        
@@ -58,8 +59,8 @@ class SchPolyline(_SchCommonParam):
             max_x = max(max_x, float(vertex.x))
             max_y = max(max_y, float(vertex.y))
 
-        return [SchCoordPoint(SchCoord(min_x), SchCoord(min_y)),
-                SchCoordPoint(SchCoord(max_x), SchCoord(max_y))]
+        return [CoordinatePoint(Coordinate(min_x), Coordinate(min_y)),
+                CoordinatePoint(Coordinate(max_x), Coordinate(max_y))]
 
 
     
@@ -80,17 +81,17 @@ class SchPolyline(_SchCommonParam):
 
         line = dwg.add(dwg.polyline( [x.get_int() for x in points],
                              fill = "none",
-                             stroke_dasharray = self.get_linestyle(),
+                             stroke_dasharray = self.draw_linestyle(),
                              stroke = self.color.to_hex(),
-                             stroke_width = int(self.linewidth),
+                             stroke_width = int(self.linewidth) * zoom,
                              stroke_linejoin="round",
                              stroke_linecap="round",
                              ))
 
         # Add the marker to the drawing
-        marker_start = self.lineshape_start.draw_marker( dwg, int(self.lineshape_size),
+        marker_start = self.lineshape_start.draw_marker( dwg, int(self.lineshape_size) * zoom,
                                                         self.color.to_hex() )        
-        marker_end = self.lineshape_end.draw_marker( dwg, int(self.lineshape_size),
+        marker_end = self.lineshape_end.draw_marker( dwg, int(self.lineshape_size) * zoom,
                                                     self.color.to_hex(), end=True)
         
         line.set_markers((marker_start, False, marker_end))

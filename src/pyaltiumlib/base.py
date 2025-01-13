@@ -13,7 +13,10 @@ class GenericLibFile:
 
         if not olefile.isOleFile( filepath ): 
             raise FileNotFoundError(f"{filepath} is not a supported OLE file.")
-                     
+            
+        self.LibType = type(self)
+        self.LibHeader = ""
+        
         self.FilePath = filepath        
         self._olefile = None
         self._olefile_open = False
@@ -89,13 +92,13 @@ class GenericLibFile:
             raise ValueError(f"file: { self.FilePath }. File not open!")
                     
         if not container == "":
-            
-            if not self._olefile.exists( container ):
-                raise ValueError(f"Part '{container}' does not exist in file '{self.FilePath}'!")
-                
+
             illegal_characters = '<>:"/\\|?*\x00'
             container = "".join("_" if char in illegal_characters else char for char in container)
             
+            if not self._olefile.exists( container ):
+                raise ValueError(f"Part '{container}' does not exist in file '{self.FilePath}'!")
+       
         return self._olefile.openstream( f"{container}/{stream}" if container else stream )
 
 

@@ -44,7 +44,6 @@ class SchPin(_SchCommonParam):
         """
         Return bounding box for the object
         """
-
         self.end = self.location.copy()
         self.label_name = {
             "vertical": "middle",
@@ -113,8 +112,8 @@ class SchPin(_SchCommonParam):
         
         if self.show_name:
             dwg.add(dwg.text(self.name,
-                             font_size = self.Symbol.LibFile.Fonts[self.Symbol.LibFile.SystemFontID].size * zoom,
-                             font_family = self.Symbol.LibFile.Fonts[self.Symbol.LibFile.SystemFontID].font,
+                             font_size = self.Symbol.LibFile._Fonts[self.Symbol.LibFile._SystemFontID].size * zoom,
+                             font_family = self.Symbol.LibFile._Fonts[self.Symbol.LibFile._SystemFontID].font,
                              insert = position_name.get_int(),
                              fill = self.color.to_hex(),
                              dominant_baseline = self.label_name["vertical"], 
@@ -124,8 +123,8 @@ class SchPin(_SchCommonParam):
 
         if self.show_designator:
             dwg.add(dwg.text(self.designator,
-                             font_size = self.Symbol.LibFile.Fonts[self.Symbol.LibFile.SystemFontID].size * zoom,
-                             font_family = self.Symbol.LibFile.Fonts[self.Symbol.LibFile.SystemFontID].font,
+                             font_size = self.Symbol.LibFile._Fonts[self.Symbol.LibFile._SystemFontID].size * zoom,
+                             font_family = self.Symbol.LibFile._Fonts[self.Symbol.LibFile._SystemFontID].font,
                              insert = position_designator.get_int(),
                              fill = self.color.to_hex(),
                              dominant_baseline = self.label_designator["vertical"], 
@@ -136,7 +135,7 @@ class SchPin(_SchCommonParam):
         dwg.add(dwg.line(start = start.get_int(),
                          end = stop.get_int(),
                          stroke= self.color.to_hex(),
-                         stroke_width=4,
+                         stroke_width= 1 * zoom,
                          stroke_linecap="round"
                          ))
         

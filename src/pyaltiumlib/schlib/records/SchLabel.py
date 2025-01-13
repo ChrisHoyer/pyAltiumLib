@@ -15,8 +15,8 @@ class SchLabel(_SchCommonParam):
         
         self.font_id = int(self.rawdata.get("fontid", 0))
         self.text = self.rawdata.get("text", "")
-        self.is_mirrored = self.rawdata.get("ismirrored", "F").upper() == "T"
-        self.is_hidden = self.rawdata.get("ishidden", "F").upper() == "T"
+        self.is_mirrored = self.rawdata.get_bool('ismirrored')
+        self.is_hidden = self.rawdata.get_bool('ishidden')
             
 
     def __repr__(self):
@@ -39,8 +39,8 @@ class SchLabel(_SchCommonParam):
             }
 
         # Estimate text size
-        width = len(self.text) * self.Symbol.LibFile.Fonts[self.font_id].size * 0.6
-        height = self.Symbol.LibFile.Fonts[self.font_id].size
+        width = len(self.text) * self.Symbol.LibFile._Fonts[self.font_id].size * 0.6
+        height = self.Symbol.LibFile._Fonts[self.font_id].size
 
         end = self.location.copy()
         start = self.location.copy()
@@ -79,11 +79,11 @@ class SchLabel(_SchCommonParam):
         insert = (self.location * zoom) + offset
         
         dwg.add(dwg.text(self.text,
-                         font_size = self.Symbol.LibFile.Fonts[self.font_id].size * zoom,
-                         font_family = self.Symbol.LibFile.Fonts[self.font_id].font,
-                         font_weight = self.Symbol.LibFile.Fonts[self.font_id].bold,
-                         font_style = self.Symbol.LibFile.Fonts[self.font_id].style,
-                         text_decoration = self.Symbol.LibFile.Fonts[self.font_id].text_decoration, 
+                         font_size = self.Symbol.LibFile._Fonts[self.font_id].size * zoom,
+                         font_family = self.Symbol.LibFile._Fonts[self.font_id].font,
+                         font_weight = self.Symbol.LibFile._Fonts[self.font_id].bold,
+                         font_style = self.Symbol.LibFile._Fonts[self.font_id].style,
+                         text_decoration = self.Symbol.LibFile._Fonts[self.font_id].text_decoration, 
                          insert = insert.get_int(),
                          fill = self.color.to_hex(),
                          dominant_baseline=self.alignment["vertical"],

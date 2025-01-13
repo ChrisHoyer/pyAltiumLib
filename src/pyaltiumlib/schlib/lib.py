@@ -1,6 +1,6 @@
 from pyaltiumlib.base import GenericLibFile
-from pyaltiumlib.schlib.symbol import SchLibSymbol
 from pyaltiumlib.datatypes import ParameterCollection, ParameterColor, ParameterFont
+from pyaltiumlib.schlib.symbol import SchLibSymbol
 
 
 class SchLib(GenericLibFile):
@@ -8,23 +8,34 @@ class SchLib(GenericLibFile):
     def __init__(self, filepath):
         super().__init__(filepath)
         
-        # Implement System Font
-        self.SystemFontID = 0
-        self.Fonts = []
-        self.Fonts.append( ParameterFont("Times New Roman", 10) )
+        self.LibType = "Schematic"
         
-        self._ReadFileHeader()
+        # Implement System Font
+        self._SystemFontID = 0
+        self._Fonts = []
+        self._Fonts.append( ParameterFont("Times New Roman", 10) )
+        
+        self._ReadLibrary()
 
         
-    def _ReadFileHeader(self):
+    def _ReadLibrary(self):
         
         self._OpenFile()
 
+        self._ReadFileHeader()             
+
+        self._CloseFile()
+        
+
+    def _ReadFileHeader(self):
+        
         self._FileHeader = ParameterCollection.from_block( self._OpenStream("",  "FileHeader")  )
 
+        self.LibHeader = self._FileHeader.get("header", "")
+
         # Extract Fonts  (1....FontCount)
-        self.FontCount = int( self._FileHeader.get("fontidcount"), 0)
-        for index in range(self.FontCount + 1):
+        self._FontCount = int( self._FileHeader.get("fontidcount"), 0)
+        for index in range(self._FontCount + 1):
             font = self._FileHeader.get(f'fontname{index}', None)
             size = self._FileHeader.get(f'size{index}', "")
             italic = self._FileHeader.get_bool(f'italic{index}')
@@ -33,12 +44,11 @@ class SchLib(GenericLibFile):
             strikeout = self._FileHeader.get_bool(f'strikeout{index}')
             
             if font:
-                self.Fonts.append( ParameterFont( font, size, bold, italic, underline, strikeout ))
+                self._Fonts.append( ParameterFont( font, size, bold, italic, underline, strikeout ))
         
         # Generic parameter
-
-        self.background = ParameterColor(self._FileHeader.get('areacolor', 16317695))
-                
+        self._BackgroundColor = ParameterColor(self._FileHeader.get('areacolor', 16317695))       
+                                         
         # Extract and Read Components (0....CompCount)
         self.ComponentCount = int( self._FileHeader.get("compcount"), 0) 
         for index in range(self.ComponentCount):
@@ -50,9 +60,4 @@ class SchLib(GenericLibFile):
                 self.Parts.append( SchLibSymbol( self, lib_ref, 
                                                 description = descr,
                                                 partcount = parts ) )
-  
-        self._CloseFile()
-        
-   
-
-                    
+                       

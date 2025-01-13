@@ -8,7 +8,7 @@ __version__ = "0.1.0"
 import os
 
 from pyaltiumlib.schlib.lib import SchLib
-#from pyaltiumlib.pcblib._base import PcbLib
+from pyaltiumlib.pcblib.lib import PcbLib
 
 
 @staticmethod
@@ -22,8 +22,7 @@ def read( filepath ):
         return SchLib( filepath ) 
     
     elif filepath.lower().endswith('.pcblib'):
-        print("Not Implemented")
-        #return PcbLib( filepath ) 
+        return PcbLib( filepath ) 
         
     else:
         raise ValueError(f"Invalid file type: {filepath}.")

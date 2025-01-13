@@ -1,7 +1,8 @@
 """
 Schematic Data Types for Records
 """
-from pyaltiumlib.datatypes import SchCoord, SchCoordPoint, ParameterColor
+from pyaltiumlib.datatypes import ParameterColor
+from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 
 class _SchCommonParam:
     
@@ -22,8 +23,8 @@ class _SchCommonParam:
         self.unique_id = self.rawdata.get('uniqueid', '')
 
 
-        self.location = SchCoordPoint(SchCoord.parse_dpx("location.x", self.rawdata),
-                                       SchCoord.parse_dpx("location.y", self.rawdata, scale=-1.0))
+        self.location = CoordinatePoint(Coordinate.parse_dpx("location.x", self.rawdata),
+                                       Coordinate.parse_dpx("location.y", self.rawdata, scale=-1.0))
         
         
         self.color = ParameterColor(self.rawdata.get('color', 0))
@@ -34,14 +35,14 @@ class _SchCommonParam:
         self.spacing_label_designator = 1.0
 
 
-    def get_linestyle(self):
+    def draw_linestyle(self):
             
         if not hasattr(self, 'linestyle') and not hasattr(self, 'linestyle_ext'):
             raise AttributeError("Object must have either 'linestyle' or 'linestyle_ext' attribute")
         
         # dotted
         if self.linestyle.to_int() == 1 or self.linestyle_ext.to_int() == 1:
-            return "7,10"
+            return "4,10"
         
         # dashed
         if self.linestyle.to_int() == 2 or self.linestyle_ext.to_int() == 1:
@@ -49,7 +50,7 @@ class _SchCommonParam:
         
         # dash-dotted
         if self.linestyle.to_int() == 3 or self.linestyle_ext.to_int() == 3:
-            return "1,10,7,10"   
+            return "1,10,4,10"   
          
         # solid
         else:

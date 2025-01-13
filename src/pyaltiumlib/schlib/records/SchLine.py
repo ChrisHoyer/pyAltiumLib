@@ -1,5 +1,6 @@
 from pyaltiumlib.schlib.records.base import _SchCommonParam
-from pyaltiumlib.datatypes import SchCoord, SchCoordPoint, SchematicLineWidth, SchematicLineStyle
+from pyaltiumlib.datatypes import SchematicLineWidth, SchematicLineStyle
+from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 
 class SchLine(_SchCommonParam):
     
@@ -14,8 +15,8 @@ class SchLine(_SchCommonParam):
         self.linestyle = SchematicLineStyle(self.rawdata.get('linestyle', 0))
         self.linestyle_ext = SchematicLineStyle(self.rawdata.get('linestyleext', 0))
          
-        self.corner = SchCoordPoint(SchCoord.parse_dpx("corner.x", self.rawdata),
-                                     SchCoord.parse_dpx("corner.y", self.rawdata, scale=-1.0))           
+        self.corner = CoordinatePoint(Coordinate.parse_dpx("corner.x", self.rawdata),
+                                      Coordinate.parse_dpx("corner.y", self.rawdata, scale=-1.0))           
         
     def __repr__(self):
         return f"SchLine "        
@@ -35,8 +36,8 @@ class SchLine(_SchCommonParam):
         max_x = max(float(self.corner.x), float(self.location.x))
         max_y = max(float(self.corner.y), float(self.location.y))
         
-        return [SchCoordPoint(SchCoord(min_x), SchCoord(min_y)),
-                SchCoordPoint(SchCoord(max_x), SchCoord(max_y))]
+        return [CoordinatePoint(Coordinate(min_x), Coordinate(min_y)),
+                CoordinatePoint(Coordinate(max_x), Coordinate(max_y))]
 
 
     
@@ -56,9 +57,9 @@ class SchLine(_SchCommonParam):
             
         dwg.add(dwg.line(start = start.get_int(),
                          end = end.get_int(),
-                         stroke_dasharray = self.get_linestyle(),
+                         stroke_dasharray = self.draw_linestyle(),
                          stroke = self.color.to_hex(),
-                         stroke_width = int(self.linewidth),
+                         stroke_width = int(self.linewidth) * zoom,
                          stroke_linejoin="round",
                          stroke_linecap="round"
                          ))

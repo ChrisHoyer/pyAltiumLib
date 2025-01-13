@@ -1,5 +1,6 @@
 from pyaltiumlib.schlib.records.base import _SchCommonParam
-from pyaltiumlib.datatypes import SchCoord, SchCoordPoint, SchematicLineWidth
+from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
+from pyaltiumlib.datatypes import SchematicLineWidth
 
 class SchEllipse(_SchCommonParam):
     
@@ -10,8 +11,8 @@ class SchEllipse(_SchCommonParam):
         if not( self.record == 8 ):
             raise TypeError("Incorrect assigned schematic record")
             
-        self.radius_x = SchCoord.parse_dpx("radius", self.rawdata)
-        self.radius_y = SchCoord.parse_dpx("secondaryradius", self.rawdata)                   
+        self.radius_x = Coordinate.parse_dpx("radius", self.rawdata)
+        self.radius_y = Coordinate.parse_dpx("secondaryradius", self.rawdata)                   
         self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0))
         self.issolid = self.rawdata.get_bool('issolid')
         
@@ -36,7 +37,7 @@ class SchEllipse(_SchCommonParam):
         min_y = min(self.location.y, start_y, end_y)
         max_y = max(self.location.y, start_y, end_y)
         
-        return [SchCoordPoint(min_x, min_y), SchCoordPoint(max_x, max_y)]
+        return [CoordinatePoint(min_x, min_y), CoordinatePoint(max_x, max_y)]
 
     
     def draw_svg(self, dwg, offset, zoom):
@@ -58,7 +59,7 @@ class SchEllipse(_SchCommonParam):
                             r = (int(radius_x), int(radius_y)),
                             fill = self.areacolor.to_hex() if self.issolid else "none",
                             stroke = self.color.to_hex(),
-                            stroke_width = int(self.linewidth),
+                            stroke_width = int(self.linewidth) * zoom,
                             stroke_linejoin="round",
                             stroke_linecap="round"
                             ))
