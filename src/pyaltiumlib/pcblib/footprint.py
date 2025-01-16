@@ -1,31 +1,16 @@
-import json
-
-from pyaltiumlib.datatypes import ParameterCollection
-from pyaltiumlib.datatypes import BinaryReader
+from pyaltiumlib.libcomponent import LibComponent
+from pyaltiumlib.datatypes import ParameterCollection, BinaryReader 
 from pyaltiumlib.pcblib.records import *
 
-class PcbLibFootprint:
+class PcbLibFootprint(LibComponent):
     
     def __init__(self, parent, name, description=""):
 
-        self.LibFile = parent
-        self.Name = str(name)
-        self.Description = description
-        
-        self.Records = [] 
+        super().__init__(parent, name, description)
         
         self._ReadFootprintParameters()  
-        self._ReadFootprintData()                          
- 
-        
-    def __repr__(self):
-        footprint_data = {
-           "Name": self.Name,
-           "Description": self.Description,
-           }
-        
-        return json.dumps(footprint_data, indent=4)
-                  
+        self._ReadFootprintData()   
+                                   
 # =============================================================================
 #     Internal content reading related functions
 # =============================================================================   
@@ -46,25 +31,33 @@ class PcbLibFootprint:
 
         olestream = self.LibFile._OpenStream(self.Name,  "Data")
         
-        _, name = BinaryReader.from_stream( olestream ).read_string_block()
+        name = BinaryReader.from_stream( olestream ).read_string_block()
 
         StreamOnGoing = True
         while StreamOnGoing: 
             
             RecordID = int.from_bytes( olestream.read(1), "little" )
-            
-            if RecordID == 0x02:
+
+            if RecordID == 0:
+                StreamOnGoing = False
+                break
+                
+            elif RecordID == 2:
                 self.Records.append( PcbPad(self, olestream) )
                 
-            
-      
-        return None
-        
- 
-# =============================================================================
-#     Drawing related
-# =============================================================================   
- 
+            elif RecordID == 4:
+                self.Records.append( PcbTrack(self, olestream) )
+                
+            elif RecordID == 5:
+                self.Records.append( PcbString(self, olestream) )
+                
+            elif RecordID == 12:
+                self.Records.append( PcbComponentBody(self, olestream) )
+
+            else:
+                print(f"RecordID: {RecordID}")
+                
+
 
                
 

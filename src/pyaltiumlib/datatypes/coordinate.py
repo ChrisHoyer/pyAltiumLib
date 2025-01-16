@@ -1,3 +1,5 @@
+import math
+
 # =============================================================================
 #     Single Coordinate
 # =============================================================================   
@@ -102,6 +104,18 @@ class CoordinatePoint:
     
     def get_int(self):
         return ( int(self.x), int(self.y))
+
+    def rotate(self, center, angle):
+        
+            theta = math.radians(angle)
+            x_rel = self.x - center.x
+            y_rel = self.y - center.y
+    
+            x_rot = x_rel * math.cos(theta) - y_rel * math.sin(theta)
+            y_rot = x_rel * math.sin(theta) + y_rel * math.cos(theta)
+    
+            return CoordinatePoint(x_rot + center.x, y_rot + center.y)
+
     
     def copy(self):
         return CoordinatePoint(self.x, self.y)

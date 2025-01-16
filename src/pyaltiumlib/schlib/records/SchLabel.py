@@ -1,7 +1,7 @@
-from pyaltiumlib.schlib.records.base import _SchCommonParam
+from pyaltiumlib.schlib.records.base import _GenericSchRecord
 from pyaltiumlib.datatypes import SchematicTextOrientation, SchematicTextJustification
 
-class SchLabel(_SchCommonParam):
+class SchLabel(_GenericSchRecord):
     
     def __init__(self, data, parent):
        

@@ -5,9 +5,15 @@ This module provides classes for handling schematic library data types and recor
 """
 
 from .PCBPad import PcbPad
+from .PCBTrack import PcbTrack
+from .PCBString import PcbString
+from .PCBComponentBody import PcbComponentBody
 
 
 
 __all__ = [
-    "PcbPad"
+    "PcbPad",
+    "PcbTrack",
+    "PcbString",
+    "PcbComponentBody"
 ]

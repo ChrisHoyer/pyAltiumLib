@@ -1,5 +1,5 @@
 from pyaltiumlib.base import GenericLibFile
-from pyaltiumlib.datatypes import BinaryReader, ParameterCollection
+from pyaltiumlib.datatypes import BinaryReader, ParameterCollection, PCBLayerDefinition
 from pyaltiumlib.pcblib.footprint import PcbLibFootprint
 
 class PcbLib(GenericLibFile):
@@ -8,7 +8,8 @@ class PcbLib(GenericLibFile):
         super().__init__(filepath)
         
         self.LibType = "PCB"
-                
+        self.Layer = PCBLayerDefinition.LoadDefaultLayers()
+        
         self._ReadLibrary()
     
 

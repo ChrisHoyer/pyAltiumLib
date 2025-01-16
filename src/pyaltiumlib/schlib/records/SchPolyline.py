@@ -1,8 +1,8 @@
-from pyaltiumlib.schlib.records.base import _SchCommonParam
+from pyaltiumlib.schlib.records.base import _GenericSchRecord
 from pyaltiumlib.datatypes import SchematicLineWidth, SchematicLineStyle, SchematicLineShape
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 
-class SchPolyline(_SchCommonParam):
+class SchPolyline(_GenericSchRecord):
     
     def __init__(self, data, parent):
        

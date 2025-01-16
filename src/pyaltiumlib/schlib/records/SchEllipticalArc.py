@@ -1,10 +1,10 @@
-from pyaltiumlib.schlib.records.base import _SchCommonParam
+from pyaltiumlib.schlib.records.base import _GenericSchRecord
 from pyaltiumlib.datatypes import SchematicLineWidth
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 import math
 
 
-class SchEllipticalArc(_SchCommonParam):
+class SchEllipticalArc(_GenericSchRecord):
     
     def __init__(self, data, parent):
        

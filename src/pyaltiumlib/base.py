@@ -1,8 +1,4 @@
-"""
-
-
-
-"""
+from pyaltiumlib.datatypes import ParameterColor
 
 import json
 import olefile
@@ -25,6 +21,8 @@ class GenericLibFile:
         self._FileHeader = None
         self.ComponentCount = 0
         self.Parts = []
+        
+        self._BackgroundColor = ParameterColor.from_hex("#FFFFFF")  
 
 
     def __repr__(self):

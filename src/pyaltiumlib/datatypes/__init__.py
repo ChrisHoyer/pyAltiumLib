@@ -6,6 +6,7 @@ from .parametercollection import ParameterCollection
 from .parametercolor import ParameterColor
 from .parameterfont import ParameterFont
 from .binaryreader import BinaryReader
+from .coordinate import Coordinate, CoordinatePoint
 
 # Schematic related
 from .schematicpin import SchematicPin
@@ -15,6 +16,9 @@ from .schematicmapping import (
     SchematicTextJustification
     )
 
+# PCB related
+from .pcblayerdefinition import PCBLayerDefinition
+from .pcbmapping import ( PCBPadShape )
 
 
 __all__ = [
@@ -22,6 +26,8 @@ __all__ = [
     "ParameterColor",
     "ParameterFont",
     "BinaryReader",
+    "Coordinate",
+    "CoordinatePoint",
     "SchematicPin",
     "SchematicLineWidth",
     "SchematicLineStyle",
@@ -29,5 +35,7 @@ __all__ = [
     "SchematicPinSymbol",
     "SchematicPinElectricalType",
     "SchematicTextOrientation",
-    "SchematicTextJustification"
+    "SchematicTextJustification",
+    "PCBLayerDefinition",
+    "PCBPadShape"
 ]

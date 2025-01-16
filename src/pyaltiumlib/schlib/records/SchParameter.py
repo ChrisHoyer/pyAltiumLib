@@ -1,7 +1,7 @@
-from pyaltiumlib.schlib.records.base import _SchCommonParam
+from pyaltiumlib.schlib.records.base import _GenericSchRecord
 
 
-class SchParameter(_SchCommonParam):
+class SchParameter(_GenericSchRecord):
     
     def __init__(self, data, parent):
        

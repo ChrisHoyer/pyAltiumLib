@@ -15,8 +15,10 @@ class BinaryReader:
             raise ValueError("Stream does not match the declared block length.")        
         
         return cls( data )       
-        
 
+    def has_content(self):
+        return not len(self.data) == 0
+        
     def read(self, length):
                     
         if self.offset + length > len(self.data):
@@ -31,8 +33,8 @@ class BinaryReader:
             raise ValueError("Not enough data to read.")
         return self.read(1)
 
-    def read_int8(self):
-        return int.from_bytes(self.read_byte())
+    def read_int8(self, signed=False):
+        return int.from_bytes(self.read_byte(), signed=signed)
     
     def read_int16(self, signed=False):
         if self.offset + 2 > len(self.data):
@@ -50,6 +52,14 @@ class BinaryReader:
         self.offset += 4
         return value
 
+    def read_double(self):
+        if self.offset + 8 > len(self.data):
+            raise ValueError("Not enough data to read a Double.")
+
+        raw_bytes = self.data[self.offset:self.offset + 8]
+        self.offset += 8
+        return self._decode_double(raw_bytes)
+
     def read_string_block(self, size_string=1):
         
         length_string = int.from_bytes( self.read( size_string ), "little" )
@@ -60,7 +70,30 @@ class BinaryReader:
         
         return string_data.decode('windows-1252')
 
-    def read_bin_coord(self):
+    def read_bin_coord(self, scaley=-1.0):
         x = self.read(4)
         y = self.read(4)
-        return CoordinatePoint( Coordinate.parse_bin(x), Coordinate.parse_bin(y))      
+        return CoordinatePoint( Coordinate.parse_bin(x), Coordinate.parse_bin(y, scale=scaley)) 
+
+
+    def _decode_double(self, raw_bytes):
+        # Decode IEEE 754 double-precision format
+        value = 0
+        for i, b in enumerate(raw_bytes):
+            value |= b << (i * 8)
+
+        sign = (value >> 63) & 0x1
+        exponent = (value >> 52) & 0x7FF
+        mantissa = value & ((1 << 52) - 1)
+
+        if exponent == 0x7FF:
+            if mantissa == 0:
+                return float('inf') if sign == 0 else float('-inf')
+            return float('nan')
+
+        if exponent == 0:
+            result = (mantissa / (1 << 52)) * (2 ** (-1022))
+        else:
+            result = (1 + (mantissa / (1 << 52))) * (2 ** (exponent - 1023))
+
+        return -result if sign == 1 else result

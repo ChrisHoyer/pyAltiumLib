@@ -1,8 +1,8 @@
 from pyaltiumlib.datatypes import SchematicLineWidth, SchematicLineStyle
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
-from pyaltiumlib.schlib.records.base import _SchCommonParam
+from pyaltiumlib.schlib.records.base import _GenericSchRecord
 
-class SchRectangle(_SchCommonParam):
+class SchRectangle(_GenericSchRecord):
     
     def __init__(self, data, parent):
        

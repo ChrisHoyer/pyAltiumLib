@@ -1,8 +1,8 @@
-from pyaltiumlib.schlib.records.base import _SchCommonParam
+from pyaltiumlib.schlib.records.base import _GenericSchRecord
 from pyaltiumlib.datatypes import SchematicLineWidth, SchematicLineStyle
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 
-class SchLine(_SchCommonParam):
+class SchLine(_GenericSchRecord):
     
     def __init__(self, data, parent):
        
@@ -31,10 +31,12 @@ class SchLine(_SchCommonParam):
         Return bounding box for the object
         """
         
-        min_x = min(float(self.corner.x), float(self.location.x))
-        min_y = min(float(self.corner.y), float(self.location.y))
-        max_x = max(float(self.corner.x), float(self.location.x))
-        max_y = max(float(self.corner.y), float(self.location.y))
+        half_width = int(self.linewidth) / 2
+        
+        min_x = min(float(self.location.x), float(self.corner.x)) - half_width
+        min_y = min(float(self.location.y), float(self.corner.y)) - half_width
+        max_x = max(float(self.location.x), float(self.corner.x)) + half_width
+        max_y = max(float(self.location.y), float(self.corner.y)) + half_width
         
         return [CoordinatePoint(Coordinate(min_x), Coordinate(min_y)),
                 CoordinatePoint(Coordinate(max_x), Coordinate(max_y))]

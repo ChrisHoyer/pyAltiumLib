@@ -1,8 +1,8 @@
-from pyaltiumlib.schlib.records.base import _SchCommonParam
+from pyaltiumlib.schlib.records.base import _GenericSchRecord
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 from pyaltiumlib.datatypes import SchematicLineWidth
 
-class SchPolygon(_SchCommonParam):
+class SchPolygon(_GenericSchRecord):
     
     def __init__(self, data, parent):
        

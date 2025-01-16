@@ -2,7 +2,6 @@ from pyaltiumlib.base import GenericLibFile
 from pyaltiumlib.datatypes import ParameterCollection, ParameterColor, ParameterFont
 from pyaltiumlib.schlib.symbol import SchLibSymbol
 
-
 class SchLib(GenericLibFile):
     
     def __init__(self, filepath):

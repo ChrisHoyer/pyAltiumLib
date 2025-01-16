@@ -1,8 +1,8 @@
-from pyaltiumlib.schlib.records.base import _SchCommonParam
+from pyaltiumlib.schlib.records.base import _GenericSchRecord
 from pyaltiumlib.datatypes import SchematicTextOrientation
 
 
-class SchComponent(_SchCommonParam):
+class SchComponent(_GenericSchRecord):
     
     def __init__(self, data, parent):
        

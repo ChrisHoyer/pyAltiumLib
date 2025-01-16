@@ -4,7 +4,7 @@ Schematic Data Types for Records
 from pyaltiumlib.datatypes import ParameterColor
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 
-class _SchCommonParam:
+class _GenericSchRecord:
     
     def __init__(self, data, parent):
         
@@ -56,10 +56,7 @@ class _SchCommonParam:
         else:
             return "none"
 
-# =============================================================================
-#     Drawing related
-# =============================================================================   
-         
+
     def draw_bounding_box(self, graphic, offset, zoom):
         """
         Draws a bounding box using svgwrite.
@@ -74,10 +71,10 @@ class _SchCommonParam:
         
         if size.y == 0:
             raise ValueError(f"RecordID: {self.record} - Invalid bounding box dimensions y: {bbox}")
-
+        
         if size.x == 0:
             raise ValueError(f"RecordID: {self.record} - Invalid bounding box dimensions x: {bbox}")           
-
+        
         graphic.add(
             graphic.rect(
                 insert= start.get_int(),
@@ -86,4 +83,4 @@ class _SchCommonParam:
                 stroke="black",
                 stroke_width=1
             )
-        )        
+        )     

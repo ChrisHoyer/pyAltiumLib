@@ -1,7 +1,7 @@
-from pyaltiumlib.schlib.records.base import _SchCommonParam
+from pyaltiumlib.schlib.records.base import _GenericSchRecord
 from pyaltiumlib.datatypes import SchematicLineWidth, SchematicPinSymbol, SchematicPinElectricalType
 
-class SchPin(_SchCommonParam):
+class SchPin(_GenericSchRecord):
     
     def __init__(self, data, parent):
         
