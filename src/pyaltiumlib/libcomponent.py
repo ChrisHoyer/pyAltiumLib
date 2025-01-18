@@ -12,6 +12,7 @@ class LibComponent:
                     
         self.Records = [] 
         self._BoundingBoxes = []
+        self.drawing_layer = {}
         
     
     def __repr__(self):
@@ -45,17 +46,19 @@ class LibComponent:
                                  size=[size_x, size_y],
                                  fill=self.LibFile._BackgroundColor.to_hex()))
         
+        # Add Drawing Layer
+        if hasattr(self, 'LibFile'):
+            if hasattr(self.LibFile, 'Layer'):
+                for x in sorted(self.LibFile.Layer, key=lambda obj: obj.drawing_order, reverse=True):
+                    self.drawing_layer[x.id] = graphic.add(graphic.g(id=x.svg_layer))
+                
         if draw_bbox:
             for obj in validObj:
                     obj.draw_bounding_box( graphic, offset, zoom)
             
-        # Zorder available?
-        validObj = sorted(validObj, key=lambda obj: getattr(obj, 'zorder', float('inf')), reverse=True)
-                 
         # Draw Primitives
         for obj in validObj:
-            obj.draw_svg( graphic, offset, zoom)
-                   
+            obj.draw_svg( graphic, offset, zoom)               
 
 
     def _autoscale(self, elements, target_width, target_height, margin=10.0):

@@ -78,7 +78,7 @@ class SchBezier(_GenericSchRecord):
         for vertex in self.vertices:
             points.append( (vertex * zoom) + offset )
             
-        points = [x.get_int() for x in points]
+        points = [x.to_int_tuple() for x in points]
         interp_points = self.bezier_interpolate(points, steps=100)
 
             

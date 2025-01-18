@@ -114,7 +114,7 @@ class SchPin(_GenericSchRecord):
             dwg.add(dwg.text(self.name,
                              font_size = self.Symbol.LibFile._Fonts[self.Symbol.LibFile._SystemFontID].size * zoom,
                              font_family = self.Symbol.LibFile._Fonts[self.Symbol.LibFile._SystemFontID].font,
-                             insert = position_name.get_int(),
+                             insert = position_name.to_int_tuple(),
                              fill = self.color.to_hex(),
                              dominant_baseline = self.label_name["vertical"], 
                              text_anchor = self.label_name["horizontal"],
@@ -125,15 +125,15 @@ class SchPin(_GenericSchRecord):
             dwg.add(dwg.text(self.designator,
                              font_size = self.Symbol.LibFile._Fonts[self.Symbol.LibFile._SystemFontID].size * zoom,
                              font_family = self.Symbol.LibFile._Fonts[self.Symbol.LibFile._SystemFontID].font,
-                             insert = position_designator.get_int(),
+                             insert = position_designator.to_int_tuple(),
                              fill = self.color.to_hex(),
                              dominant_baseline = self.label_designator["vertical"], 
                              text_anchor = self.label_designator["horizontal"],
                              transform=f"rotate({self.label_designator['rotation']} {int(position_designator.x)} {int(position_designator.y)})"
                              ))
             
-        dwg.add(dwg.line(start = start.get_int(),
-                         end = stop.get_int(),
+        dwg.add(dwg.line(start = start.to_int_tuple(),
+                         end = stop.to_int_tuple(),
                          stroke= self.color.to_hex(),
                          stroke_width= 1 * zoom,
                          stroke_linecap="round"

@@ -58,7 +58,7 @@ class SchEllipticalArc(_GenericSchRecord):
         radius_x = self.radius_x * zoom
         radius_y = self.radius_y * zoom
         
-        arc_path = self.get_arc_path(center.get_int(), int(radius_x), int(radius_y))
+        arc_path = self.get_arc_path(center.to_int_tuple(), int(radius_x), int(radius_y))
 
         dwg.add(dwg.path(d = arc_path,
                          fill = "none",

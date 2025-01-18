@@ -9,6 +9,7 @@ class PcbLib(GenericLibFile):
         
         self.LibType = "PCB"
         self.Layer = PCBLayerDefinition.LoadDefaultLayers()
+        self.drawing_layer = {}
         
         self._ReadLibrary()
     

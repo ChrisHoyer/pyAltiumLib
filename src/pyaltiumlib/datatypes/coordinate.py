@@ -21,7 +21,7 @@ class Coordinate:
     def parse_bin(cls, x_bytes, scale=1.0):
         x = int.from_bytes(x_bytes, byteorder="little", signed=True)
         
-        return cls( scale * x / 1000.0 )
+        return cls( scale * x / 10000.0 )
        
     def __repr__(self):
         return f"{self.value}"       
@@ -33,7 +33,20 @@ class Coordinate:
         return int(self.value)
 
 # ================== Math Functions =========================================
+    
+    def __abs__(self):
+        return abs( int(self.value) )
 
+    def __truediv__(self, other):
+        if isinstance(other, (int, float)):
+            if other == 0:
+                raise ZeroDivisionError("Division by zero is not allowed.")
+            return Coordinate(self.value / other)
+        elif isinstance(other, Coordinate):
+            if other.value == 0:
+                raise ZeroDivisionError("Division by zero is not allowed.")
+            return Coordinate(self.value / other.value)
+        return NotImplemented
     
     def __mul__(self, other):
         if isinstance(other, (int, float)):
@@ -56,6 +69,9 @@ class Coordinate:
             return Coordinate(self.value - other.value)
         return NotImplemented
 
+    def __rtruediv__(self, other):
+        return self.__div__(other)
+    
     def __rmul__(self, other):
         return self.__mul__(other)
     
@@ -102,9 +118,18 @@ class CoordinatePoint:
     def __repr__(self):
         return f"({self.x};{self.y})" 
     
-    def get_int(self):
-        return ( int(self.x), int(self.y))
+    def to_int(self):
+        return CoordinatePoint( int(self.x), int(self.y))
 
+    def to_int_tuple(self):
+        return ( int(self.x), int(self.y))
+    
+    def expand(self, size):
+        if isinstance(size, (int, float)):
+            return CoordinatePoint(self.x + size, self.y + size)
+        if isinstance(size, (int, Coordinate)):
+            return CoordinatePoint(self.x + size.value, self.y - size.value)
+        
     def rotate(self, center, angle):
         
             theta = math.radians(angle)
@@ -122,6 +147,10 @@ class CoordinatePoint:
 
 # ================== Math Functions =========================================
 
+    def __abs__(self):
+        return CoordinatePoint( abs(self.x), abs(self.y))
+    
+    
     def __add__(self, other):
         if isinstance(other, CoordinatePoint):
             return CoordinatePoint(self.x + other.x, self.y + other.y)
@@ -132,6 +161,17 @@ class CoordinatePoint:
             return CoordinatePoint(self.x - other.x, self.y - other.y)
         return NotImplemented
 
+    def __truediv__(self, other):
+        if isinstance(other, (int, float)):
+            if other == 0:
+                raise ZeroDivisionError("Division by zero is not allowed.")
+            return CoordinatePoint(self.x / other, self.y / other)
+        elif isinstance(other, Coordinate):
+            if other.value == 0:
+                raise ZeroDivisionError("Division by zero is not allowed.")
+            return  CoordinatePoint(self.x / other.x, self.y / other.y)
+        return NotImplemented
+    
     def __mul__(self, other):
         if isinstance(other, (int, float)):
             return CoordinatePoint(self.x * other, self.y * other)

@@ -84,7 +84,7 @@ class SchLabel(_GenericSchRecord):
                          font_weight = self.Symbol.LibFile._Fonts[self.font_id].bold,
                          font_style = self.Symbol.LibFile._Fonts[self.font_id].style,
                          text_decoration = self.Symbol.LibFile._Fonts[self.font_id].text_decoration, 
-                         insert = insert.get_int(),
+                         insert = insert.to_int_tuple(),
                          fill = self.color.to_hex(),
                          dominant_baseline=self.alignment["vertical"],
                          text_anchor=self.alignment["horizontal"],

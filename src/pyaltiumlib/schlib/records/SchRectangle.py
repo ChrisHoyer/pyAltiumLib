@@ -53,8 +53,8 @@ class SchRectangle(_GenericSchRecord):
         size = start - end
         start.y = start.y - size.y
 
-        dwg.add(dwg.rect(insert = start.get_int(),
-                         size = [ abs(x) for x in size.get_int() ],
+        dwg.add(dwg.rect(insert = start.to_int_tuple(),
+                         size = [ abs(x) for x in size.to_int_tuple() ],
                          fill = self.areacolor.to_hex() if self.issolid else "none",
                          stroke = self.color.to_hex(),
                          stroke_dasharray = self.draw_linestyle(),

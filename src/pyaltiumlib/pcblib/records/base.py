@@ -12,15 +12,13 @@ class _GenericPCBRecord:
             raise ValueError("Byte array length is not as expected")     
         
         self.layer = byte_array[0]
-        
-        self.zorder = self.get_layer_by_id(self.layer).drawing_order
-        
-        self.unlocked = bool( byte_array[1] & 0x01 ) 
-        self.tenting_top = bool( byte_array[1] & 0x04 ) 
-        self.tenting_bottom = bool( byte_array[1] & 0x05 ) 
-        self.fabrication_top = bool( byte_array[1] & 0x06 ) 
-        self.fabrication_bottom = bool( byte_array[1] & 0x07 ) 
-        self.keepout = bool( byte_array[2] & 0x01 )
+                
+        self.unlocked = bool( byte_array[1] & 0x04 ) 
+        self.tenting_top = bool( byte_array[1] & 0x20 ) 
+        self.tenting_bottom = bool( byte_array[1] & 0x40 ) 
+        self.fabrication_top = bool( byte_array[1] & 0x80 ) 
+        self.fabrication_bottom = bool( byte_array[2] & 0x01 ) 
+        self.keepout = bool( byte_array[2] & 0x02 )
         
         if not all(byte == 0xFF for byte in byte_array[3:13]):
             raise ValueError("Byte array spacer is not as expected")
@@ -33,7 +31,6 @@ class _GenericPCBRecord:
                 return layer
             
         return None
-
 
     def draw_bounding_box(self, graphic, offset, zoom):
         """
@@ -55,10 +52,10 @@ class _GenericPCBRecord:
         
         graphic.add(
             graphic.rect(
-                insert= start.get_int(),
-                size=[ abs(x) for x in size.get_int() ],
+                insert= start.to_int_tuple(),
+                size= abs(size).to_int_tuple(),
                 fill="none",
-                stroke="black",
+                stroke="white",
                 stroke_width=1
             )
         )   

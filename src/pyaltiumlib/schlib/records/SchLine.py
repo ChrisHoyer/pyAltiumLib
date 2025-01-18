@@ -57,8 +57,8 @@ class SchLine(_GenericSchRecord):
         start = (self.location * zoom) + offset
         end = (self.corner * zoom) + offset
             
-        dwg.add(dwg.line(start = start.get_int(),
-                         end = end.get_int(),
+        dwg.add(dwg.line(start = start.to_int_tuple(),
+                         end = end.to_int_tuple(),
                          stroke_dasharray = self.draw_linestyle(),
                          stroke = self.color.to_hex(),
                          stroke_width = int(self.linewidth) * zoom,

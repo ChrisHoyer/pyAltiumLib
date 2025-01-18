@@ -79,7 +79,7 @@ class SchPolyline(_GenericSchRecord):
         for vertex in self.vertices:
             points.append( (vertex * zoom) + offset )
 
-        line = dwg.add(dwg.polyline( [x.get_int() for x in points],
+        line = dwg.add(dwg.polyline( [x.to_int_tuple() for x in points],
                              fill = "none",
                              stroke_dasharray = self.draw_linestyle(),
                              stroke = self.color.to_hex(),

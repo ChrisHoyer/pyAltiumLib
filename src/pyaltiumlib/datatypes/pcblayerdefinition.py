@@ -6,6 +6,7 @@ class PCBLayerDefinition:
         
         self.id = id
         self.name = name
+        self.svg_layer = name.replace(' ', '_')
         self.drawing_order = drawing_order
         self.color = ParameterColor(color)
 
@@ -19,7 +20,7 @@ class PCBLayerDefinition:
         """
 
         default_layers = [
-            (0, "NoLayer", 0, 0),  
+            (0, "None", 0, 0),  
             (1, "Top Layer", 6, 255),
             (2, "Mid-Layer 1", 6, 93308),
             (3, "Mid-Layer 2", 6, 14738350),

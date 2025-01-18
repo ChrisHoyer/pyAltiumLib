@@ -18,7 +18,9 @@ from .schematicmapping import (
 
 # PCB related
 from .pcblayerdefinition import PCBLayerDefinition
-from .pcbmapping import ( PCBPadShape )
+from .pcbmapping import ( PCBPadShape, PCBHoleShape, PCBStackMode, 
+                         PCBTextJustification
+                         )
 
 
 __all__ = [
@@ -37,5 +39,8 @@ __all__ = [
     "SchematicTextOrientation",
     "SchematicTextJustification",
     "PCBLayerDefinition",
-    "PCBPadShape"
+    "PCBPadShape",
+    "PCBStackMode",
+    "PCBHoleShape",
+    "PCBTextJustification"
 ]

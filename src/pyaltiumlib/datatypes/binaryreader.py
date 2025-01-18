@@ -18,6 +18,9 @@ class BinaryReader:
 
     def has_content(self):
         return not len(self.data) == 0
+    
+    def length(self):
+        return len(self.data)
         
     def read(self, length):
                     
@@ -75,6 +78,28 @@ class BinaryReader:
         y = self.read(4)
         return CoordinatePoint( Coordinate.parse_bin(x), Coordinate.parse_bin(y, scale=scaley)) 
 
+    def read_unicode_text(self, length=32, encoding='utf-16-le'):
+        
+        pos = self.offset
+        data = []
+    
+        while len(data) < length:
+            if self.offset + 2 > len(self.data):
+                raise ValueError("Not enough data to read.")
+            
+            # Read 2 bytes (1 Unicode character)
+            unicode_char = self.read(2)
+            if unicode_char == b'\x00\x00':  # Null terminator
+                break
+            data.extend(unicode_char)
+        
+        # Ensure we skip the remaining bytes to read exactly `length` bytes
+        self.offset = pos + length
+        
+        return bytes(data).decode(encoding)
+    
+    
+# =================================0
 
     def _decode_double(self, raw_bytes):
         # Decode IEEE 754 double-precision format
@@ -97,3 +122,4 @@ class BinaryReader:
             result = (1 + (mantissa / (1 << 52))) * (2 ** (exponent - 1023))
 
         return -result if sign == 1 else result
+

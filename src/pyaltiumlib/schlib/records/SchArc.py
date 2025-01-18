@@ -57,7 +57,7 @@ class SchArc(_GenericSchRecord):
         center = (self.location * zoom) + offset
         radius = self.radius * zoom
         
-        arc_path = self.get_arc_path(center.get_int(), int(radius), int(radius))
+        arc_path = self.get_arc_path(center.to_int_tuple(), int(radius), int(radius))
 
         dwg.add(dwg.path(d = arc_path,
                          fill = "none",

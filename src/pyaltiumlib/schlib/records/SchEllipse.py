@@ -55,7 +55,7 @@ class SchEllipse(_GenericSchRecord):
         radius_x = self.radius_x * zoom
         radius_y = self.radius_y * zoom
         
-        dwg.add(dwg.ellipse(center = center.get_int(),
+        dwg.add(dwg.ellipse(center = center.to_int_tuple(),
                             r = (int(radius_x), int(radius_y)),
                             fill = self.areacolor.to_hex() if self.issolid else "none",
                             stroke = self.color.to_hex(),

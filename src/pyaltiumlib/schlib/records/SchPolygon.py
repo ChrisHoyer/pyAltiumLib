@@ -75,7 +75,7 @@ class SchPolygon(_GenericSchRecord):
         # Close Polygon
         points.append( points[0] )
                 
-        dwg.add(dwg.polyline( [x.get_int() for x in points],
+        dwg.add(dwg.polyline( [x.to_int_tuple() for x in points],
                              fill = self.areacolor.to_hex() if self.issolid else "none",
                              stroke = self.color.to_hex(),
                              stroke_width = int(self.linewidth) * zoom,

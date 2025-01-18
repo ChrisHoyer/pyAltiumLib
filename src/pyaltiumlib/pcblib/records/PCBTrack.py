@@ -59,13 +59,14 @@ class PcbTrack(_GenericPCBRecord):
 
         start = (self.start * zoom) + offset
         end = (self.end * zoom) + offset
-        
         layer = self.get_layer_by_id(self.layer)
             
-        dwg.add(dwg.line(start = start.get_int(),
-                         end = end.get_int(),
-                         stroke = layer.color.to_hex(),
-                         stroke_width = int(self.linewidth) * zoom,
-                         stroke_linejoin="round",
-                         stroke_linecap="round"
-                         ))
+        drawing_primitive = dwg.line(start = start.to_int_tuple(),
+                                     end = end.to_int_tuple(),
+                                     stroke = layer.color.to_hex(),
+                                     stroke_width = int(self.linewidth) * zoom,
+                                     stroke_linejoin="round",
+                                     stroke_linecap="round"
+                                     )
+        
+        self.Footprint.drawing_layer[self.layer].add( drawing_primitive )

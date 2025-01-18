@@ -22,7 +22,7 @@ class GenericLibFile:
         self.ComponentCount = 0
         self.Parts = []
         
-        self._BackgroundColor = ParameterColor.from_hex("#FFFFFF")  
+        self._BackgroundColor = ParameterColor.from_hex("#6D6A69")  
 
 
     def __repr__(self):
