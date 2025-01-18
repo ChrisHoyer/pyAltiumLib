@@ -29,7 +29,7 @@ class LibComponent:
 # =============================================================================   
  
     
-    def draw_svg(self, graphic, size_x, size_y, draw_bbox=True):
+    def draw_svg(self, graphic, size_x, size_y, draw_bbox=False):
                
         validObj = []
         for obj in self.Records:

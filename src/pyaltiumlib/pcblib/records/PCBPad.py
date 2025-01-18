@@ -157,13 +157,20 @@ class PcbPad(_GenericPCBRecord):
         Returns:
             None
         """
+
+        print()
+        print( self )
+        print()
         
         # Masks
+        # TODO: for other shapes, there seems to be something incorrect.... Sanity check for solder mask necessary?
         # TODO: What happens if expansion_manual_solder_mask is not 2 or 0?
         solder_mask = self.expansion_solder_mask  if self.expansion_manual_solder_mask == 2 else Coordinate(8) 
         
+        print(solder_mask)
+        
         # Draw Pads
-        # TODO: For now only Bottom, Top or Both are implemented
+        # TODO: For now only Bottom and/or Top are implemented
         if self.layer == 1:
             if not self.tenting_top:
                 self.draw_svg_pad_element(dwg, offset, zoom, self.size_top.expand(solder_mask), self.shape_top, 37, 1)
@@ -171,17 +178,16 @@ class PcbPad(_GenericPCBRecord):
             
         elif self.layer == 32:
             if not self.tenting_bottom:
-                self.draw_svg_pad_element(dwg, offset, zoom, self.size_top.expand(solder_mask), self.shape_top, 38, 32)
+                self.draw_svg_pad_element(dwg, offset, zoom, self.size_bottom.expand(solder_mask), self.shape_bottom, 38, 32)
             self.draw_svg_pad_element(dwg, offset, zoom, self.size_bottom, self.shape_bottom, 32)
             
         elif self.layer == 74:
-            
             if not self.tenting_top:
                 self.draw_svg_pad_element(dwg, offset, zoom, self.size_top.expand(solder_mask), self.shape_top, 37, 1)
             self.draw_svg_pad_element(dwg, offset, zoom, self.size_top, self.shape_top, 1)   
 
             if not self.tenting_bottom:
-                self.draw_svg_pad_element(dwg, offset, zoom, self.size_top.expand(solder_mask), self.shape_top, 38, 32)            
+                self.draw_svg_pad_element(dwg, offset, zoom, self.size_bottom.expand(solder_mask), self.shape_bottom, 38, 32)            
             self.draw_svg_pad_element(dwg, offset, zoom, self.size_bottom, self.shape_bottom, 32)
             
         
