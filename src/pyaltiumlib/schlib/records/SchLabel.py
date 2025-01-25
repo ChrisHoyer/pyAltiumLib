@@ -1,95 +1,106 @@
 from pyaltiumlib.schlib.records.base import _GenericSchRecord
 from pyaltiumlib.datatypes import SchematicTextOrientation, SchematicTextJustification
+from pyaltiumlib.datatypes.coordinate import CoordinatePoint
+
+import logging
+from typing import Dict, List
+
+logger = logging.getLogger(__name__)
 
 class SchLabel(_GenericSchRecord):
+    """
+    Represents a text label in an Altium schematic library.
     
+    Attributes:
+        orientation (SchematicTextOrientation): Text orientation
+        justification (SchematicTextJustification): Text alignment
+        font_id (int): Index of font in parent library
+        text (str): Display text content
+        is_mirrored (bool): Mirror state
+        is_hidden (bool): Visibility state
+        alignment (Dict): Text positioning metadata
+    """
+
     def __init__(self, data, parent):
-       
         super().__init__(data, parent)
         
-        if not( self.record == 4 ):
-            raise TypeError("Incorrect assigned schematic record")
-            
-        self.orientation = SchematicTextOrientation( self.rawdata.get("orientation", 0))
-        self.justification = SchematicTextJustification( self.rawdata.get("justification", 0))
-        
+        if self.record != 4:
+            raise ValueError(f"Invalid record type {self.record} for SchLabel (expected 4)")
+
+        self.orientation = SchematicTextOrientation(self.rawdata.get("orientation", 0))
+        self.justification = SchematicTextJustification(self.rawdata.get("justification", 0))
         self.font_id = int(self.rawdata.get("fontid", 0))
         self.text = self.rawdata.get("text", "")
         self.is_mirrored = self.rawdata.get_bool('ismirrored')
         self.is_hidden = self.rawdata.get_bool('ishidden')
-            
+        self.alignment: Dict[str, any] = {}
 
-    def __repr__(self):
-        return f"SchLabel "        
-        
-# =============================================================================
-#     Drawing related
-# =============================================================================   
+    def __repr__(self) -> str:
+        return f"SchLabel(text='{self.text}')"
 
-    def get_bounding_box(self):
-        """
-        Return bounding box for the object
-        """
+    def get_bounding_box(self) -> List[CoordinatePoint]:
+        """Calculate bounding box based on text metrics and orientation."""
+        if not hasattr(self.Symbol.LibFile, '_Fonts') or self.font_id >= len(self.Symbol.LibFile._Fonts):
+            logger.warning(f"Invalid font ID {self.font_id} for label '{self.text}'")
+            return [self.location.copy(), self.location.copy()]
 
+        font = self.Symbol.LibFile._Fonts[self.font_id]
         self.alignment = {
             "vertical": self.justification.get_vertical(),
             "horizontal": self.justification.get_horizontal(),
             "rotation": self.orientation.to_int() * -90,
-            "position" : self.location.copy()
-            }
+            "position": self.location.copy()
+        }
 
-        # Estimate text size
-        width = len(self.text) * self.Symbol.LibFile._Fonts[self.font_id].size * 0.6
-        height = self.Symbol.LibFile._Fonts[self.font_id].size
+        # Calculate text dimensions
+        char_width = font.size * 0.6
+        width = len(self.text) * char_width
+        height = font.size
 
-        end = self.location.copy()
+        # Calculate bounding box based on orientation
+        orientation = self.orientation.to_int()
         start = self.location.copy()
+        end = self.location.copy()
 
-        # Rotation
-        if self.orientation.to_int() == 0:
-            end.x = end.x + width
-            end.y = end.y - height 
-            
-        if self.orientation.to_int() == 1:
-            start.x = start.x - height
-            end.y = end.y - width  
-
-        if self.orientation.to_int() == 2:
-            start.x = start.x - width
-            start.y = start.y + height
-                
-        if self.orientation.to_int() == 3:
-            end.x = end.x - height
-            start.y = start.y + width 
+        if orientation == 0:  # 0 degrees
+            end.x += width
+            end.y -= height
+        elif orientation == 1:  # 90 degrees
+            start.x -= height
+            end.y -= width
+        elif orientation == 2:  # 180 degrees
+            start.x -= width
+            start.y += height
+        elif orientation == 3:  # 270 degrees
+            end.x -= height
+            start.y += width
 
         return [start, end]
 
+    def draw_svg(self, dwg, offset, zoom) -> None:
+        """Render label text to SVG with proper formatting and alignment."""
+        if self.is_hidden:
+            return
 
-    def draw_svg(self, dwg, offset, zoom):
-        """
-        Draw element using svgwrite
-        Args:
-            dwg: svg Drawing
-            offset (int): SchematicCoordinate with drawing center point
-            zoom (float): Scaling Factor for all elements
-        Returns:
-            None
-        """
-                
+        try:
+            font = self.Symbol.LibFile._Fonts[self.font_id]
+        except IndexError:
+            logger.error(f"Missing font ID {self.font_id} for label '{self.text}'")
+            return
+
         insert = (self.location * zoom) + offset
-        
-        dwg.add(dwg.text(self.text,
-                         font_size = self.Symbol.LibFile._Fonts[self.font_id].size * zoom,
-                         font_family = self.Symbol.LibFile._Fonts[self.font_id].font,
-                         font_weight = self.Symbol.LibFile._Fonts[self.font_id].bold,
-                         font_style = self.Symbol.LibFile._Fonts[self.font_id].style,
-                         text_decoration = self.Symbol.LibFile._Fonts[self.font_id].text_decoration, 
-                         insert = insert.to_int_tuple(),
-                         fill = self.color.to_hex(),
-                         dominant_baseline=self.alignment["vertical"],
-                         text_anchor=self.alignment["horizontal"],
-                         transform=f"rotate({self.alignment['rotation']} {int(insert.x)} {int(insert.y)})"
-                         ))
-        
+        transform=f"rotate({self.alignment['rotation']} {int(insert.x)} {int(insert.y)})"
 
-        return None
+        dwg.add(dwg.text(
+            self.text,
+            insert=insert.to_int_tuple(),
+            font_size=font.size * zoom,
+            font_family=font.font,
+            font_weight=font.bold,
+            font_style=font.style,
+            text_decoration=font.text_decoration,
+            fill=self.color.to_hex(),
+            dominant_baseline=self.alignment["vertical"],
+            text_anchor=self.alignment["horizontal"],
+            transform=transform
+        ))

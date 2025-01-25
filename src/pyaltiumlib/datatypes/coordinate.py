@@ -54,7 +54,7 @@ class Coordinate:
         elif isinstance(other, Coordinate):
             return Coordinate(self.value * other.value)
         return NotImplemented
-
+    
     def __add__(self, other):
         if isinstance(other, (int, float)):
             return Coordinate(self.value + other)
@@ -139,8 +139,15 @@ class CoordinatePoint:
             x_rot = x_rel * math.cos(theta) - y_rel * math.sin(theta)
             y_rot = x_rel * math.sin(theta) + y_rel * math.cos(theta)
     
-            return CoordinatePoint(x_rot + center.x, y_rot + center.y)
+            self.x = x_rot + center.x
+            self.y = y_rot + center.y
+            return self
 
+    def offset(self, offset_x, offset_y):
+        
+            self.x = self.x + offset_x
+            self.y = self.y + offset_y
+            return self
     
     def copy(self):
         return CoordinatePoint(self.x, self.y)

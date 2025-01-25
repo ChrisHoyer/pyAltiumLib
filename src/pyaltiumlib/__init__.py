@@ -6,14 +6,25 @@ implemented in Python.
 __version__ = "0.1.0"
 
 import os
-
+from typing import Union
 from pyaltiumlib.schlib.lib import SchLib
 from pyaltiumlib.pcblib.lib import PcbLib
 
-
 @staticmethod
-def read( filepath ):
-        
+def read(filepath: str) -> Union[SchLib, PcbLib]:
+    """
+    Read an Altium library file and return the appropriate library object.
+
+    Args:
+        filepath (str): The path to the library file.
+
+    Returns:
+        Union[SchLib, PcbLib]: The library object corresponding to the file type.
+
+    Raises:
+        FileNotFoundError: If the file does not exist.
+        ValueError: If the file type is invalid.
+    """
     if not os.path.isfile( filepath ): 
         raise FileNotFoundError(f"{filepath} does not exist.")
 

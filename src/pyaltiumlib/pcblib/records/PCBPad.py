@@ -158,17 +158,11 @@ class PcbPad(_GenericPCBRecord):
             None
         """
 
-        print()
-        print( self )
-        print()
-        
         # Masks
         # TODO: for other shapes, there seems to be something incorrect.... Sanity check for solder mask necessary?
         # TODO: What happens if expansion_manual_solder_mask is not 2 or 0?
         solder_mask = self.expansion_solder_mask  if self.expansion_manual_solder_mask == 2 else Coordinate(8) 
-        
-        print(solder_mask)
-        
+                
         # Draw Pads
         # TODO: For now only Bottom and/or Top are implemented
         if self.layer == 1:

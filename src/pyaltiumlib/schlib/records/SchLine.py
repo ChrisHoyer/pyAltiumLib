@@ -2,67 +2,64 @@ from pyaltiumlib.schlib.records.base import _GenericSchRecord
 from pyaltiumlib.datatypes import SchematicLineWidth, SchematicLineStyle
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 
+import logging
+from typing import List
+
+logger = logging.getLogger(__name__)
+
 class SchLine(_GenericSchRecord):
+    """
+    Represents a straight line in an Altium schematic library.
     
+    Attributes:
+        linewidth (SchematicLineWidth): Stroke width
+        linestyle (SchematicLineStyle): Stroke pattern
+        corner (CoordinatePoint): End point coordinates
+    """
+
     def __init__(self, data, parent):
-       
         super().__init__(data, parent)
         
-        if not( self.record == 13 ):
-            raise TypeError("Incorrect assigned schematic record")
-            
-        self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0))             
+        if self.record != 13:
+            raise ValueError(f"Invalid record type {self.record} for SchLine (expected 13)")
+
+        self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0))
         self.linestyle = SchematicLineStyle(self.rawdata.get('linestyle', 0))
         self.linestyle_ext = SchematicLineStyle(self.rawdata.get('linestyleext', 0))
-         
-        self.corner = CoordinatePoint(Coordinate.parse_dpx("corner.x", self.rawdata),
-                                      Coordinate.parse_dpx("corner.y", self.rawdata, scale=-1.0))           
         
-    def __repr__(self):
-        return f"SchLine "        
-        
+        self.corner = CoordinatePoint(
+            Coordinate.parse_dpx("corner.x", self.rawdata),
+            Coordinate.parse_dpx("corner.y", self.rawdata, scale=-1.0)
+        )
 
-# =============================================================================
-#     Drawing related
-# =============================================================================   
-         
-    def get_bounding_box(self):
-        """
-        Return bounding box for the object
-        """
-        
-        half_width = int(self.linewidth) / 2
-        
-        min_x = min(float(self.location.x), float(self.corner.x)) - half_width
-        min_y = min(float(self.location.y), float(self.corner.y)) - half_width
-        max_x = max(float(self.location.x), float(self.corner.x)) + half_width
-        max_y = max(float(self.location.y), float(self.corner.y)) + half_width
-        
-        return [CoordinatePoint(Coordinate(min_x), Coordinate(min_y)),
-                CoordinatePoint(Coordinate(max_x), Coordinate(max_y))]
+    def __repr__(self) -> str:
+        return f"SchLine({self.location} to {self.corner})"
 
+    def get_bounding_box(self) -> List[CoordinatePoint]:
+        """Calculate bounding box including line width buffer."""
+        half_width = self.linewidth.value / 2
+        return [
+            CoordinatePoint(
+                min(self.location.x, self.corner.x) - half_width,
+                min(self.location.y, self.corner.y) - half_width
+            ),
+            CoordinatePoint(
+                max(self.location.x, self.corner.x) + half_width,
+                max(self.location.y, self.corner.y) + half_width
+            )
+        ]
 
-    
-    def draw_svg(self, dwg, offset, zoom):
-        """
-        Draw element using svgwrite
-        Args:
-            dwg: svg Drawing
-            offset (int): SchematicCoordinate with drawing center point
-            zoom (float): Scaling Factor for all elements
-        Returns:
-            None
-        """
-
+    def draw_svg(self, dwg, offset, zoom) -> None:
+        """Render line to SVG with proper styling."""
         start = (self.location * zoom) + offset
         end = (self.corner * zoom) + offset
-            
-        dwg.add(dwg.line(start = start.to_int_tuple(),
-                         end = end.to_int_tuple(),
-                         stroke_dasharray = self.draw_linestyle(),
-                         stroke = self.color.to_hex(),
-                         stroke_width = int(self.linewidth) * zoom,
-                         stroke_linejoin="round",
-                         stroke_linecap="round"
-                         ))
-            
+        
+        dwg.add(dwg.line(
+            start=start.to_int_tuple(),
+            end=end.to_int_tuple(),
+            stroke=self.color.to_hex(),
+            stroke_width=int(self.linewidth) * zoom,
+            stroke_dasharray=self.draw_linestyle(),
+            stroke_linecap="round",
+            stroke_linejoin="round"
+        ))

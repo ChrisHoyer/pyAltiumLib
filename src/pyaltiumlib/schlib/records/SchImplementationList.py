@@ -1,48 +1,42 @@
 from pyaltiumlib.schlib.records.base import _GenericSchRecord
+import logging
 
+# Set up logging
+logger = logging.getLogger(__name__)
 
 class SchImplementationList(_GenericSchRecord):
-    
+    """
+    A class to represent an implementation list in an Altium Schematic Library.
+
+    Attributes:
+        None: This class currently does not have additional attributes.
+    """
+
     def __init__(self, data, parent):
-       
         super().__init__(data, parent)
         
-        if not( self.record == 44 ):
+        if self.record != 44:
             raise TypeError("Incorrect assigned schematic record")
             
-            
-            
-        
     def __repr__(self):
-        return f"SchImplementationList "        
-        
+        return f"SchImplementationList"
 
-      
-# =============================================================================
-#     Drawing related
-# =============================================================================   
-         
     def get_bounding_box(self):
         """
-        Return bounding box for the object
+        Return the bounding box for the implementation list.
+
+        Returns:
+            None: Implementation lists do not have a bounding box.
         """
-        
         return None
 
-    
     def draw_svg(self, dwg, offset, zoom):
         """
-        Draw element using svgwrite
+        Draw the implementation list using svgwrite.
+
         Args:
-            dwg: svg Drawing
-            offset (int): SchematicCoordinate with drawing center point
-            zoom (float): Scaling Factor for all elements
-        Returns:
-            None
+            dwg: The SVG drawing object.
+            offset (CoordinatePoint): The offset for drawing.
+            zoom (float): The zoom factor for scaling.
         """
-
-        return None  
-    
-
-
-
+        return None

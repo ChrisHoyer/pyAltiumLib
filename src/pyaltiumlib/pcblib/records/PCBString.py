@@ -1,6 +1,6 @@
 from pyaltiumlib.pcblib.records.base import _GenericPCBRecord
 from pyaltiumlib.datatypes import BinaryReader, Coordinate, CoordinatePoint
-from pyaltiumlib.datatypes import PCBTextJustification
+from pyaltiumlib.datatypes import PCBTextJustification, PCBTextKind
 
 class PcbString(_GenericPCBRecord):
     
@@ -29,14 +29,14 @@ class PcbString(_GenericPCBRecord):
             self.stroke_font = block.read_int16()
             self.rotation = block.read_double()
             self.mirrored = bool(block.read_byte())
-            self.stroke_width = block.read_int32()
+            self.stroke_width = Coordinate.parse_bin( block.read(4) ) 
             
             if block.length() >= 123:
                 
                 block.read_int16() # Unknown
                 block.read_byte() # Unknown
                 
-                self.text_kind = block.read_byte()
+                self.text_kind = PCBTextKind( block.read_int8() )
                 self.font_bold = block.read_byte()
                 self.font_italic = block.read_byte()
                 self.font_name = block.read_unicode_text()
@@ -77,23 +77,47 @@ class PcbString(_GenericPCBRecord):
         """
         Return bounding box for the object
         """
-        
-        print()
-        print( self )
-        print()
-        
+           
         self.alignment = {
             "vertical": self.font_inverted_rect_justification.get_vertical(),
             "horizontal": self.font_inverted_rect_justification.get_horizontal(),
-            "rotation": - self.rotation,
-            "position" : self.corner1.copy()
+            "rotation": -self.rotation,
+            "anchor": self.corner1.copy()
             }
+                
+        # bounding box
+        left_top = self.corner1.copy()
+        right_bot = self.corner1.copy()
+        left_top.y = left_top.y - self.font_inverted_rect_height
+        right_bot.x = right_bot.x + self.font_inverted_rect_width
         
-        self.corner2 = self.corner1.copy()
-        self.corner2.x = len(self.text) * self.height * 0.6
-        self.corner2.y = self.corner2.y + self.height
+        # Set anchor point
+        if self.alignment["vertical"] == "text-after-edge":
+            self.alignment["anchor"].y = self.corner1.y - self.font_inverted_rect_height
+            left_top.y = left_top.y - self.font_inverted_rect_height
+            right_bot.y = right_bot.y - self.font_inverted_rect_height
+            
+        elif self.alignment["vertical"] == "central":
+            self.alignment["anchor"].y = self.corner1.y - self.font_inverted_rect_height/2
+            
+        elif self.alignment["vertical"] == "text-before-edge":
+            self.alignment["anchor"].y = self.corner1.y
+            left_top.y = left_top.y + self.font_inverted_rect_height
+            right_bot.y = right_bot.y + self.font_inverted_rect_height
+            
+        if self.alignment["horizontal"] == "end":
+            self.alignment["anchor"].x = self.corner1.x + self.font_inverted_rect_width
+        elif self.alignment["horizontal"] == "middle":
+            self.alignment["anchor"].x = self.corner1.x + self.font_inverted_rect_width/2
+        elif self.alignment["horizontal"] == "start":
+            self.alignment["anchor"].x = self.corner1.x
+            
+        # rotate
+        self.alignment["anchor"] = self.alignment["anchor"].rotate(self.corner1, -self.rotation)
+        left_top = left_top.rotate(self.corner1, -self.rotation)
+        right_bot = right_bot.rotate(self.corner1, -self.rotation)                 
 
-        return [self.corner1, self.corner2]
+        return [left_top, right_bot]
     
     def draw_svg(self, dwg, offset, zoom):
         """
@@ -106,17 +130,22 @@ class PcbString(_GenericPCBRecord):
             None
         """
         
-        insert = (self.corner1 * zoom) + offset
+        insert = (self.alignment["anchor"] * zoom) + offset
         layer = self.get_layer_by_id(self.layer)
+        
+        if  self.text_kind == PCBTextKind(0):
+            font =  self.text_kind.get_font()
+        else:
+            font =  self.font_name
         
         drawing_primitive = dwg.text(self.text,
                                      font_size = int(self.height * zoom),
-                                     font_family = self.font_name, 
+                                     font_family = font, 
                                      insert = insert.to_int_tuple(),
                                      fill = layer.color.to_hex(),
                                      dominant_baseline=self.alignment["vertical"],
                                      text_anchor=self.alignment["horizontal"],
                                      transform=f"rotate({self.alignment['rotation']} {int(insert.x)} {int(insert.y)})"
                                      )                
-        
+
         self.Footprint.drawing_layer[self.layer].add( drawing_primitive )

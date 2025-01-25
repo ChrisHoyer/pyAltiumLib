@@ -1,11 +1,35 @@
-import json
-
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 
+import json
+import logging
+from typing import Dict, List, Any
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 class LibComponent:
-    
-    def __init__(self, parent, name, description):
-        
+    """
+   A class to represent a component in an Altium library.
+
+   Attributes:
+       LibFile: The parent library file.
+       Name (str): The name of the component.
+       Description (str): The description of the component.
+       Records (List[Any]): A list of records in the component.
+       _BoundingBoxes (List[Any]): A list of bounding boxes for the component.
+       drawing_layer (Dict[int, Any]): A dictionary of drawing layers for PCB Libs.
+   """
+   
+    def __init__(self, parent, name: str, description: str):
+        """
+        Initialize a LibComponent object.
+
+        Args:
+            parent: The parent library file.
+            name (str): The name of the component.
+            description (str): The description of the component.
+        """        
         self.LibFile = parent
         self.Name = name
         self.Description = description
@@ -15,13 +39,19 @@ class LibComponent:
         self.drawing_layer = {}
         
     
-    def __repr__(self):
-       symbol_data = {
+    def __repr__(self) -> str:
+        """
+        Return a JSON representation of the component.
+
+        Returns:
+            str: A JSON string representation of the component.
+        """
+        symbol_data = {
            "Name": self.Name,
            "Description": self.Description
            }
         
-       return json.dumps(symbol_data, indent=4)
+        return json.dumps(symbol_data, indent=4)
    
 
 # =============================================================================
@@ -29,14 +59,22 @@ class LibComponent:
 # =============================================================================   
  
     
-    def draw_svg(self, graphic, size_x, size_y, draw_bbox=False):
-               
+    def draw_svg(self, graphic, size_x: float, size_y: float, draw_bbox: bool = False) -> None:
+        """
+        Draw the component as an SVG.
+
+        Args:
+            graphic: The SVG graphic object.
+            size_x (float): The width of the SVG.
+            size_y (float): The height of the SVG.
+            draw_bbox (bool): Whether to draw bounding boxes.
+        """    
         validObj = []
         for obj in self.Records:
             if hasattr(obj, 'draw_svg') and callable(getattr(obj, 'draw_svg')):
-                validObj.append( obj )
+                validObj.append(obj)
             else:
-                print(f" object: {obj} has no drawing function")
+                logger.warning(f"Object: {obj} has no drawing function")
 
         # Get Bounding box
         offset, zoom = self._autoscale( validObj, size_x, size_y)
@@ -61,13 +99,16 @@ class LibComponent:
             obj.draw_svg( graphic, offset, zoom)               
 
 
-    def _autoscale(self, elements, target_width, target_height, margin=10.0):
+    def _autoscale(self, elements: List[Any], target_width: float, target_height: float, margin: float = 10.0) -> tuple:
         """
-        Adjusts the coordinates of elements to fit within the target dimensions using zoom.
+        Adjust the coordinates of elements to fit within the target dimensions using zoom.
+
         Args:
-            elements (list): A list of objects with `get_BoundingBox` method.
-            target_width (int): Target image width.
-            target_height (int): Target image height.
+            elements (List[Any]): A list of objects with `get_bounding_box` method.
+            target_width (float): Target image width.
+            target_height (float): Target image height.
+            margin (float): Margin around the bounding box.
+
         Returns:
             tuple: (offset, zoom)
         """
