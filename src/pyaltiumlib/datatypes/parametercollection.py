@@ -85,7 +85,7 @@ class ParameterCollection:
         return result if len(keys) > 1 else result.get(keys[0], default)   
 
 
-    def get_bool(self, key):
+    def get_bool(self, key, default=False):
         """
         Retrieves value corresponding to the given key as boolean
         
@@ -106,10 +106,10 @@ class ParameterCollection:
             if value == "T":
                 return True
             else:
-                return False
+                return default
             
         else:
-            return False
+            return default
             
             
             

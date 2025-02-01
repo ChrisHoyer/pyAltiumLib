@@ -1,17 +1,35 @@
-##########################
- pyAltiumLib Documentation
-##########################
+######################################
+ pyAltiumLib |version| Documentation
+######################################
 
-PyAltiumLib is a tool designed to be able to parse Altium library files.
+This is the documentation for PyAltiumLib |version|, last updated |today|.
+
+PyAltiumLib is a tool to read Altium Designer library files. The included components are extracted. Metadata such as the description and the name of the component can be listed. It is also possible to visualize the component using the :code:`svgwrite` package. 
+
 
 **Quick links:** `GitHub <https://github.com/ChrisHoyer/pyAltiumLib>`__ -
 `Documentation <https://pyaltiumlib.readthedocs.io/latest/>`__
 
 .. toctree::
-   :caption: Table of Contents
-   :numbered: 3
-   :maxdepth: 2
+   :caption: Contents
+   :maxdepth: 1
 
    usage/index
-   fileformat/index
+   
+.. toctree::
+   :caption: Classes and Methods
+   :maxdepth: 1
 
+   classes/LibFile
+   classes/Components
+
+
+.. toctree::
+   :caption: Altium File Format
+   :maxdepth: 1
+
+   fileformat/FileStructure
+   fileformat/BasicTypes
+   fileformat/Primitives
+   fileformat/SchLib
+   fileformat/PCBLib

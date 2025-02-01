@@ -26,7 +26,7 @@ class _GenericPCBRecord:
         
     def get_layer_by_id(self, layerid): 
         
-        for layer in self.Footprint.LibFile.Layer:
+        for layer in self.Footprint.LibFile._Layer:
             if layer.id == layerid: 
                 return layer
             

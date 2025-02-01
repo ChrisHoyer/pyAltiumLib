@@ -1,5 +1,5 @@
 PCB Library (.pcblib)
-#######################
+************************
 
 The `.pcblib` file format stores PCB footprints. It is based on OLE (Object Linking and Embedding) format, a compound document standard from Microsoft. 
 
@@ -52,7 +52,7 @@ The format follows a structured hierarchy, with several storage containers and d
 This list is incomplete and is limited to the essentials for reading and displaying footprints.
 
 Container Library
-******************
+=====================
 
 Contains common elements used in the library as well as a table of contents (TOC)
 
@@ -65,7 +65,7 @@ Contains common elements used in the library as well as a table of contents (TOC
    #. Each footprint name as :ref:`PCBStringBlock`
 
 Container Library/ComponentParamsTOC
-*************************************
+=====================================
 
 Contains name, description, height and pad count of each footprint.
 
@@ -76,7 +76,7 @@ Contains name, description, height and pad count of each footprint.
    #. Parameter of each component as :ref:`ParameterCollection`
 
 Container Library/Models
-************************
+========================
 
 Contains embedded 3D models, if used in the footprint.
 
@@ -90,7 +90,7 @@ Contains embedded 3D models, if used in the footprint.
    #. Embedded Models are stored as ASCII STEP files but using zlib compression
 
 Container <footprint>
-**********************
+======================
 
 A container for each individual footprint. Each footprint consists of multiple primitives. A primitive is a single drawing element, such as a line, arc, rectangle, or pad. The naming of this container has some limitations due to the compound document standard. The maximum text length is 31, container names longer than 31 will be truncated. Also, if a :code:`/` is used in the name, it will be replaced by a :code:`_`.
 

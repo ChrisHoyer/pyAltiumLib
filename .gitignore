@@ -12,5 +12,9 @@ env/
 build/
 build/*
 
+# Distribution / packaging
+dist/
+*.egg-info/
 
+# Unit test / coverage reports
 /tests/local/

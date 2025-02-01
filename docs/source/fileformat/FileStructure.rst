@@ -1,6 +1,5 @@
-###################
-Altium File Format
-###################
+File Structure
+***************
 
 This documentation provides an overview of the structure, data organization and components of the Altium file formats `.pcblib` (PCB library) and `.schlib` (schematic library). This guide combines information from several open-source repositories:
 
@@ -14,11 +13,9 @@ This documentation provides an overview of the structure, data organization and 
 
 These resources provide insights into the format used, which is essential for developing tools. The file formats are based on the Microsoft OLE (Object Linking and Embedding) standard, which organizes data (streams) into hierarchical containers.
 
-.. toctree::
-   :maxdepth: 4
-   :titlesonly:
+**File Structure**
 
-   BasicTypes
-   Primitives
-   PCBLib
-   SchLib
+.. raw:: html
+    :file: ./LibraryFile_Container.drawio.html
+
+The basic structure is organized in containers. Each library file contains several subcontainers with the component as a footprint or symbol. Each component is composed of so-called records. These records contain the visible structures such as rectangles, polygons and lines. The records for footprints are binary data. Schematic records are mostly parameter collections.

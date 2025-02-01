@@ -2,14 +2,32 @@ from pyaltiumlib.base import GenericLibFile
 from pyaltiumlib.datatypes import BinaryReader, ParameterCollection, PCBLayerDefinition
 from pyaltiumlib.pcblib.footprint import PcbLibFootprint
 
+# Set up logging
+import logging
+logger = logging.getLogger(__name__)
+
 class PcbLib(GenericLibFile):
+    """
+    PCB class for handling Altium Designer PCB library files.
+    This class is derived from :class:`pyaltiumlib.base.GenericLibFile`.
     
-    def __init__(self, filepath):
+    During initialization the library file will be read.
+    
+    :param string filepath: The path to the .PcbLib library file
+    
+    :raises FileNotFoundError: If file is not a supported file.
+    :raises ValueError: If library data or header can not be read
+    """
+    
+    def __init__(self, filepath: str):
+        """
+        Initialize a PCBLib object.
+        """
         super().__init__(filepath)
         
         self.LibType = "PCB"
-        self.Layer = PCBLayerDefinition.LoadDefaultLayers()
-        self.drawing_layer = {}
+        self._Layer = PCBLayerDefinition.LoadDefaultLayers()
+        self._drawing_layer = {}
         
         self._ReadLibrary()
     

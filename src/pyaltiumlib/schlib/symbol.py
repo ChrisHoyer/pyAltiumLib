@@ -2,30 +2,29 @@ from pyaltiumlib.libcomponent import LibComponent
 from pyaltiumlib.datatypes import ParameterCollection, SchematicPin
 from pyaltiumlib.schlib.records import *
 
-from typing import Optional, List, Dict, Any
-import logging
-
 # Set up logging
-logging.basicConfig(level=logging.INFO)
+import logging
 logger = logging.getLogger(__name__)
 
 class SchLibSymbol(LibComponent):
     """
-    A class to represent a symbol in an Altium Schematic Library.
+    Symbol class represent a schematic symbol in an Altium Schematic Library.
+    This class is derived from :class:`pyaltiumlib.libcomponent.LibComponent`. 
+    
+    During initialization the library file will be read.
+    
+    :param class parent: reference to library file :class:`pyaltiumlib.schlib.lib.SchLib`
+    :param string name: name of the component
+    :param string description: description of the component
+    :param int partcount: number of parts in the symbol
 
-    Attributes:
-        PartCount (int): The number of parts in the symbol.
+    :raises ValueError: If record id is not valid
+    :raises ValueError: If component data can not be read
     """
     
     def __init__(self, parent, name: str, description: str = "", partcount: int = 0):
         """
         Initialize a SchLibSymbol object.
-
-        Args:
-            parent: The parent library file.
-            name (str): The name of the symbol.
-            description (str): The description of the symbol.
-            partcount (int): The number of parts in the symbol.
         """
         super().__init__(parent, name, description)
         

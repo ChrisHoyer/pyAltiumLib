@@ -200,7 +200,7 @@ class PcbPad(_GenericPCBRecord):
                                      transform=f"rotate(-{self.rotation % 180} {center.x} {center.y})"
                                      )
         
-        self.Footprint.drawing_layer[0].add( drawing_primitive )
+        self.Footprint._drawing_layer[0].add( drawing_primitive )
 
         
     def draw_svg_hole(self, dwg, offset, zoom, layer_id):
@@ -236,7 +236,7 @@ class PcbPad(_GenericPCBRecord):
                                      fill=layer.color.to_hex(),
                                      transform=f"rotate(-{self.rotation} {center.x} {center.y})")
         
-        self.Footprint.drawing_layer[layer_id].add( drawing_primitive )
+        self.Footprint._drawing_layer[layer_id].add( drawing_primitive )
                       
         
     def draw_svg_pad_element(self, dwg, offset, zoom, size, shape, plot_layer, ref_layer=None):
@@ -296,7 +296,7 @@ class PcbPad(_GenericPCBRecord):
         else:
             print(f"Unknown pad shape: {shape}")
             
-        self.Footprint.drawing_layer[plot_layer].add( drawing_primitive )
+        self.Footprint._drawing_layer[plot_layer].add( drawing_primitive )
 
         
     def get_rounded_rect_path(self, start, size, layer_id, radius_percentage = 100):

@@ -1,34 +1,41 @@
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 
-import json
 import logging
-from typing import Dict, List, Any
+from typing import List, Any, Dict
 
 # Set up logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class LibComponent:
     """
-   A class to represent a component in an Altium library.
+    Base class represent a basic component Altium Designer library files.
 
-   Attributes:
-       LibFile: The parent library file.
-       Name (str): The name of the component.
-       Description (str): The description of the component.
-       Records (List[Any]): A list of records in the component.
-       _BoundingBoxes (List[Any]): A list of bounding boxes for the component.
-       drawing_layer (Dict[int, Any]): A dictionary of drawing layers for PCB Libs.
-   """
-   
+    This class provides fundamental functionality for reading and illustrating
+    Altium Designer components
+    
+    :param class parent: reference to library file :class:`pyaltiumlib.schlib.lib.SchLib` or :class:`pyaltiumlib.pcblib.lib.PcbLib`
+    :param string name: name of the component
+    :param string description: description of the component
+    """
+
+    LibFile = None
+    """
+    `class` that references to library file
+    """
+
+    Name = ''
+    """`string` that contains the name of the component
+    """
+
+    Description = ''
+    """
+    `string` that contains the description of the component
+    """
+    
     def __init__(self, parent, name: str, description: str):
         """
         Initialize a LibComponent object.
 
-        Args:
-            parent: The parent library file.
-            name (str): The name of the component.
-            description (str): The description of the component.
         """        
         self.LibFile = parent
         self.Name = name
@@ -36,23 +43,32 @@ class LibComponent:
                     
         self.Records = [] 
         self._BoundingBoxes = []
-        self.drawing_layer = {}
+        self._drawing_layer = {}
         
-    
-    def __repr__(self) -> str:
-        """
-        Return a JSON representation of the component.
 
-        Returns:
-            str: A JSON string representation of the component.
+    def __repr__(self) -> Dict:
         """
-        symbol_data = {
+        Converts name and descirption to a dictionary.
+
+        :return: A dict representation of the object
+        :rtype: Dict
+        """
+        return self.read_meta()
+
+
+    def read_meta(self) -> Dict:
+        """
+        Converts name and descirption to a dictionary.
+
+        :return: A dict representation of the object
+        :rtype: Dict
+        """
+        component_data = {
            "Name": self.Name,
            "Description": self.Description
            }
-        
-        return json.dumps(symbol_data, indent=4)
-   
+        return component_data 
+       
 
 # =============================================================================
 #     Drawing related
@@ -61,14 +77,28 @@ class LibComponent:
     
     def draw_svg(self, graphic, size_x: float, size_y: float, draw_bbox: bool = False) -> None:
         """
-        Draw the component as an SVG.
+        Draw all drawable records the component to an svg drawing. All records are
+        autoscaled to fit the given drawing object size.
 
-        Args:
-            graphic: The SVG graphic object.
-            size_x (float): The width of the SVG.
-            size_y (float): The height of the SVG.
-            draw_bbox (bool): Whether to draw bounding boxes.
+        :param svgwrite.Drawing graphic: the svgwrite drawing object
+        :param float size_x: The width of the svgwrite drawing object
+        :param float size_y: The height of the svgwrite drawing object        
+        :param bool [optional] draw_bbox: Draw bounding boxes
+        :default draw_bbox: False
+            
+        :raises ImportError: If 'svgwrite' module is not installed.
+        :raises ValueError: If 'graphic' is not the right instance.
         """    
+        
+        try:
+            import svgwrite
+        except ImportError:
+            logger.error("The 'svgwrite' module is not installed. Install it using 'pip install svgwrite'.")
+
+        if not isinstance(graphic, svgwrite.Drawing):
+            logger.error("The provided 'dwg' object is not an instance of 'svgwrite.Drawing'.")
+
+        
         validObj = []
         for obj in self.Records:
             if hasattr(obj, 'draw_svg') and callable(getattr(obj, 'draw_svg')):
@@ -86,9 +116,9 @@ class LibComponent:
         
         # Add Drawing Layer
         if hasattr(self, 'LibFile'):
-            if hasattr(self.LibFile, 'Layer'):
-                for x in sorted(self.LibFile.Layer, key=lambda obj: obj.drawing_order, reverse=True):
-                    self.drawing_layer[x.id] = graphic.add(graphic.g(id=x.svg_layer))
+            if hasattr(self.LibFile, '_Layer'):
+                for x in sorted(self.LibFile._Layer, key=lambda obj: obj.drawing_order, reverse=True):
+                    self._drawing_layer[x.id] = graphic.add(graphic.g(id=x.svg_layer))
                 
         if draw_bbox:
             for obj in validObj:

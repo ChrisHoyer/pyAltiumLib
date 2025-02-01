@@ -2,8 +2,24 @@ from pyaltiumlib.libcomponent import LibComponent
 from pyaltiumlib.datatypes import ParameterCollection, BinaryReader 
 from pyaltiumlib.pcblib.records import *
 
+# Set up logging
+import logging
+logger = logging.getLogger(__name__)
+
 class PcbLibFootprint(LibComponent):
+    """
+    Footprint class represent a PCb footprint in an Altium Schematic Library.
+    This class is derived from :class:`pyaltiumlib.libcomponent.LibComponent`. 
     
+    During initialization the library file will be read.
+    
+    :param class parent: reference to library file :class:`pyaltiumlib.schlib.lib.PCBLib`
+    :param string name: name of the component
+    :param string description: description of the component
+
+    :raises ValueError: If record id is not valid
+    :raises ValueError: If component data can not be read
+    """   
     def __init__(self, parent, name, description=""):
 
         super().__init__(parent, name, description)

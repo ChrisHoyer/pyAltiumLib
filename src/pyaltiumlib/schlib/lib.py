@@ -1,30 +1,28 @@
 from pyaltiumlib.base import GenericLibFile
 from pyaltiumlib.datatypes import ParameterCollection, ParameterColor, ParameterFont
 from pyaltiumlib.schlib.symbol import SchLibSymbol
-from typing import List, Optional, Dict, Any
-import logging
+
 
 # Set up logging
-logging.basicConfig(level=logging.INFO)
+import logging
 logger = logging.getLogger(__name__)
 
 class SchLib(GenericLibFile):
     """
-    A class to handle Altium Schematic Library files (.SchLib).
+    Schematic class for handling Altium Designer schematic library files.
+    This class is derived from :class:`pyaltiumlib.base.GenericLibFile`. 
     
-    Attributes:
-        LibType (str): The type of library (e.g., "Schematic").
-        _SystemFontID (int): The ID of the system font.
-        _Fonts (List[ParameterFont]): A list of fonts used in the library.
-        _FontCount (int): The number of fonts in the library.
-    """    
+    During initialization the library file will be read.
+    
+    :param string filepath: The path to the .SchLib library file
+    
+    :raises FileNotFoundError: If file is not a supported file.
+    :raises ValueError: If library data or header can not be read
+    """
     
     def __init__(self, filepath: str):
         """
         Initialize a SchLib object.
-
-        Args:
-            filepath (str): The path to the .SchLib file.
         """
         super().__init__(filepath)
         

@@ -2,6 +2,7 @@
 Installation & Contributing
 #############################
 
+
 Installation
 ============
 *WIP: needs to be available via pip*
@@ -10,9 +11,9 @@ For now just refer to the module folder located in :code:`PyAltiumLib/src`
 
 Dependencies:
 
-- :code:`sys, os`
-- :code:`math, svgwrite` - to render drawings
-- :code:`json` - to have a json dump output
+- Python defaults :code:`sys, os, math, typing`
+- :code:`olefile` - to read the files
+- :code:`svgwrite` - to render drawings
 
 Usage Instructions
 ===================
@@ -24,7 +25,7 @@ Ensure the package is already installed. Additionally, for rendering components 
 Installation of `svgwrite` (if not already installed):
 
 .. code-block:: bash
-    
+    pip install olefile    
     pip install svgwrite
 
 
@@ -43,11 +44,11 @@ Load the file and retrieve the list of components.
     # Load File
     LibFile = pyaltiumlib.read(filepath)
 
-    # Receive Component List as JSON
-    json = LibFile.toJSON()
+    # Read Meta Data
+    json = LibFile.read_meta()
 
     # Get a List of All Components
-    all_parts = LibFile.ListParts()
+    all_parts = LibFile.list_parts()
 
 Render Components as SVG
 ----------------------------------------
@@ -62,7 +63,7 @@ Render each component as an SVG file. The components are saved as individual SVG
     for partname in all_parts:
 
         # Choose element
-        Component = LibFile.GetPart(partname)
+        Component = LibFile.get_part(partname)
 
         # Create a new image with a white background
         dwg = svgwrite.Drawing(f"img_sch/{partname}.svg", size=(400, 400))
