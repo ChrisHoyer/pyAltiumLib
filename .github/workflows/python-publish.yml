@@ -26,7 +26,7 @@ jobs:
     - name: Read version from __init__.py
       id: read_version
       run: |
-        VERSION=$(python -c "from pathlib import Path; exec(open('src/pyaltiumlib/__init__.py').read()); print(__version__)")
+        VERSION=$(python setup.py --version)
         echo "VERSION=$VERSION" >> $GITHUB_ENV  # Save the version as an environment variable
 
     - name: Upload to PyPI
