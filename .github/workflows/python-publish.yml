@@ -1,0 +1,29 @@
+name: Upload Python package
+
+on:
+  push:
+    branches:
+      - main  # or the branch you want to trigger the deployment on
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.x'  # or the version you are using
+
+    - name: Build and publish package
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python setup.py sdist bdist_wheel
+        pip install twine
+        twine upload dist/*  # Upload the package to PyPI
+
