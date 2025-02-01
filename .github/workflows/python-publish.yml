@@ -27,25 +27,29 @@ jobs:
       id: read_version
       run: |
         VERSION=$(python setup.py --version)
-        echo "VERSION=$VERSION" >> $GITHUB_ENV  # Save the version as an environment variable
+        echo "VERSION=$VERSION" >> $GITHUB_ENV 
+
+    - name: Build package
+      run: |
+        python setup.py sdist bdist_wheel
 
     - name: Upload to PyPI
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        pip install twine  # Install Twine for uploading
-        twine upload dist/*  # Upload the package to PyPI
+        pip install twine
+        twine upload dist/*
 
     - name: Create Git tag
       run: |
-        git tag ${{ env.VERSION }}  # Create a Git tag using the version from __init__.py
-        git push origin ${{ env.VERSION }}  # Push the tag to GitHub
+        git tag ${{ env.VERSION }}
+        git push origin ${{ env.VERSION }}
 
     - name: Create GitHub release
       id: create_release
       run: |
-        VERSION_NAME="${{ env.VERSION }}"  # Use the version extracted for the release name
+        VERSION_NAME="${{ env.VERSION }}"
         echo "Creating release for version: $VERSION_NAME"
         gh release create $VERSION_NAME dist/* --title "Release $VERSION_NAME" --notes "Release version created from __init__.py"
 
