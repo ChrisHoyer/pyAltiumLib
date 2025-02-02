@@ -12,13 +12,14 @@ PyAltiumLib is a tool to read Altium Designer library files. The included compon
 
 
 .. toctree::
-   :caption: Contents
+   :caption: Introduction
    :maxdepth: 1
 
-   usage/index
+   usage/install
+   usage/release
    
 .. toctree::
-   :caption: Classes and Methods
+   :caption: API Reference
    :maxdepth: 1
 
    classes/LibFile
@@ -32,5 +33,3 @@ PyAltiumLib is a tool to read Altium Designer library files. The included compon
    fileformat/FileStructure
    fileformat/BasicTypes
    fileformat/Primitives
-   fileformat/SchLib
-   fileformat/PCBLib

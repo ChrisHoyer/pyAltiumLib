@@ -1,3 +1,9 @@
+[![Build and Release on GitHub](https://github.com/ChrisHoyer/pyAltiumLib/actions/workflows/publish-github.yml/badge.svg)](https://github.com/ChrisHoyer/pyAltiumLib/actions/workflows/publish-github.yml)
+![GitHub Release](https://img.shields.io/github/v/release/ChrisHoyer/pyAltiumLib)
+[![Build and Release on PyPi](https://github.com/ChrisHoyer/pyAltiumLib/actions/workflows/publish-pypi.yml/badge.svg)](https://github.com/ChrisHoyer/pyAltiumLib/actions/workflows/publish-pypi.yml)
+[![PyPI Release](https://img.shields.io/pypi/v/pyaltiumlib.svg)](https://pypi.org/project/pyaltiumlib/)
+[![Documentation Status](https://readthedocs.org/projects/pyaltiumlib/badge/?version=latest)](https://pyaltiumlib.readthedocs.io/latest)
+
 # pyAltiumLib
 
 PyAltiumLib is a tool to read Altium Designer library files. The included components are extracted. Metadata such as the description and the name of the component can be listed. It is also possible to visualize the component using the svgwrite package.
