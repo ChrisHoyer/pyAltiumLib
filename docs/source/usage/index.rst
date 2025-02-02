@@ -5,9 +5,9 @@ Installation & Contributing
 
 Installation
 ============
-*WIP: needs to be available via pip*
 
-For now just refer to the module folder located in :code:`PyAltiumLib/src`
+.. code-block:: bash
+    pip install pyaltiumlib
 
 Dependencies:
 

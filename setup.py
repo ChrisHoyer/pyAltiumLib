@@ -15,6 +15,12 @@ def get_version():
             return v['__version__']
     raise IOError('__version__ string not found')
 
+# get description from readme.md
+def get_description():  
+    long_description = ""
+    with open("README.md", "r") as f:
+        long_description = f.read()
+    return long_description    
 
 setup(name='pyaltiumlib',
       version=get_version(),
@@ -26,4 +32,6 @@ setup(name='pyaltiumlib',
       install_requires=['olefile>=0.47', 'svgwrite>=1.4.3'],
       package_dir={"": "src"},
       python_requires=">=3.7",
+      long_description=get_description(),
+      long_description_content_type="text/markdown",    
       )
