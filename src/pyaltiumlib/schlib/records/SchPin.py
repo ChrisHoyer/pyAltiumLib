@@ -32,6 +32,8 @@ class SchPin(_GenericSchRecord):
         
         self.pinlength = self.rawdata.get('length', 0)
         
+        self.is_initialized = True
+        
         
     def __repr__(self):
         return f"SchPin"

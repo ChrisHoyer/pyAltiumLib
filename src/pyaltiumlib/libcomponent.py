@@ -31,6 +31,12 @@ class LibComponent:
     """
     `string` that contains the description of the component
     """
+
+    Records = []
+    """
+    `List[any]` is a collection of records in their specific class 
+    contained in the library.
+    """
     
     def __init__(self, parent, name: str, description: str):
         """
@@ -39,12 +45,12 @@ class LibComponent:
         """        
         self.LibFile = parent
         self.Name = name
-        self.Description = description
-                    
-        self.Records = [] 
-        self._BoundingBoxes = []
-        self._drawing_layer = {}
+        self.Description = description                  
+        self.Records = []
         
+        self._BoundingBoxes = []
+        self._graphic_layers = {}
+       
 
     def __repr__(self) -> Dict:
         """
@@ -84,7 +90,6 @@ class LibComponent:
         :param float size_x: The width of the svgwrite drawing object
         :param float size_y: The height of the svgwrite drawing object        
         :param bool [optional] draw_bbox: Draw bounding boxes
-        :default draw_bbox: False
             
         :raises ImportError: If 'svgwrite' module is not installed.
         :raises ValueError: If 'graphic' is not the right instance.
@@ -102,7 +107,8 @@ class LibComponent:
         validObj = []
         for obj in self.Records:
             if hasattr(obj, 'draw_svg') and callable(getattr(obj, 'draw_svg')):
-                validObj.append(obj)
+                if obj.is_initialized:
+                    validObj.append(obj)
             else:
                 logger.warning(f"Object: {obj} has no drawing function")
 
@@ -115,32 +121,25 @@ class LibComponent:
                                  fill=self.LibFile._BackgroundColor.to_hex()))
         
         # Add Drawing Layer
+        self._graphic_layers = {}
         if hasattr(self, 'LibFile'):
-            if hasattr(self.LibFile, '_Layer'):
-                for x in sorted(self.LibFile._Layer, key=lambda obj: obj.drawing_order, reverse=True):
-                    self._drawing_layer[x.id] = graphic.add(graphic.g(id=x.svg_layer))
-                
+            if hasattr(self.LibFile, 'Layers'):
+                for x in sorted(self.LibFile.Layers, key=lambda obj: obj.drawing_order, reverse=True):
+                    self._graphic_layers[x.id] = graphic.add(graphic.g(id=x.svg_layer))
+                                
         if draw_bbox:
             for obj in validObj:
                     obj.draw_bounding_box( graphic, offset, zoom)
             
         # Draw Primitives
         for obj in validObj:
-            obj.draw_svg( graphic, offset, zoom)               
+            obj.draw_svg( graphic, offset, zoom)
+          
 
 
     def _autoscale(self, elements: List[Any], target_width: float, target_height: float, margin: float = 10.0) -> tuple:
         """
         Adjust the coordinates of elements to fit within the target dimensions using zoom.
-
-        Args:
-            elements (List[Any]): A list of objects with `get_bounding_box` method.
-            target_width (float): Target image width.
-            target_height (float): Target image height.
-            margin (float): Margin around the bounding box.
-
-        Returns:
-            tuple: (offset, zoom)
         """
 
         min_point = CoordinatePoint(Coordinate(float("inf")), Coordinate(float("inf")))

@@ -44,5 +44,5 @@ __all__ = [
     "PCBHoleShape",
     "PCBTextJustification",
     "PCBStrokeFont",
-    "PCBTextKind"
+    "PCBTextKind",
 ]

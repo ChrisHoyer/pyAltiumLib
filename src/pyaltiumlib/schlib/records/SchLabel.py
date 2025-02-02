@@ -34,6 +34,8 @@ class SchLabel(_GenericSchRecord):
         self.is_mirrored = self.rawdata.get_bool('ismirrored')
         self.is_hidden = self.rawdata.get_bool('ishidden')
         self.alignment: Dict[str, any] = {}
+        
+        self.is_initialized = True
 
     def __repr__(self) -> str:
         return f"SchLabel(text='{self.text}')"

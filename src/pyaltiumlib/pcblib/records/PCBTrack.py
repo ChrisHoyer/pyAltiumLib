@@ -1,9 +1,9 @@
 from pyaltiumlib.pcblib.records.base import _GenericPCBRecord
 from pyaltiumlib.datatypes import BinaryReader, Coordinate, CoordinatePoint
 from typing import Tuple
-import logging
 
 # Configure logging
+import logging
 logger = logging.getLogger(__name__)
 
 class PcbTrack(_GenericPCBRecord):
@@ -26,13 +26,13 @@ class PcbTrack(_GenericPCBRecord):
             stream: A binary stream containing the track data.
         """
         super().__init__(parent)
-        self.parse(stream)
+        self._parse(stream)
 
     def __repr__(self) -> str:
         """Return a string representation of the PCB track."""
         return f"PCBTrack(start={self.start}, end={self.end}, width={self.linewidth})"
 
-    def parse(self, stream) -> None:
+    def _parse(self, stream) -> None:
         """
         Parse the binary stream to extract track data.
         
@@ -52,7 +52,9 @@ class PcbTrack(_GenericPCBRecord):
                 # Read track-specific properties
                 self.start = block.read_bin_coord()  # Starting point
                 self.end = block.read_bin_coord()    # Ending point
-                self.linewidth = Coordinate.parse_bin(block.read(4))  # Track width
+                self.linewidth = Coordinate.parse_bin(block.read(4))
+                
+            self.is_initialized = True
                 
         except Exception as e:
             logger.error(f"Failed to parse PCB track: {str(e)}")
@@ -83,6 +85,7 @@ class PcbTrack(_GenericPCBRecord):
             logger.error(f"Error calculating bounding box: {str(e)}")
             return self.start, self.end
 
+
     def draw_svg(self, dwg, offset: CoordinatePoint, zoom: float) -> None:
         """
         Render the track as an SVG line.
@@ -95,6 +98,7 @@ class PcbTrack(_GenericPCBRecord):
         Raises:
             ValueError: If the layer or drawing context is invalid.
         """
+
         try:
             # Calculate scaled and offset coordinates
             start = (self.start * zoom) + offset
@@ -115,8 +119,8 @@ class PcbTrack(_GenericPCBRecord):
                 stroke_linecap="round"
             )
             
-            # Add the line to the appropriate drawing layer
-            self.Footprint._drawing_layer[self.layer].add(drawing_primitive)
+            self.Footprint._graphic_layers[self.layer].add(drawing_primitive)
+            
         except Exception as e:
             logger.error(f"Failed to draw PCB track: {str(e)}")
             raise

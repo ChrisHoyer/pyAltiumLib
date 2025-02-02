@@ -8,15 +8,15 @@ class PcbPad(_GenericPCBRecord):
         
         super().__init__(parent)
         
-        self.parse( stream )
+        self._parse( stream )
     
         
     def __repr__(self):
-        variables = ', '.join(f"{key}={value!r}" for key, value in self.__dict__.items())
-        return f"{self.__class__.__name__}({variables})"
+        """Return a string representation of the PCB track."""
+        return f"PCBPad(location={self.location})"
     
     
-    def parse(self, stream):
+    def _parse(self, stream):
         
         self.designator = BinaryReader.from_stream( stream ).read_string_block()
         
@@ -111,6 +111,8 @@ class PcbPad(_GenericPCBRecord):
             self.shape_layers = None
             self.corner_radius_percentage = None
             
+        self.is_initialized = True
+            
             
 # =============================================================================
 #     Drawing related
@@ -200,7 +202,7 @@ class PcbPad(_GenericPCBRecord):
                                      transform=f"rotate(-{self.rotation % 180} {center.x} {center.y})"
                                      )
         
-        self.Footprint._drawing_layer[0].add( drawing_primitive )
+        self.Footprint._graphic_layers[0].add( drawing_primitive )
 
         
     def draw_svg_hole(self, dwg, offset, zoom, layer_id):
@@ -236,7 +238,7 @@ class PcbPad(_GenericPCBRecord):
                                      fill=layer.color.to_hex(),
                                      transform=f"rotate(-{self.rotation} {center.x} {center.y})")
         
-        self.Footprint._drawing_layer[layer_id].add( drawing_primitive )
+        self.Footprint._graphic_layers[layer_id].add( drawing_primitive )
                       
         
     def draw_svg_pad_element(self, dwg, offset, zoom, size, shape, plot_layer, ref_layer=None):
@@ -296,7 +298,7 @@ class PcbPad(_GenericPCBRecord):
         else:
             print(f"Unknown pad shape: {shape}")
             
-        self.Footprint._drawing_layer[plot_layer].add( drawing_primitive )
+        self.Footprint._graphic_layers[plot_layer].add( drawing_primitive )
 
         
     def get_rounded_rect_path(self, start, size, layer_id, radius_percentage = 100):

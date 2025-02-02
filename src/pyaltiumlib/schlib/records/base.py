@@ -42,6 +42,7 @@ class _GenericSchRecord:
         """
         self.Symbol = parent
         self.rawdata = data
+        self.is_initialized = False
 
         # Parse record metadata
         self.record = int(self.rawdata.get('record', 0))

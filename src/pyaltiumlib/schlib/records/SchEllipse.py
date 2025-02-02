@@ -28,6 +28,8 @@ class SchEllipse(_GenericSchRecord):
         self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0))
         self.issolid = self.rawdata.get_bool('issolid')
         
+        self.is_initialized = True
+        
     def __repr__(self):
         return f"SchEllipse"
 

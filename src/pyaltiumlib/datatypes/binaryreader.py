@@ -1,5 +1,9 @@
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 
+# Configure logging
+import logging
+logger = logging.getLogger(__name__)
+
 class BinaryReader:
     
     def __init__(self, data):
@@ -12,7 +16,7 @@ class BinaryReader:
         data = stream.read( length )
         
         if len(data) != length:
-            raise ValueError("Stream does not match the declared block length.")        
+             logger.warning("Stream does not match the declared block length.")        
         
         return cls( data )       
 
@@ -25,7 +29,7 @@ class BinaryReader:
     def read(self, length):
                     
         if self.offset + length > len(self.data):
-            raise ValueError("Not enough data to read the requested length.")
+            logger.warning("Not enough data to read the requested length.")
         
         result = self.data[self.offset:self.offset + length]
         self.offset += length
@@ -33,7 +37,7 @@ class BinaryReader:
 
     def read_byte(self):
         if self.offset + 1 > len(self.data):
-            raise ValueError("Not enough data to read.")
+            logger.warning("Not enough data to read.")
         return self.read(1)
 
     def read_int8(self, signed=False):
@@ -41,7 +45,7 @@ class BinaryReader:
     
     def read_int16(self, signed=False):
         if self.offset + 2 > len(self.data):
-            raise ValueError("Not enough data to read an Int16.")
+            logger.warning("Not enough data to read an Int16.")
         
         value = int.from_bytes(self.data[self.offset:self.offset + 2], byteorder="little", signed=signed)
         self.offset += 2
@@ -49,7 +53,7 @@ class BinaryReader:
     
     def read_int32(self, signed=False):
         if self.offset + 4 > len(self.data):
-            raise ValueError("Not enough data to read an Int32.")
+            logger.warning("Not enough data to read an Int32.")
         
         value = int.from_bytes(self.data[self.offset:self.offset + 4], byteorder="little", signed=signed)
         self.offset += 4
@@ -57,7 +61,7 @@ class BinaryReader:
 
     def read_double(self):
         if self.offset + 8 > len(self.data):
-            raise ValueError("Not enough data to read a Double.")
+            logger.warning("Not enough data to read a Double.")
 
         raw_bytes = self.data[self.offset:self.offset + 8]
         self.offset += 8
@@ -69,7 +73,7 @@ class BinaryReader:
         string_data = self.read( length_string )
                  
         if len(string_data) != length_string:
-            raise ValueError("String does not match the declared string length.")        
+            logger.warning("String does not match the declared string length.")        
         
         return string_data.decode('windows-1252')
 
@@ -85,7 +89,7 @@ class BinaryReader:
     
         while len(data) < length:
             if self.offset + 2 > len(self.data):
-                raise ValueError("Not enough data to read.")
+                logger.warning("Not enough data to read.")
             
             # Read 2 bytes (1 Unicode character)
             unicode_char = self.read(2)

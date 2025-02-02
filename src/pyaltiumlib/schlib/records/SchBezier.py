@@ -40,6 +40,8 @@ class SchBezier(_GenericSchRecord):
                        
         self.linestyle = SchematicLineStyle(self.rawdata.get('linestyle', 0))
         self.linestyle_ext = SchematicLineStyle(self.rawdata.get('linestyleext', 0))
+        
+        self.is_initialized = True
       
     def __repr__(self):
         return f"SchBezier"

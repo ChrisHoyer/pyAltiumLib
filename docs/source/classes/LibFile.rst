@@ -34,3 +34,4 @@ PCB Library File (PCBLib)
 
 .. autoclass:: pyaltiumlib.pcblib.lib.PcbLib
 
+    .. autoattribute:: Layers

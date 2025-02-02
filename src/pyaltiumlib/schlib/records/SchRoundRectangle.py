@@ -37,7 +37,9 @@ class SchRoundRectangle(_GenericSchRecord):
         self.corner = CoordinatePoint(Coordinate.parse_dpx("corner.x", self.rawdata),
                                        Coordinate.parse_dpx("corner.y", self.rawdata, scale=-1.0))
         self.radius_x = Coordinate.parse_dpx("CornerXRadius", self.rawdata)        
-        self.radius_y = Coordinate.parse_dpx("CornerYRadius", self.rawdata)  
+        self.radius_y = Coordinate.parse_dpx("CornerYRadius", self.rawdata) 
+        
+        self.is_initialized = True
                   
     def __repr__(self):
         return f"SchRoundedRectangle"

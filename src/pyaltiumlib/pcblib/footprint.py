@@ -15,7 +15,7 @@ class PcbLibFootprint(LibComponent):
     
     :param class parent: reference to library file :class:`pyaltiumlib.schlib.lib.PCBLib`
     :param string name: name of the component
-    :param string description: description of the component
+    :param string [optional] description: description of the component
 
     :raises ValueError: If record id is not valid
     :raises ValueError: If component data can not be read
@@ -57,6 +57,9 @@ class PcbLibFootprint(LibComponent):
             if RecordID == 0:
                 StreamOnGoing = False
                 break
+
+            elif RecordID == 1:
+                self.Records.append( PcbArc(self, olestream) )
                 
             elif RecordID == 2:
                 self.Records.append( PcbPad(self, olestream) )

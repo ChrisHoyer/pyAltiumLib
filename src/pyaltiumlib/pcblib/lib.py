@@ -19,6 +19,11 @@ class PcbLib(GenericLibFile):
     :raises ValueError: If library data or header can not be read
     """
     
+    Layers = None
+    """
+    Collection with default PCB Layer Definition
+    """
+    
     def __init__(self, filepath: str):
         """
         Initialize a PCBLib object.
@@ -26,9 +31,7 @@ class PcbLib(GenericLibFile):
         super().__init__(filepath)
         
         self.LibType = "PCB"
-        self._Layer = PCBLayerDefinition.LoadDefaultLayers()
-        self._drawing_layer = {}
-        
+        self.Layers = PCBLayerDefinition.LoadDefaultLayers()        
         self._ReadLibrary()
     
 

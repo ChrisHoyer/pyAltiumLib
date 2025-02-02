@@ -31,6 +31,8 @@ class SchLine(_GenericSchRecord):
             Coordinate.parse_dpx("corner.x", self.rawdata),
             Coordinate.parse_dpx("corner.y", self.rawdata, scale=-1.0)
         )
+        
+        self.is_initialized = True
 
     def __repr__(self) -> str:
         return f"SchLine({self.location} to {self.corner})"

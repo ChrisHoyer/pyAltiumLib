@@ -7,7 +7,7 @@ AUTHOR_NAME = 'Chris Hoyer'
 AUTHOR_EMAIL = 'info@chrishoyer.de'
 CYEAR = '2024-2025'
 
-__version__ = "0.1"
+__version__ = "0.2"
 __author__ = "Chris Hoyer <info@chrishoyer.de>"
 
 import os

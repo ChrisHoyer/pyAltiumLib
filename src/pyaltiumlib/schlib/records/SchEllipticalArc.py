@@ -1,10 +1,10 @@
 from pyaltiumlib.schlib.records.base import _GenericSchRecord
 from pyaltiumlib.datatypes import SchematicLineWidth
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
-import math
-import logging
+from pyaltiumlib.datatypes.svg_utils import get_arc_path
 
 # Set up logging
+import logging
 logger = logging.getLogger(__name__)
 
 class SchEllipticalArc(_GenericSchRecord):
@@ -29,7 +29,9 @@ class SchEllipticalArc(_GenericSchRecord):
         self.radius_y = Coordinate.parse_dpx("secondaryradius", self.rawdata)        
         self.angle_start = float(self.rawdata.get('startangle', 0))            
         self.angle_end = float(self.rawdata.get('endangle', 0))            
-        self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0)) 
+        self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0))
+        
+        self.is_initialized = True
         
     def __repr__(self):
         return f"SchEllipticalArc"
@@ -66,47 +68,11 @@ class SchEllipticalArc(_GenericSchRecord):
         radius_x = self.radius_x * zoom
         radius_y = self.radius_y * zoom
         
-        arc_path = self.get_arc_path(center.to_int_tuple(), int(radius_x), int(radius_y))
+        arc_path = get_arc_path(center.to_int_tuple(),
+                                int(radius_x), int(radius_y),
+                                self.angle_start, self.angle_end)
 
         dwg.add(dwg.path(d=arc_path,
                          fill="none",
                          stroke=self.color.to_hex(),
                          stroke_width=int(self.linewidth) * zoom))
-
-    def get_arc_path(self, center, radius_x, radius_y):
-        """
-        Generate the SVG path data for the elliptical arc.
-
-        Args:
-            center (tuple): The center coordinates of the arc.
-            radius_x (int): The x-radius of the arc.
-            radius_y (int): The y-radius of the arc.
-
-        Returns:
-            str: The SVG path data for the arc.
-        """
-        def degrees_to_radians(degrees):
-            return (degrees * math.pi / 180) % (2*math.pi)
-        
-        angle_start = degrees_to_radians(self.angle_start)
-        angle_stop = degrees_to_radians(self.angle_end)
-        
-        if angle_start == angle_stop:
-            angle_stop -= 0.001
-        
-        start_x = center[0] + radius_x * math.cos(-angle_start)
-        start_y = center[1] + radius_y * math.sin(-angle_start)
-        end_x = center[0] + radius_x * math.cos(-angle_stop)
-        end_y = center[1] + radius_y * math.sin(-angle_stop)
-        
-        # Set large_arc_flag based on the angle difference
-        large_arc_flag = 1 if (angle_stop - angle_start) % (2 * math.pi) > math.pi else 0
-        
-        # Set sweep_flag to 0 for counterclockwise
-        sweep_flag = 0
-        
-        path_data = (
-            f"M {start_x},{start_y} "
-            f"A {radius_x},{radius_y} 0 {large_arc_flag},{sweep_flag} {end_x},{end_y}"
-        )
-        return path_data

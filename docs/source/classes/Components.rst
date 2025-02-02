@@ -10,6 +10,7 @@ Generic Component (Base)
     .. autoattribute:: LibFile
     .. autoattribute:: Name
     .. autoattribute:: Description
+    .. autoattribute:: Records
 
     .. automethod:: pyaltiumlib.libcomponent.LibComponent.read_meta
     .. automethod:: pyaltiumlib.libcomponent.LibComponent.draw_svg
@@ -24,3 +25,4 @@ PCB Footprint
 ==================
 
 .. autoclass:: pyaltiumlib.pcblib.footprint.PcbLibFootprint
+

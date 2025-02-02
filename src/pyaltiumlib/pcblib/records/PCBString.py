@@ -2,9 +2,10 @@ from pyaltiumlib.pcblib.records.base import _GenericPCBRecord
 from pyaltiumlib.datatypes import BinaryReader, Coordinate, CoordinatePoint
 from pyaltiumlib.datatypes import PCBTextJustification, PCBTextKind
 from typing import Tuple
-import logging
+
 
 # Configure logging
+import logging
 logger = logging.getLogger(__name__)
 
 class PcbString(_GenericPCBRecord):
@@ -48,19 +49,12 @@ class PcbString(_GenericPCBRecord):
         self.parse(stream)
 
     def __repr__(self) -> str:
-        """Return a string representation of the PCB string."""
-        variables = ', '.join(f"{key}={value!r}" for key, value in self.__dict__.items())
-        return f"{self.__class__.__name__}({variables})"
+        """Return a string representation of the PCB track."""
+        return f"PCBString(text={self.text}, location={self.location})"
 
     def parse(self, stream) -> None:
         """
         Parse the binary stream to extract string data.
-        
-        Args:
-            stream: A binary stream containing the string data.
-        
-        Raises:
-            ValueError: If the stream is invalid or incomplete.
         """
         try:
             block = BinaryReader.from_stream(stream)
@@ -112,6 +106,8 @@ class PcbString(_GenericPCBRecord):
                     
             if string.has_content():
                 self.text = string.read_string_block()
+                
+            self.is_initialized = True
                 
         except Exception as e:
             logger.error(f"Failed to parse PCB string: {str(e)}")
@@ -206,7 +202,7 @@ class PcbString(_GenericPCBRecord):
             )
 
             # Add the text to the appropriate drawing layer
-            self.Footprint._drawing_layer[self.layer].add(drawing_primitive)
+            self.Footprint._graphic_layers[self.layer].add(drawing_primitive)
         except Exception as e:
             logger.error(f"Failed to draw PCB string: {str(e)}")
             raise

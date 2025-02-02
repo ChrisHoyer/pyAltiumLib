@@ -32,6 +32,8 @@ class SchPolygon(_GenericSchRecord):
         
         self.num_vertices = int(self.rawdata.get('locationcount', 0))
         self.vertices = self._parse_vertices()
+        
+        self.is_initialized = True
 
     def __repr__(self) -> str:
         """Return a string representation of the polygon."""

@@ -33,7 +33,9 @@ class SchRectangle(_GenericSchRecord):
         self.linestyle_ext = SchematicLineStyle(self.rawdata.get('linestyleext', 0))
         
         self.corner = CoordinatePoint(Coordinate.parse_dpx("corner.x", self.rawdata),
-                                       Coordinate.parse_dpx("corner.y", self.rawdata, scale=-1.0))               
+                                       Coordinate.parse_dpx("corner.y", self.rawdata, scale=-1.0))  
+
+        self.is_initialized = True             
                     
     def __repr__(self):
         return f"SchRectangle"

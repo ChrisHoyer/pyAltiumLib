@@ -4,6 +4,7 @@ class _GenericPCBRecord:
     def __init__(self, parent):
         
         self.Footprint = parent
+        self.is_initialized = False
         
         
     def read_common(self, byte_array):
@@ -26,7 +27,7 @@ class _GenericPCBRecord:
         
     def get_layer_by_id(self, layerid): 
         
-        for layer in self.Footprint.LibFile._Layer:
+        for layer in self.Footprint.LibFile.Layers:
             if layer.id == layerid: 
                 return layer
             

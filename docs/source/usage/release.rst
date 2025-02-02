@@ -14,7 +14,7 @@ The code is available in `this repository <https://github.com/ChrisHoyer/pyAltiu
 File Format Coverage
 =======================
 
-Currently, the format is not completely supported, some aspects are not fully implemented.
+Currently, the format is not completely supported, some aspects are not fully implemented. Not all containers or records are known yet, so this list and the associated documentation may be incomplete.
 
 The coverage of containers of the Altium library file format is shown below:
 
@@ -197,7 +197,7 @@ The coverage of records/primitives of the Altium library file format is shown be
      - Coverage
    * - PCB Primitives
      - Arc
-     - Not Implemented
+     - Key features implemented
    * - PCB Primitives
      - Pad
      - Key features implemented

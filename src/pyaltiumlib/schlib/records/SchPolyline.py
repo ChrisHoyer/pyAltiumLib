@@ -45,7 +45,9 @@ class SchPolyline(_GenericSchRecord):
         self.linestyle_ext = SchematicLineStyle(self.rawdata.get('linestyleext', 0))
         self.lineshape_start = SchematicLineShape(self.rawdata.get('startlineshape', 0))            
         self.lineshape_end = SchematicLineShape(self.rawdata.get('endlineshape', 0))  
-        self.lineshape_size = SchematicLineWidth(self.rawdata.get('lineshapesize', 0))           
+        self.lineshape_size = SchematicLineWidth(self.rawdata.get('lineshapesize', 0))
+
+        self.is_initialized = True           
         
     def __repr__(self):
         return f"SchPolyline"

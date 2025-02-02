@@ -15,8 +15,8 @@ class SchLibSymbol(LibComponent):
     
     :param class parent: reference to library file :class:`pyaltiumlib.schlib.lib.SchLib`
     :param string name: name of the component
-    :param string description: description of the component
-    :param int partcount: number of parts in the symbol
+    :param string [optional] description: description of the component
+    :param int [optional] partcount: number of parts in the symbol
 
     :raises ValueError: If record id is not valid
     :raises ValueError: If component data can not be read

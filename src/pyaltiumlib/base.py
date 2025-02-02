@@ -53,7 +53,9 @@ class GenericLibFile:
             raise
             
         self.LibType = type(self)        
-        self.FilePath = filepath    
+        self.FilePath = filepath 
+        self.ComponentCount = 0
+        self.Parts = []
         
         self._olefile = None
         self._olefile_open = False
