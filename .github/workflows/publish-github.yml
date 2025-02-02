@@ -33,17 +33,25 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
 
-    - name: Create Git tag
+    - name: Check if tag already exists
+      id: check_tag
+      run: |
+        if git rev-parse "refs/tags/${{ env.VERSION }}" >/dev/null 2>&1; then
+          echo "Tag already exists, skipping tag creation."
+          echo "TAG_EXISTS=true" >> $GITHUB_ENV
+        else
+          echo "Creating new tag: ${{ env.VERSION }}"
+          echo "TAG_EXISTS=false" >> $GITHUB_ENV
+        fi
+
+    - name: Create Git tag (if needed)
+      if: env.TAG_EXISTS == 'false'
       run: |
         git tag ${{ env.VERSION }}
         git push origin ${{ env.VERSION }}
 
     - name: Create GitHub release
-      id: create_release
-      run: |
-        VERSION_NAME="${{ env.VERSION }}"
-        echo "Creating release for version: $VERSION_NAME"
-        gh release create $VERSION_NAME dist/* --title "Release $VERSION_NAME" --notes "Release version created from __init__.py"
-
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+      run: |
+        gh release create ${{ env.VERSION }} dist/* --title "Release ${{ env.VERSION }}" --notes "Release version created from __init__.py"
