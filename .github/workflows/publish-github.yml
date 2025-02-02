@@ -48,19 +48,20 @@ jobs:
         fi
 
     - name: Create and push Git tag (if needed)
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       if: env.TAG_EXISTS == 'false'
       run: |
         git tag ${{ env.VERSION }}
         git push origin ${{ env.VERSION }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build package
       run: |
         python setup.py sdist bdist_wheel
 
     - name: Create GitHub release
-      run: |
-        gh release create ${{ env.VERSION }} dist/* --title "Release ${{ env.VERSION }}" --notes "Release version created from __init__.py"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create ${{ env.VERSION }} dist/* --title "Release ${{ env.VERSION }}" --notes "Release version created from __init__.py"
+
