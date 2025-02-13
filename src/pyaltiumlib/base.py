@@ -1,5 +1,6 @@
 from pyaltiumlib.datatypes import ParameterColor
 
+import os
 import olefile
 from typing import List, Optional, Dict, Any
 
@@ -17,45 +18,44 @@ class GenericLibFile:
     :param string filepath: The path to the library file
     
     :raises FileNotFoundError: If file is not a supported file.
-    """
-    
-    LibType = None
-    """
-    `string` that specifies the type of the library.
-    """
-
-    LibHeader = ''
-    """`string` that contains the file path to the library.
-    """
-
-    FilePath = ''
-    """
-    `string` that stores the header information of the library.
-    """
-    
-    ComponentCount = 0
-    """
-    `int` with total number of components in the library.
-    """
-
-    Parts = []
-    """
-    `List[any]` is a collection of components derived from :class:`pyaltiumlib.libcomponent.LibComponent` in their specific class 
-    contained in the library.
-    """    
+    """  
     
     def __init__(self, filepath: str):
-        """
-        Initialize a GenericLibFile object.
-        """
+
         if not olefile.isOleFile( filepath ): 
-            logger.error(f"{filepath} is not a supported file.")
+            logger.error(f"'{filepath}' is not a supported file.")
             raise
             
-        self.LibType = type(self)        
+        self.LibType = type(self) 
+        """
+        `string` that specifies the type of the library.
+        """
+        
+        self.LibHeader = ""
+        """
+        `string` that stores the header information of the library.
+        """
+        
         self.FilePath = filepath 
+        """
+        `string` that contains the file path to the library.
+        """
+        
+        self.FileName = os.path.basename(filepath)
+        """
+        `string` that contains the name of the library.
+        """
+        
         self.ComponentCount = 0
+        """
+        `int` with total number of components in the library.
+        """
+        
         self.Parts = []
+        """
+        `List[any]` is a collection of components derived from :class:`pyaltiumlib.libcomponent.LibComponent` in their specific class 
+        contained in the library.
+        """ 
         
         self._olefile = None
         self._olefile_open = False
@@ -66,19 +66,19 @@ class GenericLibFile:
         self._BackgroundColor = ParameterColor.from_hex("#6D6A69")  
 
 
-    def __repr__(self) -> Dict:
+    def __repr__(self) -> str:
         """
-        Converts public attributes of the high level file to a dictionary.
+        Converts public attributes of the high level file to a string.
 
-        :return: A dict representation of the content of the object
-        :rtype: Dict
+        :return: A string representation of the content of the object
+        :rtype: str
         """
-        return self.read_meta()
+        return str( self.read_meta() )
     
 # =============================================================================
 #     External access 
 # =============================================================================
-
+    
     def read_meta(self) -> Dict:
         """
         Converts public attributes of the high level file to a dictionary.
@@ -92,8 +92,7 @@ class GenericLibFile:
             if not key.startswith("_")
             }
         return public_attributes        
-    
- 
+     
     def list_parts(self) -> List[str]:
         """
         List the names of all parts in the library.
@@ -102,8 +101,7 @@ class GenericLibFile:
         :rtype: List[str]
         """
         return [x.Name for x in self.Parts]
-
-
+   
     def get_part(self, name: str) -> Optional[Any]:
         """
         Get a part of the library by its name.
@@ -128,13 +126,13 @@ class GenericLibFile:
         Open the library file for reading.
         """        
         if self._olefile_open:
-            raise ValueError(f"file: { self.FilePath }. Already open!")
+            raise ValueError(f"file: '{self.FilePath}'. Already open!")
                 
         try:
             self._olefile = olefile.OleFileIO( self.FilePath )
             self._olefile_open = True
         except Exception as e:
-            logger.error(f"Failed to open file: {self.FilePath}. Error: {e}")
+            logger.error(f"Failed to open file: '{self.FilePath}'. Error: {e}")
             raise
 
     def _OpenStream(self, container: str, stream: str) -> Any:
@@ -149,7 +147,7 @@ class GenericLibFile:
             Any: The opened stream.
         """                
         if not self._olefile_open:
-            logger.error(f"file: { self.FilePath }. File not open!")
+            logger.error(f"file: '{self.FilePath}'. File not opened!")
             raise
                     
         if not container == "":

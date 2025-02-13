@@ -1,30 +1,27 @@
-from pyaltiumlib.schlib.records.base import _GenericSchRecord
+from pyaltiumlib.schlib.records.base import GenericSchRecord
 from pyaltiumlib.datatypes import SchematicLineWidth, SchematicLineStyle
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
-import logging
+
+from typing import List, Tuple
 
 # Set up logging
+import logging
 logger = logging.getLogger(__name__)
 
-class SchBezier(_GenericSchRecord):
+class SchBezier(GenericSchRecord):
     """
-    A class to represent a Bezier curve in an Altium Schematic Library.
-
-    Attributes:
-        transparent (bool): Whether the Bezier curve is transparent.
-        issolid (bool): Whether the Bezier curve is solid.
-        linewidth (SchematicLineWidth): The width of the Bezier curve.
-        num_vertices (int): The number of vertices in the Bezier curve.
-        vertices (List[CoordinatePoint]): The vertices of the Bezier curve.
-        linestyle (SchematicLineStyle): The line style of the Bezier curve.
-        linestyle_ext (SchematicLineStyle): The extended line style of the Bezier curve.
+    Implementation of a schematic record
+    See also :ref:`SchPrimitive05` details on this schematic records. This record can be drawn.
+    
+    :param Dict data: Dictionary containing raw record data
+    :param class parent: Parent symbol object    
+    :raises ValueError: If record id is not valid
     """
-
     def __init__(self, data, parent):
         super().__init__(data, parent)
         
         if self.record != 5:
-            raise TypeError("Incorrect assigned schematic record")
+            logger.warning(f"Error in mapping between record objects and record id! - incorrect id {self.record}")
 
         self.transparent = self.rawdata.get_bool("transparent")
         self.issolid = self.rawdata.get_bool("issolid")
@@ -42,16 +39,13 @@ class SchBezier(_GenericSchRecord):
         self.linestyle_ext = SchematicLineStyle(self.rawdata.get('linestyleext', 0))
         
         self.is_initialized = True
-      
-    def __repr__(self):
-        return f"SchBezier"
 
-    def get_bounding_box(self):
+    def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """
-        Return the bounding box for the Bezier curve.
-
-        Returns:
-            List[CoordinatePoint]: The bounding box as a list of two CoordinatePoints.
+        Generates and returns a bounding box for this record
+        
+        :return: List with two coordinate entries 
+        :rtype: tuple with :ref:`DataTypeCoordinatePoint`
         """
         min_x = float("inf")
         min_y = float("inf")
@@ -72,14 +66,13 @@ class SchBezier(_GenericSchRecord):
         return [CoordinatePoint(Coordinate(min_x), Coordinate(min_y)),
                 CoordinatePoint(Coordinate(max_x), Coordinate(max_y))]
 
-    def draw_svg(self, dwg, offset, zoom):
+    def draw_svg(self, dwg, offset, zoom) -> None:
         """
-        Draw the Bezier curve using svgwrite.
-
-        Args:
-            dwg: The SVG drawing object.
-            offset (CoordinatePoint): The offset for drawing.
-            zoom (float): The zoom factor for scaling.
+        Draw schematic record using svgwrite.
+        
+        :param graphic dwg: svg drawing object
+        :param CoordinatePoint offset: Move drawing by the given offset as :ref:`DataTypeCoordinatePoint`
+        :param float zoom: Scaling Factor for all elements  
         """
         points = []
         for vertex in self.vertices:
@@ -90,23 +83,24 @@ class SchBezier(_GenericSchRecord):
 
         dwg.add(dwg.polyline(interp_points,
                              fill="none",
-                             stroke_dasharray=self.draw_linestyle(),
+                             stroke_dasharray=self.get_svg_stroke_dasharray(),
                              stroke=self.color.to_hex(),
                              stroke_width=int(self.linewidth) * zoom,
                              stroke_linejoin="round",
                              stroke_linecap="round"))
         
-    def bezier_interpolate(self, control_points, steps=20):
+    @classmethod     
+    def bezier_interpolate(self, control_points, steps=20) -> List:
         """
-        Interpolate points along a Bezier curve.
+        Interpolate points along a Bezier curve before using De Casteljau's algorithm.
+        
+        :param List[tuple] control_points: The control points of the Bezier curve.
+        :param int optional steps: The number of steps for interpolation.
 
-        Args:
-            control_points (List[tuple]): The control points of the Bezier curve.
-            steps (int): The number of steps for interpolation.
-
-        Returns:
-            List[tuple]: The interpolated points along the Bezier curve.
+        :return: The interpolated points along the Bezier curve
+        :rtype: List[tuple]
         """
+
         interpolated_points = []
         
         # Bezier curve using De Casteljau's algorithm

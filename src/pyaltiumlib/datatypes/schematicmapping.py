@@ -1,6 +1,6 @@
-from .mapping import _MappingBase
+from .mapping import MappingBase
 
-class SchematicLineWidth(_MappingBase):
+class SchematicLineWidth(MappingBase):
     _map = {
         0: "Smallest",
         1: "Small",
@@ -21,7 +21,7 @@ class SchematicLineWidth(_MappingBase):
             return 1
     
 
-class SchematicLineStyle(_MappingBase):
+class SchematicLineStyle(MappingBase):
     _map = {
         0: "Solid",
         1: "Dashed",
@@ -31,7 +31,7 @@ class SchematicLineStyle(_MappingBase):
     
 
 
-class SchematicLineShape(_MappingBase):
+class SchematicLineShape(MappingBase):
     _map = {
         0: "None",
         1: "Arrow",
@@ -97,7 +97,7 @@ class SchematicLineShape(_MappingBase):
     
     
     
-class SchematicPinSymbol(_MappingBase):
+class SchematicPinSymbol(MappingBase):
     _map = {
         0: "NoneType",
         1: "Dot",
@@ -123,7 +123,7 @@ class SchematicPinSymbol(_MappingBase):
         34: "BidirectionalSignalFlow"
     }
 
-class SchematicPinElectricalType(_MappingBase):
+class SchematicPinElectricalType(MappingBase):
     _map = {
         0: "Input",
         1: "InputOutput",
@@ -135,7 +135,7 @@ class SchematicPinElectricalType(_MappingBase):
         7: "Power"
     }
     
-class SchematicTextOrientation(_MappingBase):
+class SchematicTextOrientation(MappingBase):
     _map = {
         0: "None",
         1: "Rotated 90 degrees",
@@ -143,7 +143,7 @@ class SchematicTextOrientation(_MappingBase):
         3: "Rotated 270 degrees",
     }
 
-class SchematicTextJustification(_MappingBase):
+class SchematicTextJustification(MappingBase):
     _map = {
         0: {"name": "BottomLeft", "vertical": "text-after-edge", "horizontal": "start"},
         1: {"name": "BottomCenter", "vertical": "text-after-edge", "horizontal": "middle"},

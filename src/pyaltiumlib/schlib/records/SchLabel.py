@@ -1,31 +1,28 @@
-from pyaltiumlib.schlib.records.base import _GenericSchRecord
+from pyaltiumlib.schlib.records.base import GenericSchRecord
 from pyaltiumlib.datatypes import SchematicTextOrientation, SchematicTextJustification
 from pyaltiumlib.datatypes.coordinate import CoordinatePoint
 
-import logging
-from typing import Dict, List
+from typing import Dict, Tuple
 
+# Set up logging
+import logging
 logger = logging.getLogger(__name__)
 
-class SchLabel(_GenericSchRecord):
+class SchLabel(GenericSchRecord):
     """
-    Represents a text label in an Altium schematic library.
+    Implementation of a schematic record
+    See also :ref:`SchPrimitive04` details on this schematic records. This record can be drawn.
     
-    Attributes:
-        orientation (SchematicTextOrientation): Text orientation
-        justification (SchematicTextJustification): Text alignment
-        font_id (int): Index of font in parent library
-        text (str): Display text content
-        is_mirrored (bool): Mirror state
-        is_hidden (bool): Visibility state
-        alignment (Dict): Text positioning metadata
+    :param Dict data: Dictionary containing raw record data
+    :param class parent: Parent symbol object   
+    :raises ValueError: If record id is not valid
     """
 
     def __init__(self, data, parent):
         super().__init__(data, parent)
         
         if self.record != 4:
-            raise ValueError(f"Invalid record type {self.record} for SchLabel (expected 4)")
+            logger.warning(f"Error in mapping between record objects and record id! - incorrect id {self.record}")
 
         self.orientation = SchematicTextOrientation(self.rawdata.get("orientation", 0))
         self.justification = SchematicTextJustification(self.rawdata.get("justification", 0))
@@ -37,11 +34,13 @@ class SchLabel(_GenericSchRecord):
         
         self.is_initialized = True
 
-    def __repr__(self) -> str:
-        return f"SchLabel(text='{self.text}')"
-
-    def get_bounding_box(self) -> List[CoordinatePoint]:
-        """Calculate bounding box based on text metrics and orientation."""
+    def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
+        """
+        Generates and returns a bounding box for this record
+        
+        :return: List with two coordinate entries 
+        :rtype: tuple with :ref:`DataTypeCoordinatePoint`
+        """
         if not hasattr(self.Symbol.LibFile, '_Fonts') or self.font_id >= len(self.Symbol.LibFile._Fonts):
             logger.warning(f"Invalid font ID {self.font_id} for label '{self.text}'")
             return [self.location.copy(), self.location.copy()]
@@ -80,7 +79,13 @@ class SchLabel(_GenericSchRecord):
         return [start, end]
 
     def draw_svg(self, dwg, offset, zoom) -> None:
-        """Render label text to SVG with proper formatting and alignment."""
+        """
+        Draw schematic record using svgwrite.
+        
+        :param graphic dwg: svg drawing object
+        :param CoordinatePoint offset: Move drawing by the given offset as :ref:`DataTypeCoordinatePoint`
+        :param float zoom: Scaling Factor for all elements  
+        """
         if self.is_hidden:
             return
 

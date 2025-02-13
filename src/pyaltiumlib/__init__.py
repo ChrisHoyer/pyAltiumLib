@@ -7,7 +7,7 @@ AUTHOR_NAME = 'Chris Hoyer'
 AUTHOR_EMAIL = 'info@chrishoyer.de'
 CYEAR = '2024-2025'
 
-__version__ = "0.2"
+__version__ = "0.3"
 __author__ = "Chris Hoyer <info@chrishoyer.de>"
 
 import os
@@ -51,8 +51,3 @@ def read(filepath: str) -> Union[SchLib, PcbLib]:
     else:
         logger.error(f"Invalid file type: {filepath}.")
         raise
-    
-
-
-
-

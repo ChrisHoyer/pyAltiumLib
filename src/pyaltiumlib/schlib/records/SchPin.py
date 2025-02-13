@@ -1,14 +1,28 @@
-from pyaltiumlib.schlib.records.base import _GenericSchRecord
-from pyaltiumlib.datatypes import SchematicLineWidth, SchematicPinSymbol, SchematicPinElectricalType
+from pyaltiumlib.schlib.records.base import GenericSchRecord
+from pyaltiumlib.datatypes import SchematicLineWidth, SchematicPinSymbol, SchematicPinElectricalType, CoordinatePoint
 
-class SchPin(_GenericSchRecord):
+from typing import Tuple
+
+# Set up logging
+import logging
+logger = logging.getLogger(__name__)
+
+class SchPin(GenericSchRecord):
+    """
+    Implementation of a schematic record
+    See also :ref:`SchPrimitive02` details on this schematic records. This record can be drawn.
+    
+    :param Dict data: Dictionary containing raw record data
+    :param class parent: Parent symbol object   
+    :raises ValueError: If record id is not valid
+    """
     
     def __init__(self, data, parent):
         
         super().__init__(data, parent)
         
         if not( self.record == 2 ):
-            raise TypeError("Incorrect assigned schematic record")
+            logger.warning(f"Error in mapping between record objects and record id! - incorrect id {self.record}")
         
         self.symbol_inneredge = SchematicPinSymbol(self.rawdata.get('symbol_inneredge', 0))
         self.symbol_outeredge = SchematicPinSymbol(self.rawdata.get('symbol_outeredge', 0))
@@ -33,18 +47,13 @@ class SchPin(_GenericSchRecord):
         self.pinlength = self.rawdata.get('length', 0)
         
         self.is_initialized = True
-        
-        
-    def __repr__(self):
-        return f"SchPin"
-        
-# =============================================================================
-#     Drawing related
-# =============================================================================   
-         
-    def get_bounding_box(self):
+          
+    def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """
-        Return bounding box for the object
+        Generates and returns a bounding box for this record
+        
+        :return: List with two coordinate entries 
+        :rtype: tuple with :ref:`DataTypeCoordinatePoint`
         """
         self.end = self.location.copy()
         self.label_name = {
@@ -94,17 +103,14 @@ class SchPin(_GenericSchRecord):
             self.label_designator["position"].y = self.label_designator["position"].y - self.spacing_label_designator
           
         return [self.location, self.end]
-
     
-    def draw_svg(self, dwg, offset, zoom):
+    def draw_svg(self, dwg, offset, zoom) -> None:
         """
-        Draw element using svgwrite
-        Args:
-            dwg: svg Drawing
-            offset (int): SchematicCoordinate with drawing center point
-            zoom (float): Scaling Factor for all elements
-        Returns:
-            None
+        Draw schematic record using svgwrite.
+        
+        :param graphic dwg: svg drawing object
+        :param CoordinatePoint offset: Move drawing by the given offset as :ref:`DataTypeCoordinatePoint`
+        :param float zoom: Scaling Factor for all elements  
         """
         
         start = (self.location * zoom) + offset

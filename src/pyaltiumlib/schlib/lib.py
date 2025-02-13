@@ -2,7 +2,6 @@ from pyaltiumlib.base import GenericLibFile
 from pyaltiumlib.datatypes import ParameterCollection, ParameterColor, ParameterFont
 from pyaltiumlib.schlib.symbol import SchLibSymbol
 
-
 # Set up logging
 import logging
 logger = logging.getLogger(__name__)
@@ -10,8 +9,6 @@ logger = logging.getLogger(__name__)
 class SchLib(GenericLibFile):
     """
     Schematic class for handling Altium Designer schematic library files.
-    This class is derived from :class:`pyaltiumlib.base.GenericLibFile`. 
-    
     During initialization the library file will be read.
     
     :param string filepath: The path to the .SchLib library file
@@ -21,9 +18,6 @@ class SchLib(GenericLibFile):
     """
     
     def __init__(self, filepath: str):
-        """
-        Initialize a SchLib object.
-        """
         super().__init__(filepath)
         
         self.LibType = "Schematic"
@@ -34,7 +28,12 @@ class SchLib(GenericLibFile):
         self._Fonts.append( ParameterFont("Times New Roman", 10) )
         
         self._ReadLibrary()
+        
+        logger.info(f"Reading and extracting of '{self.FileName}' done.")
 
+# =============================================================================
+#     Internal content reading related functions
+# =============================================================================   
         
     def _ReadLibrary(self) -> None:
         """
@@ -57,11 +56,19 @@ class SchLib(GenericLibFile):
         try:
         
             self._FileHeader = ParameterCollection.from_block( self._OpenStream("",  "FileHeader")  )
-        
+            
             self.LibHeader = self._FileHeader.get("header", "")
+            
+            logger.debug(f" Fileheader of library file '{self.FileName}' is '{self.LibHeader}'.")
+            if "Schematic" in self.LibHeader and "Binary File" in self.LibHeader:
+                logger.info(f"'{self.FileName}' identified as schematic binary library file.")
+            else:
+                logger.warning(f"'{self.FilePath}' can not be identified as schematic binary library!")
         
             # Extract Fonts  (1....FontCount)
             self._FontCount = int( self._FileHeader.get("fontidcount"), 0)
+            logger.debug(f"Start extracting {self._FontCount} fonts(s) in '{self.FileName}'.")
+            
             for index in range(self._FontCount + 1):
                 font = self._FileHeader.get(f'fontname{index}', None)
                 size = self._FileHeader.get(f'size{index}', "")
@@ -78,6 +85,8 @@ class SchLib(GenericLibFile):
                                              
             # Extract and Read Components (0....CompCount)
             self.ComponentCount = int( self._FileHeader.get("compcount"), 0) 
+            logger.info(f"Start extracting {self.ComponentCount} component(s) in '{self.FileName}'.")
+            
             for index in range(self.ComponentCount):
                 lib_ref = self._FileHeader.get(f'LibRef{index}', None)
                 descr = self._FileHeader.get(f'CompDescr{index}', "")  

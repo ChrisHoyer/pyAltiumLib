@@ -8,27 +8,26 @@ logger = logging.getLogger(__name__)
 
 class SchLibSymbol(LibComponent):
     """
-    Symbol class represent a schematic symbol in an Altium Schematic Library.
-    This class is derived from :class:`pyaltiumlib.libcomponent.LibComponent`. 
-    
+    Symbol class represent a schematic symbol in an Altium Schematic Library.    
     During initialization the library file will be read.
     
     :param class parent: reference to library file :class:`pyaltiumlib.schlib.lib.SchLib`
     :param string name: name of the component
-    :param string [optional] description: description of the component
-    :param int [optional] partcount: number of parts in the symbol
+    :param string optional description: description of the component
+    :param int optional partcount: number of parts in the symbol
 
     :raises ValueError: If record id is not valid
     :raises ValueError: If component data can not be read
     """
     
     def __init__(self, parent, name: str, description: str = "", partcount: int = 0):
-        """
-        Initialize a SchLibSymbol object.
-        """
         super().__init__(parent, name, description)
         
-        self.PartCount = int(partcount) - 1 if partcount else 0                 
+        self.PartCount = int(partcount) - 1 if partcount else 0
+        """
+        `int` number of sub parts within one symbol
+        """
+               
         self._ReadSymbolData()
         
                 
@@ -74,12 +73,14 @@ class SchLibSymbol(LibComponent):
 
         try:
             record_id = int(RecordId)
+            
             if record_id in record_map:
                 self.Records.append(record_map[record_id](record, self))
             else:
-                logger.warning(f"Unsupported record id value: {RecordId}")
-        except ValueError:
-            logger.error(f"Invalid RecordId: {RecordId} is not a valid integer")
+                logger.warning(f"Found unsupported RecordID={record_id} in '{self.Name}'.")
+                
+        except Exception as e:
+            logger.error(f"Error during record parsing in '{self.Name}. Exception: {e}")
 
         
     def _ReadSymbolData(self) -> None:
@@ -106,13 +107,14 @@ class SchLibSymbol(LibComponent):
                     Record = SchematicPin( olestream.read(RecordLength) )
     
                 else:
-                    raise ValueError(f"Record type: { RecordType } unknown!")                
+                    logger.warning(f"Found unsupported RecordType={RecordType} in '{self.Name}'.")
+                    break
                     
                 if Record:
                     self._CreateRecord( Record )
                 
         except Exception as e:
-            logger.error(f"Failed to read symbol data: {e}")
+            logger.error(f"Failed to read data of '{self.Name}'. Exception: {e}")
             raise
                 
 

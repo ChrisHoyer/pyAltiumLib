@@ -1,27 +1,28 @@
-from pyaltiumlib.schlib.records.base import _GenericSchRecord
+from pyaltiumlib.schlib.records.base import GenericSchRecord
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 from pyaltiumlib.datatypes import SchematicLineWidth
-import logging
+
+from typing import Tuple
 
 # Set up logging
+import logging
 logger = logging.getLogger(__name__)
 
-class SchEllipse(_GenericSchRecord):
+class SchEllipse(GenericSchRecord):
     """
-    A class to represent an ellipse in an Altium Schematic Library.
-
-    Attributes:
-        radius_x (Coordinate): The x-radius of the ellipse.
-        radius_y (Coordinate): The y-radius of the ellipse.
-        linewidth (SchematicLineWidth): The width of the ellipse's border.
-        issolid (bool): Whether the ellipse is solid.
+    Implementation of a schematic record
+    See also :ref:`SchPrimitive08` details on this schematic records. This record can be drawn.
+    
+    :param Dict data: Dictionary containing raw record data
+    :param class parent: Parent symbol object  
+    :raises ValueError: If record id is not valid
     """
 
     def __init__(self, data, parent):
         super().__init__(data, parent)
         
         if self.record != 8:
-            raise TypeError("Incorrect assigned schematic record")
+            logger.warning(f"Error in mapping between record objects and record id! - incorrect id {self.record}")           
             
         self.radius_x = Coordinate.parse_dpx("radius", self.rawdata)
         self.radius_y = Coordinate.parse_dpx("secondaryradius", self.rawdata)                   
@@ -29,16 +30,13 @@ class SchEllipse(_GenericSchRecord):
         self.issolid = self.rawdata.get_bool('issolid')
         
         self.is_initialized = True
-        
-    def __repr__(self):
-        return f"SchEllipse"
-
-    def get_bounding_box(self):
+     
+    def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """
-        Return the bounding box for the ellipse.
-
-        Returns:
-            List[CoordinatePoint]: The bounding box as a list of two CoordinatePoints.
+        Generates and returns a bounding box for this record
+        
+        :return: List with two coordinate entries 
+        :rtype: tuple with :ref:`DataTypeCoordinatePoint`
         """
         start_x = self.location.x - self.radius_x
         start_y = self.location.y - self.radius_y        
@@ -52,14 +50,13 @@ class SchEllipse(_GenericSchRecord):
         
         return [CoordinatePoint(min_x, min_y), CoordinatePoint(max_x, max_y)]
 
-    def draw_svg(self, dwg, offset, zoom):
+    def draw_svg(self, dwg, offset, zoom) -> None:
         """
-        Draw the ellipse using svgwrite.
-
-        Args:
-            dwg: The SVG drawing object.
-            offset (CoordinatePoint): The offset for drawing.
-            zoom (float): The zoom factor for scaling.
+        Draw schematic record using svgwrite.
+        
+        :param graphic dwg: svg drawing object
+        :param CoordinatePoint offset: Move drawing by the given offset as :ref:`DataTypeCoordinatePoint`
+        :param float zoom: Scaling Factor for all elements  
         """
         center = (self.location * zoom) + offset
         radius_x = self.radius_x * zoom

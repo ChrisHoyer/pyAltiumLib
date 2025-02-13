@@ -15,9 +15,9 @@ Dependencies
 
 The following dependencies are automatically installed with `pyaltiumlib`:
 
-- **Python Standard Libraries**: `sys`, `os`, `math`, `typing`
+- **Python Standard Libraries**: `sys`, `os`, `math`, `typing`, `logging`
 - **External Libraries**:
-    - `olefile` - for reading Altium library files
+    - `olefile` - for reading ole files (Altium library file container)
     - `svgwrite` - for rendering schematic and PCB drawings
 
 

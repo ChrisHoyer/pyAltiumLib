@@ -1,27 +1,27 @@
-from pyaltiumlib.schlib.records.base import _GenericSchRecord
+from pyaltiumlib.schlib.records.base import GenericSchRecord
 from pyaltiumlib.datatypes import SchematicLineWidth, SchematicLineStyle
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 
-import logging
-from typing import List
+from typing import Tuple
 
+# Set up logging
+import logging
 logger = logging.getLogger(__name__)
 
-class SchLine(_GenericSchRecord):
+class SchLine(GenericSchRecord):
     """
-    Represents a straight line in an Altium schematic library.
+    Implementation of a schematic record
+    See also :ref:`SchPrimitive13` details on this schematic records. This record can be drawn.
     
-    Attributes:
-        linewidth (SchematicLineWidth): Stroke width
-        linestyle (SchematicLineStyle): Stroke pattern
-        corner (CoordinatePoint): End point coordinates
+    :param Dict data: Dictionary containing raw record data
+    :param class parent: Parent symbol object  
+    :raises ValueError: If record id is not valid
     """
-
     def __init__(self, data, parent):
         super().__init__(data, parent)
         
         if self.record != 13:
-            raise ValueError(f"Invalid record type {self.record} for SchLine (expected 13)")
+            logger.warning(f"Error in mapping between record objects and record id! - incorrect id {self.record}")
 
         self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0))
         self.linestyle = SchematicLineStyle(self.rawdata.get('linestyle', 0))
@@ -34,11 +34,13 @@ class SchLine(_GenericSchRecord):
         
         self.is_initialized = True
 
-    def __repr__(self) -> str:
-        return f"SchLine({self.location} to {self.corner})"
-
-    def get_bounding_box(self) -> List[CoordinatePoint]:
-        """Calculate bounding box including line width buffer."""
+    def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
+        """
+        Generates and returns a bounding box for this record
+        
+        :return: List with two coordinate entries 
+        :rtype: tuple with :ref:`DataTypeCoordinatePoint`
+        """
         half_width = self.linewidth.value / 2
         return [
             CoordinatePoint(
@@ -52,7 +54,13 @@ class SchLine(_GenericSchRecord):
         ]
 
     def draw_svg(self, dwg, offset, zoom) -> None:
-        """Render line to SVG with proper styling."""
+        """
+        Draw schematic record using svgwrite.
+        
+        :param graphic dwg: svg drawing object
+        :param CoordinatePoint offset: Move drawing by the given offset as :ref:`DataTypeCoordinatePoint`
+        :param float zoom: Scaling Factor for all elements  
+        """
         start = (self.location * zoom) + offset
         end = (self.corner * zoom) + offset
         
@@ -61,7 +69,7 @@ class SchLine(_GenericSchRecord):
             end=end.to_int_tuple(),
             stroke=self.color.to_hex(),
             stroke_width=int(self.linewidth) * zoom,
-            stroke_dasharray=self.draw_linestyle(),
+            stroke_dasharray=self.get_svg_stroke_dasharray(),
             stroke_linecap="round",
             stroke_linejoin="round"
         ))

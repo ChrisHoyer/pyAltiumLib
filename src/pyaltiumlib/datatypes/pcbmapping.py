@@ -1,6 +1,6 @@
-from .mapping import _MappingBase
+from .mapping import MappingBase
 
-class PCBPadShape(_MappingBase):
+class PCBPadShape(MappingBase):
     _map = {
         0: "None",
         1: "Round",
@@ -9,7 +9,7 @@ class PCBPadShape(_MappingBase):
         9: "Rounded Rectangle"
     }
     
-class PCBHoleShape(_MappingBase):
+class PCBHoleShape(MappingBase):
     _map = {
         -1: "None",
         0: "Round",
@@ -17,21 +17,21 @@ class PCBHoleShape(_MappingBase):
         2: "Slot",
     }
 
-class PCBStackMode(_MappingBase):
+class PCBStackMode(MappingBase):
     _map = {
         0: "Simple",
         1: "TopMiddleBottom",
         2: "FullStack",
     }
 
-class PCBStrokeFont(_MappingBase):
+class PCBStrokeFont(MappingBase):
     _map = {
         0: "Default",
         1: "SansSerif",
         2: "Serif",
     }
     
-class PCBTextKind(_MappingBase):
+class PCBTextKind(MappingBase):
     _map = {
         0: {"name": "Stroke", "default_font": "UHF"},
         1: {"name": "TrueType", "default_font": "Arial"},
@@ -52,7 +52,7 @@ class PCBTextKind(_MappingBase):
             and self.get_font() == other.get_font()
             )    
 
-class PCBTextJustification(_MappingBase):
+class PCBTextJustification(MappingBase):
     _map = {
         1: {"name": "BottomRight", "vertical": "text-after-edge", "horizontal": "start"},
         2: {"name": "MiddleRight", "vertical": "central", "horizontal": "start"},

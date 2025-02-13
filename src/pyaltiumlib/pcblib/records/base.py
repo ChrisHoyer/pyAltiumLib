@@ -1,3 +1,8 @@
+import math
+
+# Set up logging
+import logging
+logger = logging.getLogger(__name__)
 
 class _GenericPCBRecord:
     
@@ -5,7 +10,7 @@ class _GenericPCBRecord:
         
         self.Footprint = parent
         self.is_initialized = False
-        
+                
         
     def read_common(self, byte_array):
         
@@ -32,6 +37,44 @@ class _GenericPCBRecord:
                 return layer
             
         return None
+
+    def get_svg_arc_path(self, center, radius_x, radius_y, angle_start, angle_end):
+        """
+        This function returns the svg path data for an arc.
+    
+        :param tuple center: The center coordinates of the arc
+        :param int radius_x: The x-radius of the arc
+        :param int radius_y: The y-radius of the arc
+        :param float angle_start: The start angle of the arc
+        :param float angle_end: The end angle of the arc.
+    
+        :return: corresponding svg path data for arc
+        """
+        def degrees_to_radians(degrees):
+            return (degrees * math.pi / 180) % (2*math.pi)
+        
+        angle_start = degrees_to_radians(angle_start)
+        angle_stop = degrees_to_radians(angle_end)
+        
+        if angle_start == angle_stop:
+            angle_stop -= 0.001
+        
+        start_x = center[0] + radius_x * math.cos(-angle_start)
+        start_y = center[1] + radius_y * math.sin(-angle_start)
+        end_x = center[0] + radius_x * math.cos(-angle_stop)
+        end_y = center[1] + radius_y * math.sin(-angle_stop)
+        
+        # Set large_arc_flag based on the angle difference
+        large_arc_flag = 1 if (angle_stop - angle_start) % (2 * math.pi) > math.pi else 0
+        
+        # Set sweep_flag to 0 for counterclockwise
+        sweep_flag = 0
+        
+        path_data = (
+            f"M {start_x},{start_y} "
+            f"A {radius_x},{radius_y} 0 {large_arc_flag},{sweep_flag} {end_x},{end_y}"
+        )
+        return path_data
 
     def draw_bounding_box(self, graphic, offset, zoom):
         """

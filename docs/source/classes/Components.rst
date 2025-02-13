@@ -5,24 +5,19 @@ Generic Component (Base)
 =============================
 
 .. autoclass:: pyaltiumlib.libcomponent.LibComponent
-    :show-inheritance:
+    :no-index:
 
-    .. autoattribute:: LibFile
-    .. autoattribute:: Name
-    .. autoattribute:: Description
-    .. autoattribute:: Records
-
-    .. automethod:: pyaltiumlib.libcomponent.LibComponent.read_meta
-    .. automethod:: pyaltiumlib.libcomponent.LibComponent.draw_svg
-
-Schematic Symbol
-===================
+Schematic Symbol Component
+===========================
 
 .. autoclass:: pyaltiumlib.schlib.symbol.SchLibSymbol
+    :show-inheritance:
+    :no-index:
 
-
-PCB Footprint
-==================
+PCB Footprint Component
+========================
 
 .. autoclass:: pyaltiumlib.pcblib.footprint.PcbLibFootprint
+    :show-inheritance:
+    :no-index:
 

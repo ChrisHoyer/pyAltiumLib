@@ -1,33 +1,28 @@
-from pyaltiumlib.schlib.records.base import _GenericSchRecord
+from pyaltiumlib.schlib.records.base import GenericSchRecord
 from pyaltiumlib.datatypes import SchematicLineWidth, SchematicLineStyle, SchematicLineShape
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
-import logging
+
+from typing import Tuple
 
 # Set up logging
+import logging
 logger = logging.getLogger(__name__)
 
-class SchPolyline(_GenericSchRecord):
+class SchPolyline(GenericSchRecord):
     """
-    A class to represent a polyline in an Altium Schematic Library.
-
-    Attributes:
-        transparent (bool): Whether the polyline is transparent.
-        issolid (bool): Whether the polyline is solid.
-        linewidth (SchematicLineWidth): The width of the polyline.
-        num_vertices (int): The number of vertices in the polyline.
-        vertices (List[CoordinatePoint]): The vertices of the polyline.
-        linestyle (SchematicLineStyle): The line style of the polyline.
-        linestyle_ext (SchematicLineStyle): The extended line style of the polyline.
-        lineshape_start (SchematicLineShape): The shape at the start of the polyline.
-        lineshape_end (SchematicLineShape): The shape at the end of the polyline.
-        lineshape_size (SchematicLineWidth): The size of the line shapes.
+    Implementation of a schematic record
+    See also :ref:`SchPrimitive06` details on this schematic records. This record can be drawn.
+    
+    :param Dict data: Dictionary containing raw record data
+    :param class parent: Parent symbol object  
+    :raises ValueError: If record id is not valid
     """
 
     def __init__(self, data, parent):
         super().__init__(data, parent)
         
         if self.record != 6:
-            raise TypeError("Incorrect assigned schematic record")
+            logger.warning(f"Error in mapping between record objects and record id! - incorrect id {self.record}")
 
         self.transparent = self.rawdata.get_bool("transparent")
         self.issolid = self.rawdata.get_bool("issolid")
@@ -49,15 +44,12 @@ class SchPolyline(_GenericSchRecord):
 
         self.is_initialized = True           
         
-    def __repr__(self):
-        return f"SchPolyline"
-
-    def get_bounding_box(self):
+    def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """
-        Return the bounding box for the polyline.
-
-        Returns:
-            List[CoordinatePoint]: The bounding box as a list of two CoordinatePoints.
+        Generates and returns a bounding box for this record
+        
+        :return: List with two coordinate entries 
+        :rtype: tuple with :ref:`DataTypeCoordinatePoint`
         """
         min_x = float("inf")
         min_y = float("inf")
@@ -78,14 +70,13 @@ class SchPolyline(_GenericSchRecord):
         return [CoordinatePoint(Coordinate(min_x), Coordinate(min_y)),
                 CoordinatePoint(Coordinate(max_x), Coordinate(max_y))]
 
-    def draw_svg(self, dwg, offset, zoom):
+    def draw_svg(self, dwg, offset, zoom) -> None:
         """
-        Draw the polyline using svgwrite.
-
-        Args:
-            dwg: The SVG drawing object.
-            offset (CoordinatePoint): The offset for drawing.
-            zoom (float): The zoom factor for scaling.
+        Draw schematic record using svgwrite.
+        
+        :param graphic dwg: svg drawing object
+        :param CoordinatePoint offset: Move drawing by the given offset as :ref:`DataTypeCoordinatePoint`
+        :param float zoom: Scaling Factor for all elements  
         """
         points = []
         for vertex in self.vertices:
@@ -93,7 +84,7 @@ class SchPolyline(_GenericSchRecord):
 
         line = dwg.add(dwg.polyline([x.to_int_tuple() for x in points],
                              fill="none",
-                             stroke_dasharray=self.draw_linestyle(),
+                             stroke_dasharray=self.get_svg_stroke_dasharray(),
                              stroke=self.color.to_hex(),
                              stroke_width=int(self.linewidth) * zoom,
                              stroke_linejoin="round",

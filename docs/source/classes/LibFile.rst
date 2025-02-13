@@ -5,33 +5,27 @@ Dynamic Library Factory
 ============================
 
 .. automodule:: pyaltiumlib
-   :members:
-   :undoc-members:
-   :special-members: __init__
+    :no-index:
+    :members:
+    :undoc-members:
+    :special-members: __init__
 
 Generic Library File (Base)
 =================================
 
 .. autoclass:: pyaltiumlib.base.GenericLibFile
-
-    .. autoattribute:: LibType
-    .. autoattribute:: LibHeader
-    .. autoattribute:: FilePath
-    .. autoattribute:: ComponentCount
-    .. autoattribute:: Parts
-
-    .. automethod:: pyaltiumlib.base.GenericLibFile.read_meta
-    .. automethod:: pyaltiumlib.base.GenericLibFile.list_parts
-    .. automethod:: pyaltiumlib.base.GenericLibFile.get_part
+    :no-index:
 
 Schematic Library File (SchLib)
 ===============================
 
 .. autoclass:: pyaltiumlib.schlib.lib.SchLib
+    :show-inheritance:
+    :no-index:
 
 PCB Library File (PCBLib)
 ==========================
 
 .. autoclass:: pyaltiumlib.pcblib.lib.PcbLib
-
-    .. autoattribute:: Layers
+    :show-inheritance:
+    :no-index:

@@ -1,9 +1,9 @@
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 
-import logging
 from typing import List, Any, Dict
 
 # Set up logging
+import logging
 logger = logging.getLogger(__name__)
 
 class LibComponent:
@@ -17,51 +17,44 @@ class LibComponent:
     :param string name: name of the component
     :param string description: description of the component
     """
-
-    LibFile = None
-    """
-    `class` that references to library file
-    """
-
-    Name = ''
-    """`string` that contains the name of the component
-    """
-
-    Description = ''
-    """
-    `string` that contains the description of the component
-    """
-
-    Records = []
-    """
-    `List[any]` is a collection of records in their specific class 
-    contained in the library.
-    """
     
-    def __init__(self, parent, name: str, description: str):
-        """
-        Initialize a LibComponent object.
-
-        """        
+    def __init__(self, parent, name: str, description: str):        
         self.LibFile = parent
+        """
+        `class` that references to library file
+        """
+        
         self.Name = name
-        self.Description = description                  
+        """
+        `string` that contains the name of the component
+        """        
+        
+        self.Description = description  
+        """
+        `string` that contains the description of the component
+        """
+                
         self.Records = []
+        """
+        `List[any]` is a collection of records in their specific class 
+        contained in the library.
+        """ 
         
         self._BoundingBoxes = []
         self._graphic_layers = {}
+        
+        logger.debug(f"Reading Component '{self.Name}' from '{self.LibFile.FileName}'.")
        
 
-    def __repr__(self) -> Dict:
+    def __repr__(self) -> str:
         """
-        Converts name and descirption to a dictionary.
+        Converts name and descirption to a string.
 
-        :return: A dict representation of the object
-        :rtype: Dict
+        :return: A string representation of the object
+        :rtype: str
         """
-        return self.read_meta()
-
-
+        return str( self.read_meta() )
+   
     def read_meta(self) -> Dict:
         """
         Converts name and descirption to a dictionary.
@@ -79,17 +72,16 @@ class LibComponent:
 # =============================================================================
 #     Drawing related
 # =============================================================================   
- 
-    
+        
     def draw_svg(self, graphic, size_x: float, size_y: float, draw_bbox: bool = False) -> None:
         """
-        Draw all drawable records the component to an svg drawing. All records are
-        autoscaled to fit the given drawing object size.
+        Draw all drawable and initialized records the component to an svg drawing.
+        All records are autoscaled to fit the given drawing object size.
 
         :param svgwrite.Drawing graphic: the svgwrite drawing object
         :param float size_x: The width of the svgwrite drawing object
         :param float size_y: The height of the svgwrite drawing object        
-        :param bool [optional] draw_bbox: Draw bounding boxes
+        :param bool optional draw_bbox: Draw bounding boxes
             
         :raises ImportError: If 'svgwrite' module is not installed.
         :raises ValueError: If 'graphic' is not the right instance.

@@ -1,31 +1,29 @@
-from pyaltiumlib.schlib.records.base import _GenericSchRecord
+from pyaltiumlib.schlib.records.base import GenericSchRecord
 from pyaltiumlib.datatypes import SchematicLineWidth, SchematicLineStyle
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 
-import logging
+from typing import Tuple
 
 # Set up logging
+import logging
 logger = logging.getLogger(__name__)
 
-class SchRectangle(_GenericSchRecord):
+class SchRectangle(GenericSchRecord):
     """
-    A class to represent a rectangle in an Altium Schematic Library.
-
-    Attributes:
-        linewidth (SchematicLineWidth): The width of the rectangle's border.
-        transparent (bool): Whether the rectangle is transparent.
-        issolid (bool): Whether the rectangle is solid.
-        linestyle (SchematicLineStyle): The line style of the rectangle.
-        linestyle_ext (SchematicLineStyle): The extended line style of the rectangle.
-        corner (CoordinatePoint): The opposite corner of the rectangle.
+    Implementation of a schematic record
+    See also :ref:`SchPrimitive14` details on this schematic records. This record can be drawn.
+    
+    :param Dict data: Dictionary containing raw record data
+    :param class parent: Parent symbol object  
+    :raises ValueError: If record id is not valid
     """
 
     def __init__(self, data, parent):
         super().__init__(data, parent)
         
         if self.record != 14:
-            raise TypeError("Incorrect assigned schematic record")
-            
+            logger.warning(f"Error in mapping between record objects and record id! - incorrect id {self.record}")
+          
         self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0))             
         self.transparent = self.rawdata.get_bool("transparent") 
         self.issolid = self.rawdata.get_bool("issolid")
@@ -36,27 +34,24 @@ class SchRectangle(_GenericSchRecord):
                                        Coordinate.parse_dpx("corner.y", self.rawdata, scale=-1.0))  
 
         self.is_initialized = True             
-                    
-    def __repr__(self):
-        return f"SchRectangle"
 
-    def get_bounding_box(self):
+    def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """
-        Return the bounding box for the rectangle.
-
-        Returns:
-            List[CoordinatePoint]: The bounding box as a list of two CoordinatePoints.
+        Generates and returns a bounding box for this record
+        
+        :return: List with two coordinate entries 
+        :rtype: tuple with :ref:`DataTypeCoordinatePoint`
         """
         return [self.location, self.corner]
 
-    def draw_svg(self, dwg, offset, zoom):
-        """
-        Draw the rectangle using svgwrite.
 
-        Args:
-            dwg: The SVG drawing object.
-            offset (CoordinatePoint): The offset for drawing.
-            zoom (float): The zoom factor for scaling.
+    def draw_svg(self, dwg, offset, zoom) -> None:
+        """
+        Draw schematic record using svgwrite.
+        
+        :param graphic dwg: svg drawing object
+        :param CoordinatePoint offset: Move drawing by the given offset as :ref:`DataTypeCoordinatePoint`
+        :param float zoom: Scaling Factor for all elements  
         """
         start = (self.location * zoom) + offset
         end = (self.corner * zoom) + offset
@@ -69,7 +64,7 @@ class SchRectangle(_GenericSchRecord):
                          size=[abs(x) for x in size.to_int_tuple()],
                          fill=self.areacolor.to_hex() if self.issolid else "none",
                          stroke=self.color.to_hex(),
-                         stroke_dasharray=self.draw_linestyle(),
+                         stroke_dasharray=self.get_svg_stroke_dasharray(),
                          stroke_width=int(self.linewidth) * zoom,
                          stroke_linejoin="round",
                          stroke_linecap="round"))

@@ -23,8 +23,9 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.coverage']
 templates_path = []
 exclude_patterns = []
 
-autoclass_content = 'class'
-master_doc = 'index'
+autodoc_default_options = { "members": True,
+                           "no-index": True,
+                           "special-members": "__repr__",}
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

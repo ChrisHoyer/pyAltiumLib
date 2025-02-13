@@ -662,6 +662,8 @@ The more parameters are included in the :ref:`ParameterCollection`
 Schematic Records
 =====================
 
+.. _SchPrimitive01:
+
 ID 1 - Component
 -------------------
 Set up schematic component part. Other objects, such as lines, pins and labels exist, which are “owned” by the component. The component object seems to occur before any of its child objects.
@@ -690,6 +692,7 @@ The parameters of this record are given a :ref:`SchRecord`. This collection incl
      - :ref:`Int32`
      - Number of alternative symbols for part
 
+.. _SchPrimitive02:
 
 ID 2 - Pin
 -------------------
@@ -743,6 +746,7 @@ The parameters of this record are given a :ref:`SchRecord`. This collection incl
      - :ref:`SchCoordinate`
      - 
 
+.. _SchPrimitive03:
 
 ID 3 - IEEE Symbol
 -------------------
@@ -769,7 +773,7 @@ The parameters of this record are given a :ref:`SchRecord`. This collection incl
      - :ref:`Int32`
      -
 
-
+.. _SchPrimitive04:
 
 ID 4 - Label
 -------------------
@@ -802,6 +806,8 @@ The parameters of this record are given a :ref:`SchRecord`. This collection incl
      - :ref:`Boolean`
      -
 
+.. _SchPrimitive05:
+
 ID 5 - Bezier
 -------------------
 Bezier curve for component symbol. Similar structure as ID 6 - Polyline.
@@ -832,6 +838,8 @@ The parameters of this record are given a :ref:`SchRecord`. This collection incl
    * - Transparent
      - :ref:`Boolean`
      - 
+
+.. _SchPrimitive06:
 
 ID 6 - Polyline
 -------------------
@@ -873,6 +881,8 @@ The parameters of this record are given a :ref:`SchRecord`. This collection incl
      - :ref:`Int32`
      - 
 
+.. _SchPrimitive07:
+
 ID 7 - Polygon
 -------------------
 Polygon for component symbol. Similar structure as ID 6 - Polyline.
@@ -900,6 +910,8 @@ The parameters of this record are given a :ref:`SchRecord`. This collection incl
    * - Transparent
      - :ref:`Boolean`
      - 
+
+.. _SchPrimitive08:
 
 ID 8 - Ellipse
 -------------------
@@ -932,10 +944,14 @@ The parameters of this record are given a :ref:`SchRecord`. This collection incl
      - :ref:`Boolean`
      - 
 
+.. _SchPrimitive09:
+
 ID 9 - Pie
 -------------------
 Same as Arc component (ID = 12). Start Angle is 0 degree and End Angle is 360 Degree
 
+
+.. _SchPrimitive10:
 
 ID 10 - Rounded Rectangle
 --------------------------
@@ -968,6 +984,8 @@ The parameters of this record are given a :ref:`SchRecord`. This collection incl
      - :ref:`SchCoordinate`
      - 
 
+.. _SchPrimitive11:
+
 ID 11 - Elliptical Arc
 -----------------------
 Elliptical Arc for component symbol. Inherits Arc properties.
@@ -998,7 +1016,7 @@ The parameters of this record are given a :ref:`SchRecord`. This collection incl
    * - Transparent
      - :ref:`Boolean`
      - 
-
+.. _SchPrimitive12:
   
 ID 12 - Arc
 -----------------------
@@ -1028,6 +1046,8 @@ The parameters of this record are given a :ref:`SchRecord`. This collection incl
      - :ref:`Boolean`
      - 
 
+.. _SchPrimitive13:
+
 ID 13 - Line
 -----------------------
 Line for component symbol
@@ -1050,7 +1070,8 @@ The parameters of this record are given a :ref:`SchRecord`. This collection incl
      - :ref:`SchLineWidth`
      - 
 
-  
+.. _SchPrimitive14:
+
 ID 14 - Rectangle
 -----------------------
 Rectangle for component symbol.

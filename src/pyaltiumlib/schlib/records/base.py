@@ -1,45 +1,24 @@
-"""
-Base class for schematic records in Altium libraries.
-Provides common functionality for all schematic record types.
-"""
-
 from pyaltiumlib.datatypes import ParameterColor
 from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
-import logging
-from typing import Dict, Any, Optional, Tuple
+
+from typing import Dict, Any
+import math
 
 # Configure logging
+import logging
 logger = logging.getLogger(__name__)
 
-class _GenericSchRecord:
+class GenericSchRecord:
     """
-    Base class for all schematic records in Altium libraries.
+    Base class for all schematic records in altium library. 
+    See also :ref:`SchRecord` and :ref:`SchCommonParameter` for more
+    details on schematic records.
     
-    Attributes:
-        Symbol: Parent symbol object.
-        rawdata: Raw data dictionary for the record.
-        record: Record type identifier.
-        is_not_accessible: Whether the record is inaccessible.
-        graphically_locked: Whether the record is graphically locked.
-        owner_index: Index of the owner component.
-        owner_part_id: ID of the owner part.
-        owner_part_display_mode: Display mode of the owner part.
-        unique_id: Unique identifier for the record.
-        location: Position of the record in schematic coordinates.
-        color: Stroke color of the record.
-        areacolor: Fill color of the record.
-        spacing_label_name: Spacing for name labels.
-        spacing_label_designator: Spacing for designator labels.
+    :param Dict data: Dictionary containing raw record data
+    :param class parent: Parent symbol object    
     """
 
-    def __init__(self, data: Dict[str, Any], parent: Optional[Any] = None):
-        """
-        Initialize a schematic record with raw data and parent reference.
-        
-        Args:
-            data: Dictionary containing raw record data.
-            parent: Parent symbol object (optional).
-        """
+    def __init__(self, data: Dict[str, Any], parent: [Any] = None):
         self.Symbol = parent
         self.rawdata = data
         self.is_initialized = False
@@ -67,20 +46,26 @@ class _GenericSchRecord:
         self.spacing_label_name = 4.0
         self.spacing_label_designator = 1.0
 
-
-    def draw_linestyle(self) -> str:
+    def __repr__(self) -> str:
         """
-        Generate SVG stroke dasharray for the record's line style.
+        :return: A string representation of the record object
+        :rtype: str
+        """
+        return f"{self.__class__.__name__}"
+
+    def get_svg_stroke_dasharray(self) -> str:
+        """
+        This function returns the svg attribute :code:`stroke-dasharray` for the given
+        linestyle.
         
-        Returns:
-            str: SVG-compatible dasharray string.
-        
-        Raises:
-            AttributeError: If neither 'linestyle' nor 'linestyle_ext' is defined.
+        For more information on how `stroke-dasharray` works, visit the 
+        `MDN Web Docs for stroke-dasharray <https://developer.mozilla.org/de/docs/Web/SVG/Attribute/stroke-dasharray>`_.
+
+        :return: corresponding svg attribute :code:`stroke-dasharray`
+        :rtype: str
         """
         if not hasattr(self, 'linestyle') and not hasattr(self, 'linestyle_ext'):
             logger.error("Object must have either 'linestyle' or 'linestyle_ext' attribute")
-            raise
 
         # Determine line style
         style_value = getattr(self, 'linestyle', getattr(self, 'linestyle_ext')).to_int()
@@ -93,18 +78,53 @@ class _GenericSchRecord:
             return "1,10,4,10"
         else:  # Solid
             return "none"
-
+           
+    def get_svg_arc_path(self, center, radius_x, radius_y, angle_start, angle_end) -> str:
+        """
+        This function returns the svg path data for an arc.
+    
+        :param tuple center: The center coordinates of the arc
+        :param int radius_x: The x-radius of the arc
+        :param int radius_y: The y-radius of the arc
+        :param float angle_start: The start angle of the arc
+        :param float angle_end: The end angle of the arc.
+    
+        :return: corresponding svg path data for arc
+        :rtype: str
+        """
+        def degrees_to_radians(degrees):
+            return (degrees * math.pi / 180) % (2*math.pi)
+        
+        angle_start = degrees_to_radians(angle_start)
+        angle_stop = degrees_to_radians(angle_end)
+        
+        if angle_start == angle_stop:
+            angle_stop -= 0.001
+        
+        start_x = center[0] + radius_x * math.cos(-angle_start)
+        start_y = center[1] + radius_y * math.sin(-angle_start)
+        end_x = center[0] + radius_x * math.cos(-angle_stop)
+        end_y = center[1] + radius_y * math.sin(-angle_stop)
+        
+        # Set large_arc_flag based on the angle difference
+        large_arc_flag = 1 if (angle_stop - angle_start) % (2 * math.pi) > math.pi else 0
+        
+        # Set sweep_flag to 0 for counterclockwise
+        sweep_flag = 0
+        
+        path_data = (
+            f"M {start_x},{start_y} "
+            f"A {radius_x},{radius_y} 0 {large_arc_flag},{sweep_flag} {end_x},{end_y}"
+        )
+        return path_data
+   
     def draw_bounding_box(self, graphic, offset: CoordinatePoint, zoom: float) -> None:
         """
-        Draw a bounding box around the record using SVG.
+        This function is triggered when the :code:`draw_bbox` parameter is set in 
+        :py:mod:`pyaltiumlib.libcomponent.LibComponent.draw_svg`.
         
-        Args:
-            graphic: SVG drawing object.
-            offset: Offset for drawing.
-            zoom: Zoom factor for scaling.
-        
-        Raises:
-            ValueError: If bounding box dimensions are invalid.
+        Draws a bounding box using the values given by :code:`get_bounding_box`
+        for each record
         """
         try:
             bbox = self.get_bounding_box()
@@ -134,4 +154,4 @@ class _GenericSchRecord:
             )
         except Exception as e:
             logger.error(f"Failed to draw bounding box: {str(e)}")
-            raise
+            

@@ -1,6 +1,5 @@
 from pyaltiumlib.pcblib.records.base import _GenericPCBRecord
 from pyaltiumlib.datatypes import BinaryReader, Coordinate, CoordinatePoint
-from pyaltiumlib.datatypes.svg_utils import get_arc_path
 from typing import Tuple
 
 # Configure logging
@@ -89,9 +88,9 @@ class PcbArc(_GenericPCBRecord):
         if layer is None:
             raise ValueError(f"Invalid layer ID: {self.layer}")
 
-        arc_path = get_arc_path(center.to_int_tuple(),
-                                int(radius), int(radius),
-                                self.angle_start, self.angle_end)
+        arc_path = self.get_svg_arc_path(center.to_int_tuple(),
+                                         int(radius), int(radius),
+                                         self.angle_start, self.angle_end)
 
         drawing_primitive = dwg.path(d=arc_path,
                                      fill="none",
