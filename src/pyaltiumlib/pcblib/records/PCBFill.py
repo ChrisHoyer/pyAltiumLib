@@ -6,10 +6,10 @@ from typing import Tuple
 import logging
 logger = logging.getLogger(__name__)
 
-class PcbTrack(GenericPCBRecord):
+class PcbFill(GenericPCBRecord):
     """
     Implementation of a pcb record
-    See also :ref:`PCBPrimitive04` details on this PCB records. This record can be drawn.
+    See also :ref:`PCBPrimitive06` details on this PCB records. This record can be drawn.
     
     :param class parent: Parent symbol object 
     :param Dict data: Dictionary containing raw record data
@@ -21,13 +21,11 @@ class PcbTrack(GenericPCBRecord):
             block = BinaryReader.from_stream(stream)
             
             if block.has_content():
-                # Read common properties (e.g., layer, flags)
+
                 self.read_common(block.read(13))
-                
-                # Read track-specific properties
-                self.start = block.read_bin_coord()
-                self.end = block.read_bin_coord()
-                self.linewidth = Coordinate.parse_bin(block.read(4))
+                self.corner1 = block.read_bin_coord()
+                self.corner2 = block.read_bin_coord()
+                self.rotation = block.read_double()
                 
             if self.layer > 0: self.is_drawable = True
                 
@@ -46,21 +44,14 @@ class PcbTrack(GenericPCBRecord):
         :rtype: tuple with :ref:`DataTypeCoordinatePoint`
         """
         try:
-            half_width = float(self.linewidth) / 2
             
-            # Calculate min/max coordinates, including track width
-            min_x = min(float(self.start.x), float(self.end.x)) - half_width
-            min_y = min(float(self.start.y), float(self.end.y)) - half_width
-            max_x = max(float(self.start.x), float(self.end.x)) + half_width
-            max_y = max(float(self.start.y), float(self.end.y)) + half_width
+            self.center = (self.corner1 + self.corner2)/2
             
-            return (
-                CoordinatePoint(Coordinate(min_x), Coordinate(min_y)),
-                CoordinatePoint(Coordinate(max_x), Coordinate(max_y))
-            )
+            corners = [self.corner1.copy(), self.corner2.copy()]
+            return [corner.rotate(self.center, -self.rotation) for corner in corners]
+                    
         except Exception as e:
             logger.error(f"Error calculating bounding box: {str(e)}")
-            return self.start, self.end
 
 
     def draw_svg(self, dwg, offset, zoom) -> None:
@@ -72,26 +63,35 @@ class PcbTrack(GenericPCBRecord):
         :param float zoom: Scaling Factor for all elements  
         """
         try:
-            # Calculate scaled and offset coordinates
-            start = (self.start * zoom) + offset
-            end = (self.end * zoom) + offset
+            # Calculate scaled and offset coordinates   
+            start = (self.corner1 * zoom) + offset
+            end = (self.corner2 * zoom) + offset
+            center = (self.center * zoom) + offset
             
-            # Get the layer color
+            # start is lower left corner -> needs to be upper right
+            size = start - end
+            start.y = start.y - size.y
+            
             layer = self.get_layer_by_id(self.layer)
-            if layer is None:
-                logger.error(f"Invalid layer ID: {self.layer}")
+
+            region_fill = layer.color.to_hex()
+            region_stroke = "none"
             
-            # Draw the track as an SVG line
-            drawing_primitive = dwg.line(
-                start=start.to_int_tuple(),
-                end=end.to_int_tuple(),
-                stroke=layer.color.to_hex(),
-                stroke_width=int(self.linewidth) * zoom,
-                stroke_linejoin="round",
-                stroke_linecap="round"
-            )
+            if self.keepout:
+                region_fill = self.get_svg_keepout_pattern( dwg, self.layer )
+                region_stroke = layer.color.to_hex()
+                
+            drawing_primitive = dwg.rect(insert=start.to_int_tuple(),
+                                         size=[abs(x) for x in size.to_int_tuple()],
+                                         fill=region_fill,
+                                         stroke=region_stroke,
+                                         stroke_width=zoom,
+                                         stroke_linejoin="round",
+                                         stroke_linecap="round",
+                                         transform=f"rotate(-{self.rotation} {center.x} {center.y})"
+                                         )
             
             self.Footprint._graphic_layers[self.layer].add(drawing_primitive)
             
         except Exception as e:
-            logger.error(f"Failed to draw PCB track: {str(e)}")
+            logger.error(f"Failed to draw PCB Fill: {str(e)}")

@@ -32,7 +32,7 @@ class SchLine(GenericSchRecord):
             Coordinate.parse_dpx("corner.y", self.rawdata, scale=-1.0)
         )
         
-        self.is_initialized = True
+        self.is_drawable = True
 
     def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """

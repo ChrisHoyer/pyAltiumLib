@@ -61,13 +61,13 @@ class SchLib(GenericLibFile):
             
             logger.debug(f" Fileheader of library file '{self.FileName}' is '{self.LibHeader}'.")
             if "Schematic" in self.LibHeader and "Binary File" in self.LibHeader:
-                logger.info(f"'{self.FileName}' identified as schematic binary library file.")
+                logger.info(f"File '{self.FileName}' identified as schematic binary library file.")
             else:
-                logger.warning(f"'{self.FilePath}' can not be identified as schematic binary library!")
+                logger.warning(f"File '{self.FilePath}' can not be identified as schematic binary library!")
         
             # Extract Fonts  (1....FontCount)
             self._FontCount = int( self._FileHeader.get("fontidcount"), 0)
-            logger.debug(f"Start extracting {self._FontCount} fonts(s) in '{self.FileName}'.")
+            logger.debug(f"Start extracting {self._FontCount} fonts(s) from '{self.FileName}'.")
             
             for index in range(self._FontCount + 1):
                 font = self._FileHeader.get(f'fontname{index}', None)
@@ -85,7 +85,7 @@ class SchLib(GenericLibFile):
                                              
             # Extract and Read Components (0....CompCount)
             self.ComponentCount = int( self._FileHeader.get("compcount"), 0) 
-            logger.info(f"Start extracting {self.ComponentCount} component(s) in '{self.FileName}'.")
+            logger.info(f"Start extracting {self.ComponentCount} component(s) from '{self.FileName}'.")
             
             for index in range(self.ComponentCount):
                 lib_ref = self._FileHeader.get(f'LibRef{index}', None)

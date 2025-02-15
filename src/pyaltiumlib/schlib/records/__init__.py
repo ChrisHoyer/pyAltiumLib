@@ -18,7 +18,7 @@ from .SchLine import SchLine
 from .SchDesignator import SchDesignator
 from .SchParameter import SchParameter
 from .SchImplementationList import SchImplementationList
-from.SchRoundRectangle import SchRoundRectangle
+from .SchRoundRectangle import SchRoundRectangle
 
 
 __all__ = [

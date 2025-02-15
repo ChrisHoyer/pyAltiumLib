@@ -30,7 +30,7 @@ class SchEllipticalArc(GenericSchRecord):
         self.angle_end = float(self.rawdata.get('endangle', 0))            
         self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0))
         
-        self.is_initialized = True
+        self.is_drawable = True
         
     def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """

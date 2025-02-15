@@ -21,7 +21,7 @@ class GenericSchRecord:
     def __init__(self, data: Dict[str, Any], parent: [Any] = None):
         self.Symbol = parent
         self.rawdata = data
-        self.is_initialized = False
+        self.is_drawable = False
 
         # Parse record metadata
         self.record = int(self.rawdata.get('record', 0))
@@ -134,19 +134,22 @@ class GenericSchRecord:
 
             start = (bbox[0] * zoom) + offset
             end = (bbox[1] * zoom) + offset
+            
+            lower_left_x = min(start.x, end.x)
+            lower_left_y = min(start.x, end.y)
+            insert = CoordinatePoint( Coordinate(lower_left_x), Coordinate(lower_left_y) )
+            
             size = start - end
-            start.y -= size.y
-
+            
             # Validate dimensions
             if size.y == 0 or size.x == 0:
                 logger.error(f"Invalid bounding box dimensions: {size}")
-                raise
 
             # Add rectangle to SVG
             graphic.add(
                 graphic.rect(
-                    insert=start.get_int(),
-                    size=[abs(x) for x in size.get_int()],
+                    insert=insert.to_int_tuple(),
+                    size=[abs(x) for x in size.to_int_tuple()],
                     fill="none",
                     stroke="black",
                     stroke_width=1

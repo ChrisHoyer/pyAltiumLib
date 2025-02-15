@@ -31,7 +31,7 @@ class SchPolygon(GenericSchRecord):
         self.num_vertices = int(self.rawdata.get('locationcount', 0))
         self.vertices = self._parse_vertices()
         
-        self.is_initialized = True
+        self.is_drawable = True
 
     def _parse_vertices(self) -> List[CoordinatePoint]:
         vertices = []

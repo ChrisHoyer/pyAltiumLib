@@ -131,6 +131,7 @@ class BinaryReader:
         Reads a length-prefixed string.
         
         :param int optional size_string: Number of bytes specifying the string length.
+        
         :return: The decoded string.
         :rtype: str
         """
@@ -142,17 +143,26 @@ class BinaryReader:
         
         return string_data.decode('windows-1252')
 
-    def read_bin_coord(self, scaley=-1.0):
+    def read_bin_coord(self, scaley=-1.0, double=False, double_scaling = 1/10000.0):
         """
         Reads a binary coordinate pair and returns a CoordinatePoint.
         
         :param float scaley: Scaling factor for the Y coordinate.
+        :param bool optional double: Read coordinates as double
+        :param float optional float: Scaling of double values
+        
         :return: A CoordinatePoint object.
         :rtype: CoordinatePoint
         """
-        x = self.read(4)
-        y = self.read(4)
-        return CoordinatePoint( Coordinate.parse_bin(x), Coordinate.parse_bin(y, scale=scaley))  
+        if double:
+            x = (self.read_double() * double_scaling)
+            y = (self.read_double() * double_scaling) * scaley
+            return CoordinatePoint( Coordinate(x), Coordinate(y))  
+        
+        else:
+            x = self.read(4)
+            y = self.read(4)
+            return CoordinatePoint( Coordinate.parse_bin(x), Coordinate.parse_bin(y, scale=scaley))  
 
     def read_unicode_text(self, length=32, encoding='utf-16-le'):
         """
@@ -160,6 +170,7 @@ class BinaryReader:
         
         :param int optional length: Maximum length of the string in bytes.
         :param str optional encoding: The encoding format.
+        
         :return: The decoded Unicode string.
         :rtype: str
         """

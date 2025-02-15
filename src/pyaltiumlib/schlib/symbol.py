@@ -2,6 +2,8 @@ from pyaltiumlib.libcomponent import LibComponent
 from pyaltiumlib.datatypes import ParameterCollection, SchematicPin
 from pyaltiumlib.schlib.records import *
 
+from typing import Dict
+
 # Set up logging
 import logging
 logger = logging.getLogger(__name__)
@@ -27,9 +29,33 @@ class SchLibSymbol(LibComponent):
         """
         `int` number of sub parts within one symbol
         """
+
+        self.Designator = ""
+        """
+        `str` designator of symbol
+        """
+
+        self.Parameter = {}
+        """
+        `Dict[str]` of parameters of the symbol
+        """
                
         self._ReadSymbolData()
-        
+               
+   
+    def read_meta(self) -> Dict:
+        """
+        Converts general properties to a dictionary.
+
+        :return: A dict representation of the object
+        :rtype: Dict
+        """
+        public_attributes = {
+            key: value if isinstance(value, str) else str(value)
+            for key, value in self.__dict__.items()
+            if not key.startswith("_")
+            }
+        return public_attributes 
                 
 # =============================================================================
 #     Internal content reading related functions
@@ -44,14 +70,10 @@ class SchLibSymbol(LibComponent):
     def _CreateRecord(self, record: ParameterCollection) -> None:
         """
         Create a record based on its type.
-
-        Args:
-            record (ParameterCollection): The record to process.
         """  
         RecordId = record.get_record()
         if RecordId is None:
-            logger.error("No 'recordid' found.")
-            raise
+            logger.error(f"In {self.Name} - one entries has no 'recordid'!")
                 
         record_map = {
             1: SchComponent,
@@ -78,6 +100,10 @@ class SchLibSymbol(LibComponent):
                 self.Records.append(record_map[record_id](record, self))
             else:
                 logger.warning(f"Found unsupported RecordID={record_id} in '{self.Name}'.")
+                
+            # extract details of symbol to higher level (designator, parameters, etc)
+            if record_id == 34: self.Designator = self.Records[-1].text
+            if record_id == 41: self.Parameter[self.Records[-1].name] = self.Records[-1].text          
                 
         except Exception as e:
             logger.error(f"Error during record parsing in '{self.Name}. Exception: {e}")
@@ -115,7 +141,6 @@ class SchLibSymbol(LibComponent):
                 
         except Exception as e:
             logger.error(f"Failed to read data of '{self.Name}'. Exception: {e}")
-            raise
                 
 
                 

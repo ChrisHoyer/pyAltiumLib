@@ -2,14 +2,15 @@
  
 """
 
-from .parametercollection import ParameterCollection
+
 from .parametercolor import ParameterColor
 from .parameterfont import ParameterFont
 from .binaryreader import BinaryReader
 from .coordinate import Coordinate, CoordinatePoint
+from .parametercollection import ParameterCollection
 
 # Schematic related
-from .schematicpin import SchematicPin
+from .parametercollection import SchematicPin
 from .schematicmapping import (
     SchematicLineWidth, SchematicLineStyle, SchematicLineShape,
     SchematicPinSymbol, SchematicPinElectricalType, SchematicTextOrientation,

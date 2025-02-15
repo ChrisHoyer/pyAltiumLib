@@ -6,6 +6,8 @@ Primitives and Records
 PCB Primitives
 =====================
 
+.. _PCBPrimitive01:
+
 ID 1 - Arc
 -------------------
 
@@ -60,6 +62,8 @@ Represents a footprint arc primitive. Contains only one :ref:`Block` with the fo
      - :ref:`Int32`
      - Only of length >= 56
 
+
+.. _PCBPrimitive02:
 
 ID 2 - Pad
 -------------------
@@ -255,6 +259,8 @@ Second block on information:
      - :ref:`Byte`
      - 
 
+.. _PCBPrimitive03:
+
 ID 3 - Via
 -----------------
 
@@ -349,6 +355,7 @@ Represents a footprint via primitive. Contains only one :ref:`Block` with the fo
      - :ref:`Int32`
      - 
 
+.. _PCBPrimitive04:
 
 ID 4 - Track
 ----------------
@@ -396,6 +403,8 @@ Represents a footprint track primitive. Contains only one :ref:`Block` with the 
      - :ref:`Int32`
      - Only of length >= 45
 
+
+.. _PCBPrimitive05:
 
 ID 5 - String
 -----------------
@@ -518,6 +527,7 @@ The information are structured as follows:
      - :ref:`Int32`
      - Only of length >= 123
 
+.. _PCBPrimitive06:
 
 ID 6 - Fill
 -------------------
@@ -561,6 +571,8 @@ Represents a footprint fill primitive. Contains only one :ref:`Block` with the f
      - :ref:`Int32`
      - Only of length >= 46
 
+
+.. _PCBPrimitive11:
 
 ID 11 - Region
 -------------------
@@ -608,54 +620,15 @@ Represents a footprint region primitive. Contains only one :ref:`Block` with the
      - :ref:`PCBCoordinate`
      - 
 
+.. _PCBPrimitive12:
 
 ID 12 - Component Body
 -----------------------
 
-Represents a footprint component body primitive. Contains only one :ref:`Block` with the following data:
+Represents a footprint component body primitive.
 
-.. list-table:: 
-   :header-rows: 1
-   :widths: auto
 
-   * - **Name**
-     - **Size (Bytes)**
-     - **Datatype**
-     - **Comment**
-   * - Primitive Header
-     - 13
-     - :ref:`PCBPrimitveHeader`
-     - 
-   * - *Unknown*
-     - 4
-     - :ref:`Int32`
-     - 
-   * - *Unknown*
-     - 1
-     - :ref:`Byte`
-     - 
-   * - Parameters
-     - 
-     - :ref:`ParameterCollection`
-     - 
-   * - outlineSize
-     - 4
-     - :ref:`UInt32`
-     - Number of outline points
-   * - Outline X Point
-     - 8
-     - :ref:`Double`
-     - Needs to be combined into array of :code:`Outline`
-   * - Outline Y Point
-     - 8
-     - :ref:`Double`
-     - Needs to be combined into array of :code:`Outline`
-   * - Outline
-     - n * 8
-     - :ref:`PCBCoordinate`
-     - 
 
-The more parameters are included in the :ref:`ParameterCollection`
 
 .. _SchPrimitives:
 
@@ -1096,3 +1069,60 @@ The parameters of this record are given a :ref:`SchRecord`. This collection incl
    * - Transparent
      - :ref:`Boolean`
      - 
+
+.. _SchPrimitive34:
+
+ID 34 - Designator
+-----------------------
+Designator record for component symbol.
+
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+
+.. list-table:: 
+   :header-rows: 1
+
+   * - **Parameter**
+     - **Datatype**
+     - **Comment**
+   * - FontId
+     - :ref:`Int32`
+     -
+   * - Text
+     - :ref:`String`
+     -
+   * - IsMirrored
+     - :ref:`Boolean`
+     -
+   * - IsHidden
+     - :ref:`Boolean`
+     -
+
+.. _SchPrimitive41:
+
+ID 41 - Parameter
+-----------------------
+Parameter record for component symbol.
+
+The parameters of this record are given a :ref:`SchRecord`. This collection includes the default parameters :ref:`SchCommonParameter` and the following parameters:
+
+.. list-table:: 
+   :header-rows: 1
+
+   * - **Parameter**
+     - **Datatype**
+     - **Comment**
+   * - FontId
+     - :ref:`Int32`
+     -
+   * - Name
+     - :ref:`String`
+     -
+   * - Text
+     - :ref:`String`
+     -
+   * - IsMirrored
+     - :ref:`Boolean`
+     -
+   * - IsHidden
+     - :ref:`Boolean`
+     -

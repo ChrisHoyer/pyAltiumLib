@@ -32,7 +32,7 @@ class SchLabel(GenericSchRecord):
         self.is_hidden = self.rawdata.get_bool('ishidden')
         self.alignment: Dict[str, any] = {}
         
-        self.is_initialized = True
+        self.is_drawable = True
 
     def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """

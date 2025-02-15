@@ -61,16 +61,25 @@ class PcbLibFootprint(LibComponent):
                     
                 elif RecordID == 2:
                     self.Records.append( PcbPad(self, olestream) )
+
+                elif RecordID == 3:
+                    self.Records.append( PcbVia(self, olestream) )
                     
                 elif RecordID == 4:
                     self.Records.append( PcbTrack(self, olestream) )
                     
                 elif RecordID == 5:
                     self.Records.append( PcbString(self, olestream) )
-                    
+
+                elif RecordID == 6:
+                    self.Records.append( PcbFill(self, olestream) )   
+
+                elif RecordID == 11:
+                    self.Records.append( PcbRegion(self, olestream) )   
+
                 elif RecordID == 12:
-                    self.Records.append( PcbComponentBody(self, olestream) )
-    
+                    self.Records.append( PcbComponentBody(self, olestream) ) 
+                     
                 else:
                     logger.warning(f"Found unsupported RecordID={RecordID} in '{self.Name}'.")
 

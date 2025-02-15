@@ -188,6 +188,15 @@ The coverage of records/primitives of the Altium library file format is shown be
    * - Schematic Record
      - Rectangle
      - Implemented
+   * - Schematic Record
+     - Images
+     - Not Implemented
+   * - Schematic Record
+     - Designator
+     - Implemented
+   * - Schematic Record
+     - Parameter
+     - Implemented
 
 .. list-table:: PCB Library Record Coverage
    :header-rows: 1
@@ -203,7 +212,7 @@ The coverage of records/primitives of the Altium library file format is shown be
      - Key features implemented
    * - PCB Primitives
      - Via
-     - Not Implemented
+     - Key features implemented
    * - PCB Primitives
      - Track
      - Implemented
@@ -212,10 +221,16 @@ The coverage of records/primitives of the Altium library file format is shown be
      - Implemented
    * - PCB Primitives
      - Fill
-     - Not Implemented
+     - Implemented
    * - PCB Primitives
      - Region
-     - Not Implemented
+     - Implemented
    * - PCB Primitives
      - Component Body
      - Not Implemented
+
+
+Open points
+=======================
+
+- Schematic symbols with more than one part can be read and drawn. However, all sub parts are rendered above each other. To seperate each sub part, the owner index must be considered.

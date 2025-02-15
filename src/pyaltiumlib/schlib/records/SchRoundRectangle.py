@@ -35,7 +35,7 @@ class SchRoundRectangle(GenericSchRecord):
         self.radius_x = Coordinate.parse_dpx("CornerXRadius", self.rawdata)        
         self.radius_y = Coordinate.parse_dpx("CornerYRadius", self.rawdata) 
         
-        self.is_initialized = True
+        self.is_drawable = True
                         
     def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """

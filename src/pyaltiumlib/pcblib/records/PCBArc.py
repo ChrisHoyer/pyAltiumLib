@@ -1,37 +1,24 @@
-from pyaltiumlib.pcblib.records.base import _GenericPCBRecord
+from pyaltiumlib.pcblib.records.base import GenericPCBRecord
 from pyaltiumlib.datatypes import BinaryReader, Coordinate, CoordinatePoint
+
 from typing import Tuple
 
 # Configure logging
 import logging
 logger = logging.getLogger(__name__)
 
-class PcbArc(_GenericPCBRecord):
+class PcbArc(GenericPCBRecord):
     """
-    Represents a PCB Arc in an Altium PCB library.
+    Implementation of a pcb record
+    See also :ref:`PCBPrimitive01` details on this PCB records. This record can be drawn.
     
-    Attributes:
-        start (CoordinatePoint): The starting point of the track.
-        end (CoordinatePoint): The ending point of the track.
-        linewidth (Coordinate): The width of the track.
-        layer (int): The layer on which the track is drawn.
+    :param class parent: Parent symbol object 
+    :param Dict data: Dictionary containing raw record data
     """
 
     def __init__(self, parent, stream):
-        """
-        Initialize a PCB track with a parent object and a binary data stream.
-        """
         super().__init__(parent)
-        self._parse(stream)
 
-    def __repr__(self) -> str:
-        """Return a string representation of the PCB track."""
-        return f"PCBArc"
-
-    def _parse(self, stream) -> None:
-        """
-        Parse the binary stream to extract track data.
-        """
         try:
             block = BinaryReader.from_stream(stream)
             
@@ -41,27 +28,30 @@ class PcbArc(_GenericPCBRecord):
                 # TODO: ERROR. To long!
                     return
                 
-                # Read common properties (e.g., layer, flags)
                 self.read_common(block.read(13))
-                
-                # Read track-specific properties
                 self.location = block.read_bin_coord()
                 self.radius =  Coordinate.parse_bin(block.read(4))
                 self.angle_start = block.read_double() 
                 self.angle_end = block.read_double() 
                 self.linewidth = Coordinate.parse_bin(block.read(4))
                 
-            self.is_initialized = True
+            if self.layer > 0: self.is_drawable = True
                 
         except Exception as e:
-            logger.error(f"Failed to parse PCB track: {str(e)}")
+            logger.error(f"Failed to parse PCB record: {str(e)}")
             raise
 
+# =============================================================================
+#     Drawing related
+# ============================================================================= 
 
 
     def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """
-        Calculate the bounding box
+        Generates and returns a bounding box for this record
+        
+        :return: List with two coordinate entries 
+        :rtype: tuple with :ref:`DataTypeCoordinatePoint`
         """
         start_x = self.location.x - self.radius
         start_y = self.location.y - self.radius
@@ -75,11 +65,14 @@ class PcbArc(_GenericPCBRecord):
         
         return [CoordinatePoint(min_x, min_y), CoordinatePoint(max_x, max_y)]
 
-    def draw_svg(self, dwg, offset: CoordinatePoint, zoom: float) -> None:
+    def draw_svg(self, dwg, offset, zoom) -> None:
         """
-        Render as svg
-        """
+        Draw pcb record using svgwrite.
         
+        :param graphic dwg: svg drawing object
+        :param CoordinatePoint offset: Move drawing by the given offset as :ref:`DataTypeCoordinatePoint`
+        :param float zoom: Scaling Factor for all elements  
+        """
         center = (self.location * zoom) + offset
         radius = self.radius * zoom
         

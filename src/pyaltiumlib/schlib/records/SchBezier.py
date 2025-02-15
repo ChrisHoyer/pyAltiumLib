@@ -38,7 +38,7 @@ class SchBezier(GenericSchRecord):
         self.linestyle = SchematicLineStyle(self.rawdata.get('linestyle', 0))
         self.linestyle_ext = SchematicLineStyle(self.rawdata.get('linestyleext', 0))
         
-        self.is_initialized = True
+        self.is_drawable = True
 
     def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """

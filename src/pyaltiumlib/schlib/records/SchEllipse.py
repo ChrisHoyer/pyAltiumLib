@@ -29,7 +29,7 @@ class SchEllipse(GenericSchRecord):
         self.linewidth = SchematicLineWidth(self.rawdata.get('linewidth', 0))
         self.issolid = self.rawdata.get_bool('issolid')
         
-        self.is_initialized = True
+        self.is_drawable = True
      
     def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """

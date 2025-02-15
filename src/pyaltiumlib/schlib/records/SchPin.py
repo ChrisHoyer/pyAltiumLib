@@ -46,7 +46,7 @@ class SchPin(GenericSchRecord):
         
         self.pinlength = self.rawdata.get('length', 0)
         
-        self.is_initialized = True
+        self.is_drawable = True
           
     def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """

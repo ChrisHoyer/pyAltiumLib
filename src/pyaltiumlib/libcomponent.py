@@ -73,7 +73,8 @@ class LibComponent:
 #     Drawing related
 # =============================================================================   
         
-    def draw_svg(self, graphic, size_x: float, size_y: float, draw_bbox: bool = False) -> None:
+    def draw_svg(self, graphic, size_x: float, size_y: float,
+                 draw_bbox: bool = False, draw_designator: bool = False) -> None:
         """
         Draw all drawable and initialized records the component to an svg drawing.
         All records are autoscaled to fit the given drawing object size.
@@ -82,6 +83,8 @@ class LibComponent:
         :param float size_x: The width of the svgwrite drawing object
         :param float size_y: The height of the svgwrite drawing object        
         :param bool optional draw_bbox: Draw bounding boxes
+        
+        :param bool optional draw_designator: Draw designator elements
             
         :raises ImportError: If 'svgwrite' module is not installed.
         :raises ValueError: If 'graphic' is not the right instance.
@@ -95,14 +98,17 @@ class LibComponent:
         if not isinstance(graphic, svgwrite.Drawing):
             logger.error("The provided 'dwg' object is not an instance of 'svgwrite.Drawing'.")
 
+        supressed_elements = []
+        if not draw_designator: supressed_elements.append("SchDesignator")
+
         
         validObj = []
         for obj in self.Records:
             if hasattr(obj, 'draw_svg') and callable(getattr(obj, 'draw_svg')):
-                if obj.is_initialized:
+                if obj.is_drawable and not any(x in type(obj).__name__ for x in supressed_elements):
                     validObj.append(obj)
-            else:
-                logger.warning(f"Object: {obj} has no drawing function")
+                else:
+                    logger.info(f"Object: {obj} has drawing function but is not marked as drawable.")
 
         # Get Bounding box
         offset, zoom = self._autoscale( validObj, size_x, size_y)

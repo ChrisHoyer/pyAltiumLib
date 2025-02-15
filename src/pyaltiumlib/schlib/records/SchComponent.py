@@ -43,5 +43,3 @@ class SchComponent(GenericSchRecord):
         
         self.alias_list = self.rawdata.get("aliaslist", "")
         self.orientation = SchematicTextOrientation(self.rawdata.get("orientation", 0))
-        
-        self.is_initialized = True

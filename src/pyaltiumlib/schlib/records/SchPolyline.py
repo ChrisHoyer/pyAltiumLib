@@ -42,7 +42,7 @@ class SchPolyline(GenericSchRecord):
         self.lineshape_end = SchematicLineShape(self.rawdata.get('endlineshape', 0))  
         self.lineshape_size = SchematicLineWidth(self.rawdata.get('lineshapesize', 0))
 
-        self.is_initialized = True           
+        self.is_drawable = True           
         
     def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """

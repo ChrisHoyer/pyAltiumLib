@@ -67,9 +67,9 @@ class PcbLib(GenericLibFile):
             
         logger.debug(f" Fileheader of library file '{self.FileName}' is '{self.LibHeader}'.")
         if "PCB" in self.LibHeader and "Binary Library File" in self.LibHeader:
-            logger.info(f"'{self.FileName}' identified as pcb binary library file.")
+            logger.info(f"File '{self.FileName}' identified as pcb binary library file.")
         else:
-            logger.warning(f"'{self.FilePath}' can not be identified as pcb binary library!")
+            logger.warning(f"File '{self.FilePath}' can not be identified as pcb binary library!")
             
             
     def _ReadLibraryData(self):
@@ -79,7 +79,7 @@ class PcbLib(GenericLibFile):
         self._FileHeader = ParameterCollection.from_block( LibDataStream )
         
         self.ComponentCount = int.from_bytes( LibDataStream.read(4), "little")
-        logger.info(f"Start extracting {self.ComponentCount} component(s) in '{self.FileName}'.")
+        logger.info(f"Start extracting {self.ComponentCount} component(s) from '{self.FileName}'.")
             
         for lib_ref in [BinaryReader.from_stream( LibDataStream ).read_string_block() for index in range(self.ComponentCount)]:
                 self.Parts.append( PcbLibFootprint( self, lib_ref ) )

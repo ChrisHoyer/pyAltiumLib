@@ -34,4 +34,18 @@ Binary Reader
 .. autoclass:: pyaltiumlib.datatypes.binaryreader.BinaryReader
     :no-index:
 
-    
+ParameterCollection
+---------------------
+
+.. autoclass:: pyaltiumlib.datatypes.parametercollection.ParameterCollection
+    :no-index:
+
+Schematic Datatypes
+====================
+
+SchematicPin
+---------------------
+
+.. autoclass:: pyaltiumlib.datatypes.parametercollection.SchematicPin
+    :show-inheritance:
+    :no-index:   

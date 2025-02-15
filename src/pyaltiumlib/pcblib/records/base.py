@@ -1,21 +1,39 @@
+from pyaltiumlib.datatypes.coordinate import Coordinate, CoordinatePoint
 import math
 
 # Set up logging
 import logging
 logger = logging.getLogger(__name__)
 
-class _GenericPCBRecord:
+class GenericPCBRecord:
+    """
+    Base class for all PCB records in altium library. 
+    See also :ref:`PCBPrimitveHeader` for more details on PCB records.
+    
+    :param class parent: Parent symbol object    
+    """
     
     def __init__(self, parent):
         
         self.Footprint = parent
-        self.is_initialized = False
+        self.is_drawable = False
                 
+    def __repr__(self) -> str:
+        """
+        :return: A string representation of the record object
+        :rtype: str
+        """
+        return f"{self.__class__.__name__}"
         
     def read_common(self, byte_array):
+        """
+        Read PCB Record common parameters from byte array. The length of
+        the byte array has to be 13 bytes.
         
+        :param bytes byte_array: Array with common parameters for footprint records    
+        """        
         if len(byte_array) != 13:
-            raise ValueError("Byte array length is not as expected")     
+            logger.error("PCB reecord common parameters array length is not 13!")
         
         self.layer = byte_array[0]
                 
@@ -27,17 +45,24 @@ class _GenericPCBRecord:
         self.keepout = bool( byte_array[2] & 0x02 )
         
         if not all(byte == 0xFF for byte in byte_array[3:13]):
-            raise ValueError("Byte array spacer is not as expected")
+            logger.error("PCB record common parameters array spacer is not as expected")
 
         
     def get_layer_by_id(self, layerid): 
-        
+        """
+        Retrieves the layer by the layer id given by the reocrd.
+
+        :return: The record ID, or None if not found.
+        :rtype: Layer or None
+        """        
         for layer in self.Footprint.LibFile.Layers:
             if layer.id == layerid: 
                 return layer
-            
+        
+        logger.error(f"Can not find layer ID: {layerid}")
         return None
 
+        
     def get_svg_arc_path(self, center, radius_x, radius_y, angle_start, angle_end):
         """
         This function returns the svg path data for an arc.
@@ -76,30 +101,91 @@ class _GenericPCBRecord:
         )
         return path_data
 
-    def draw_bounding_box(self, graphic, offset, zoom):
+
+    def get_svg_rounded_rect_path(self, start, size, layer_id, radius_percentage = 100):
         """
-        Draws a bounding box using svgwrite.
+        This function returns the svg path data for a rounded rectangle.
+    
+        :param CoordinatePoint start: The start coordinates of the rounded rectangle
+        :param CoordinatePoint size: The size coordinates of the rounded rectangle
+        :param int layer_id: The layer id of the rounded rectangle
+        :param float radius_percentage: The start angle of the arc
+    
+        :return: corresponding svg path data for arc
+        """        
+        radius = (min(size.x, size.y) / 2) *  radius_percentage / 100 + 0.01
+                 
+        path_data = [
+            f"M {int(start.x + radius)} {int(start.y)}",
+            f"L {int(start.x + size.x - radius)} {int(start.y)}",
+            f"A {abs(int(radius))} {abs(int(radius))} 0 0 1 {int(start.x + size.x)} {int(start.y + radius)}",
+            f"L {int(start.x + size.x)} {int(start.y + size.y - radius)}",
+            f"A {abs(int(radius))} {abs(int(radius))} 0 0 1 {int(start.x + size.x - radius)} {int(start.y + size.y)}",
+            f"L {int(start.x + radius)} {int(start.y + size.y)}",
+            f"A {abs(int(radius))} {abs(int(radius))} 0 0 1 {int(start.x)} {int(start.y + size.y - radius)}",
+            f"L {int(start.x)} {int(start.y + radius)}",
+            f"A {abs(int(radius))} {abs(int(radius))} 0 0 1 {int(start.x + radius)} {int(start.y)}",
+            "Z"
+        ]
+        
+        return " ".join(path_data)
+
+    def get_svg_keepout_pattern(self, graphic, layer_id, size=10, stroke=1) -> None:
         """
-        bbox = self.get_bounding_box()
+        This function returns and defines the svg keep out pattern.
         
-        start = (bbox[0] * zoom) + offset
-        end = (bbox[1] * zoom) + offset
+        :param graphic dwg: svg drawing object
+        :param int layer_id: The layer id of the object
+        :param int size: The size of the pattern
+        :param int stroke: The stroke of the pattern
         
-        size = start - end
-        #start.y = start.y - size.y
+        Draws a bounding box using the values given by :code:`get_bounding_box`
+        for each record
+        """
+        layer = self.get_layer_by_id(layer_id)
         
-        if size.y == 0:
-            raise ValueError(f"RecordID: {self.record} - Invalid bounding box dimensions y: {bbox}")
+        keepout_pattern = graphic.defs.add(graphic.pattern(id="keepout_pattern", patternUnits="userSpaceOnUse", size=(size, size)))
+        keepout_pattern.add(graphic.line(start=(0, 0), end=(size, size), stroke=layer.color.to_hex(), stroke_width=stroke))
+        keepout_pattern.add(graphic.line(start=(0, size), end=(size, 0), stroke=layer.color.to_hex(), stroke_width=stroke))
+
+        return "url(#keepout_pattern)"
+
+    def draw_bounding_box(self, graphic, offset: CoordinatePoint, zoom: float) -> None:
+        """
+        This function is triggered when the :code:`draw_bbox` parameter is set in 
+        :py:mod:`pyaltiumlib.libcomponent.LibComponent.draw_svg`.
         
-        if size.x == 0:
-            raise ValueError(f"RecordID: {self.record} - Invalid bounding box dimensions x: {bbox}")           
-        
-        graphic.add(
-            graphic.rect(
-                insert= start.to_int_tuple(),
-                size= abs(size).to_int_tuple(),
-                fill="none",
-                stroke="white",
-                stroke_width=1
+        Draws a bounding box using the values given by :code:`get_bounding_box`
+        for each record
+        """
+        try:
+            bbox = self.get_bounding_box()
+            if bbox is None:
+                logger.warning("No bounding box available for record")
+                return
+
+            start = (bbox[0] * zoom) + offset
+            end = (bbox[1] * zoom) + offset
+            
+            lower_left_x = min(start.x, end.x)
+            lower_left_y = min(start.x, end.y)
+            insert = CoordinatePoint( Coordinate(lower_left_x), Coordinate(lower_left_y) )
+            
+            size = start - end
+            
+            # Validate dimensions
+            if size.y == 0 or size.x == 0:
+                logger.error(f"Invalid bounding box dimensions: {size}")
+
+            # Add rectangle to SVG
+            graphic.add(
+                graphic.rect(
+                    insert=insert.to_int_tuple(),
+                    size=[abs(x) for x in size.to_int_tuple()],
+                    fill="none",
+                    stroke="black",
+                    stroke_width=1
+                )
             )
-        )   
+        except Exception as e:
+            logger.error(f"Failed to draw bounding box: {str(e)}")
