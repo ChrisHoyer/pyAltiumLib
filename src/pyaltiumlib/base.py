@@ -15,16 +15,13 @@ class GenericLibFile:
     This class provides fundamental functionality for reading library files
     in Altium Designer format.
     
-    :param string filepath: The path to the library file
+    :param io.BytesIO oleobj: A file-like object containing the altium library file binary stream
     
     :raises FileNotFoundError: If file is not a supported file.
     """  
     
-    def __init__(self, filepath: str):
+    def __init__(self, filepath: str, oleobj):
 
-        if not olefile.isOleFile( filepath ): 
-            logger.error(f"'{filepath}' is not a supported file.")
-            raise
             
         self.LibType = type(self) 
         """
@@ -35,7 +32,7 @@ class GenericLibFile:
         """
         `string` that stores the header information of the library.
         """
-        
+                
         self.FilePath = filepath 
         """
         `string` that contains the file path to the library.
@@ -45,7 +42,7 @@ class GenericLibFile:
         """
         `string` that contains the name of the library.
         """
-        
+
         self.ComponentCount = 0
         """
         `int` with total number of components in the library.
@@ -57,8 +54,7 @@ class GenericLibFile:
         contained in the library.
         """ 
         
-        self._olefile = None
-        self._olefile_open = False
+        self.OleObj = oleobj
          
         # extracted file content
         self._FileHeader = None
@@ -92,7 +88,8 @@ class GenericLibFile:
             if not key.startswith("_")
             }
         return public_attributes        
-     
+ 
+        
     def list_parts(self) -> List[str]:
         """
         List the names of all parts in the library.
@@ -101,7 +98,8 @@ class GenericLibFile:
         :rtype: List[str]
         """
         return [x.Name for x in self.Parts]
-   
+
+    
     def get_part(self, name: str) -> Optional[Any]:
         """
         Get a part of the library by its name.
@@ -121,20 +119,6 @@ class GenericLibFile:
 #     Internal file handling related functions
 # =============================================================================
 
-    def _OpenFile(self) -> None:
-        """
-        Open the library file for reading.
-        """        
-        if self._olefile_open:
-            raise ValueError(f"file: '{self.FilePath}'. Already open!")
-                
-        try:
-            self._olefile = olefile.OleFileIO( self.FilePath )
-            self._olefile_open = True
-        except Exception as e:
-            logger.error(f"Failed to open file: '{self.FilePath}'. Error: {e}")
-            raise
-
     def _OpenStream(self, container: str, stream: str) -> Any:
         """
         Open a stream within the library file.
@@ -146,27 +130,15 @@ class GenericLibFile:
         Returns:
             Any: The opened stream.
         """                
-        if not self._olefile_open:
-            logger.error(f"file: '{self.FilePath}'. File not opened!")
-            raise
-                    
+
         if not container == "":
 
             illegal_characters = '<>:"/\\|?*\x00'
             container = "".join("_" if char in illegal_characters else char for char in container)
             
-            if not self._olefile.exists( container ):
+            if not self.OleObj.exists( container ):
                 logger.error(f"Part '{container}' does not exist in file '{self.FilePath}'!")
                 raise
         
-        return self._olefile.openstream( f"{container}/{stream}" if container else stream )
-
-
-    def _CloseFile(self) -> None:
-        """
-        Close the library file.
-        """
-        if hasattr(self, '_olefile') and self._olefile is not None:
-            self._olefile.close()
-            self._olefile_open = False
+        return self.OleObj.openstream( f"{container}/{stream}" if container else stream )
 

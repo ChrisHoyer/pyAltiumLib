@@ -11,14 +11,15 @@ class PcbLib(GenericLibFile):
     PCB class for handling Altium Designer PCB library files.    
     During initialization the library file will be read.
     
-    :param string filepath: The path to the .PcbLib library file
+    :param string filepath: The path to the .PcbLib library file   
+    :param io.BytesIO oleobj: A file-like object containing the altium library file binary stream
     
     :raises FileNotFoundError: If file is not a supported file.
     :raises ValueError: If library data or header can not be read
     """
     
-    def __init__(self, filepath: str):
-        super().__init__(filepath)
+    def __init__(self, filepath, oleobj):
+        super().__init__(filepath, oleobj)
         
         self.LibType = "PCB"
         
@@ -27,8 +28,9 @@ class PcbLib(GenericLibFile):
         Collection with default PCB Layer Definition
         """
         
-        self._ReadLibrary()
+        self._ReadPCBLibrary()
         
+        self.OleObj.close()
         logger.info(f"Reading and extracting of '{self.FileName}' done.")
       
  # =============================================================================
@@ -36,25 +38,16 @@ class PcbLib(GenericLibFile):
  # =============================================================================   
      
 
-    def _ReadLibrary(self):
-        """
-        Read the library file and extract its contents.
-        """
+    def _ReadPCBLibrary(self):
         try:
-            self._OpenFile()        
-        
-            self._ReadFileHeader()
-            self._ReadLibraryData()
+            self._ReadPCBFileHeader()
+            self._ReadPCBLibraryData()
         
         except Exception as e:
             logger.error(f"Failed to read library: {e}")
-            raise
-            
-        finally:
-            self._CloseFile()
-                    
+            raise                   
         
-    def _ReadFileHeader(self):
+    def _ReadPCBFileHeader(self):
         
         # Fileheader is different from usual string block concept
         fileheader_stream = self._OpenStream("",  "FileHeader")
@@ -72,7 +65,7 @@ class PcbLib(GenericLibFile):
             logger.warning(f"File '{self.FilePath}' can not be identified as pcb binary library!")
             
             
-    def _ReadLibraryData(self):
+    def _ReadPCBLibraryData(self):
 
         # Parse Library Data File
         LibDataStream = self._OpenStream("Library",  "Data")

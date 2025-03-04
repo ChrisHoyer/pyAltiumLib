@@ -15,7 +15,7 @@ Dependencies
 
 The following dependencies are automatically installed with `pyaltiumlib`:
 
-- **Python Standard Libraries**: `sys`, `os`, `math`, `typing`, `logging`
+- **Python Standard Libraries**: `sys`, `os`, `io`, `math`, `typing`, `logging`
 - **External Libraries**:
     - `olefile` - for reading ole files (Altium library file container)
     - `svgwrite` - for rendering schematic and PCB drawings
@@ -44,6 +44,27 @@ Load a `.schlib` or `.pcblib` file and retrieve the list of components.
 
     # Get a list of all components
     all_parts = LibFile.list_parts()
+
+Or reading directly the binary io stream
+
+.. code-block:: python
+
+    import pyaltiumlib
+
+    # Fetch the binary stream of the file
+    libfile_bytes = ....
+    libfile_obj = io.BytesIO(libfile_bytes)
+
+    # Load the library file
+    # filepath is still required to identify and identicate the correct file
+    LibFile = LibFile = altlib.read(filepath, libfile_obj)
+
+    # Retrieve metadata
+    metadata = LibFile.read_meta()
+
+    # Get a list of all components
+    all_parts = LibFile.list_parts()
+
 
 
 Rendering Components as SVG  
