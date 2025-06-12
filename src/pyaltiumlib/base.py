@@ -112,7 +112,8 @@ class GenericLibFile:
         for part in self.Parts:
             if part.Name == name:
                 return part
-        return None
+            
+        raise KeyError(f"Part '{name}' not found in '{self.FileName}'.")
     
 
 # =============================================================================
@@ -135,10 +136,11 @@ class GenericLibFile:
 
             illegal_characters = '<>:"/\\|?*\x00'
             container = "".join("_" if char in illegal_characters else char for char in container)
+            container = (container[:31]) if len(container) > 31 else container
             
             if not self.OleObj.exists( container ):
                 logger.error(f"Part '{container}' does not exist in file '{self.FilePath}'!")
-                raise
+                raise FileNotFoundError(f"Part '{container}' does not exist in file '{self.FilePath}'!")
         
         return self.OleObj.openstream( f"{container}/{stream}" if container else stream )
 
