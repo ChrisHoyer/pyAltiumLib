@@ -50,6 +50,7 @@ Or reading directly the binary io stream
 .. code-block:: python
 
     import pyaltiumlib
+    import io
 
     # Fetch the binary stream of the file
     libfile_bytes = ....
@@ -57,7 +58,8 @@ Or reading directly the binary io stream
 
     # Load the library file
     # filepath is still required to identify and identicate the correct file
-    LibFile = LibFile = altlib.read(filepath, libfile_obj)
+	# its enough the set filepath to the filename e.g. "SchematicLib.schlib"
+    LibFile = pyaltiumlib.read(filepath, libfile_obj)
 
     # Retrieve metadata
     metadata = LibFile.read_meta()
@@ -65,7 +67,41 @@ Or reading directly the binary io stream
     # Get a list of all components
     all_parts = LibFile.list_parts()
 
+Example using the Würth WPME CDIP (Capacitive Digital Isolator Powered) library. 
+The meta data output looks like this
 
+.. code-block:: bash
+
+    Testbench: Draw element '18024015401L'
+    Description: WPME-CDIP Capacitive Digital Isolator Powered, SOIC-16WB, 4/0 Channel, 5000V, Output Low
+    Designator: U?
+    Parameter: {
+        'Manufacturer Part Number': '18024015401L',
+        'Category': 'Digital Isolator',
+        'Match Code': 'WPME-CDIP',
+        'ComponentLink1Description': 'Website Link',
+        'ComponentLink1URL': 'https://www.we-online.com/redexpert/article/18024015401L?ad',
+        'ComponentLink2Description': 'Datasheet Link',
+        'ComponentLink2URL': 'https://www.we-online.com/redexpert/spec/18024015401L?ad',
+        'Manufacturer': 'Wurth Elektronik',
+        'Mount': 'Surface Mount',
+        'Operating Temperature Max': '125°C',
+        'Operating Temperature Min': '-40°C',
+        'Packaging': 'Tape and Reel',
+        'Case/Size Code': 'SOIC-16WB',
+        'Length': '10.3mm',
+        'Width': '7.5mm',
+        'Height': '2.5mm',
+        'Channel Configuration': '4/0',
+        'Common Mode Transient Immunity': '150kV/us',
+        'Data Rate': '100Mbps',
+        'Default Output': 'Low',
+        'Isolation Voltage': '5000V (RMS)',
+        'Operating Supply Voltage Min': '3.15V',
+        'Operating Supply Voltage Max': '5.5V',
+        'Propagation Delay': '10ns',
+        'Comment': '4/0 Channel, 5000V, Output Low'
+    }
 
 Rendering Components as SVG  
 ---------------------------------
@@ -91,3 +127,10 @@ Render each component as an SVG and save them in the `img_sch` directory.
         # Save the generated SVG file
         dwg.save()
 
+Example using the Würth WPME CDIP (Capacitive Digital Isolator Powered) library. 
+The rendered footprint and schematic symbol look like this:
+
++--------------------------------------------+---------------------------------------------+
+| .. image:: example/18024015401L.svg        | .. image:: example/WPME-CDIP_SOIC-16WB.svg  |
+|    :width: 400                             |    :width: 400                              |
++--------------------------------------------+---------------------------------------------+

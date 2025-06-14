@@ -68,11 +68,7 @@ class LibComponent:
            }
         return component_data 
        
-
-# =============================================================================
-#     Drawing related
-# =============================================================================   
-        
+      
     def draw_svg(self, graphic, size_x: float, size_y: float,
                  draw_bbox: bool = False, draw_designator: bool = False) -> None:
         """

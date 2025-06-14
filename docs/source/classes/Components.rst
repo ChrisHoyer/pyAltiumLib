@@ -5,6 +5,7 @@ Generic Component (Base)
 =============================
 
 .. autoclass:: pyaltiumlib.libcomponent.LibComponent
+    :show-inheritance:
     :no-index:
 
 Schematic Symbol Component
