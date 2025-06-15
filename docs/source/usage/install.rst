@@ -67,12 +67,52 @@ Or reading directly the binary io stream
     # Get a list of all components
     all_parts = LibFile.list_parts()
 
-Example using the Würth WPME CDIP (Capacitive Digital Isolator Powered) library. 
-The meta data output looks like this
+Example using the Würth WPME CDIP (Capacitive Digital Isolator Powered) library.
+
+.. code-block:: python
+
+    import pyaltiumlib
+
+    # Extract IntLib File into SchLib and PCBLib
+    # Currently there is no function implemented to read the IntLib
+    filepath = "WPME-CDIP.schlib"
+
+    # Load the library file
+    LibFile = pyaltiumlib.read(filepath)
+
+    # Retrieve metadata
+    metadata_lib = LibFile.read_meta()
+
+The variable 'metadata_lib' contains the following:
 
 .. code-block:: bash
 
-    Testbench: Draw element '18024015401L'
+    {'LibType': 'Schematic',
+    'LibHeader': 'Protel for Windows - Schematic Library Editor Binary File Version 5.0',
+    'FilePath': 'C:\\ .... \WPME-CDIP.SchLib',
+    'FileName': 'WPME-CDIP.SchLib',
+    'ComponentCount': '6',
+    'Parts': '[ ..... ]'
+    }
+
+
+.. code-block:: python
+
+    # Get a list of all components
+    all_parts = LibFile.list_parts()
+
+    # Fetch a the component 18024015401L
+    Component = LibFile.get_part( '18024015401L' )
+
+    metadata_comp = Component.read_meta()
+    if "Description" in metadata_comp: print(f"Description: {metadata_comp['Description']}" )
+    if "Designator" in metadata_comp: print(f"Designator: {metadata_comp['Designator']}" )
+    if "Parameter" in metadata_comp: print(f"Parameter: {metadata_comp['Parameter']}" )
+
+The some printed meta data output of the component '18024015401L' looks like this
+
+.. code-block:: bash
+
     Description: WPME-CDIP Capacitive Digital Isolator Powered, SOIC-16WB, 4/0 Channel, 5000V, Output Low
     Designator: U?
     Parameter: {

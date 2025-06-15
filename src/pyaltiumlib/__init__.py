@@ -7,7 +7,7 @@ AUTHOR_NAME = 'Chris Hoyer'
 AUTHOR_EMAIL = 'info@chrishoyer.de'
 CYEAR = '2024-2025'
 
-__version__ = "0.6"
+__version__ = "0.6.1"
 __author__ = "Chris Hoyer <info@chrishoyer.de>"
 
 import os
@@ -67,7 +67,9 @@ def read(filepath: str, libfile_obj = None) -> Union[SchLib, PcbLib]:
     if filepath.lower().endswith('.schlib'):
         return SchLib(filepath, libfile_ole)
     
-    if filepath.lower().endswith('.pcblib'):
+    elif filepath.lower().endswith('.pcblib'):
         return PcbLib(filepath, libfile_ole)
-
-    logger.error(f"Invalid file type: {filepath}")
+    
+    else:
+        logger.error(f"Invalid file type: {filepath}")
+        raise ValueError(f"Unsupported file format: {filepath}")

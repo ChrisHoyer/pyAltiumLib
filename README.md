@@ -52,3 +52,8 @@ for partname in all_parts:
     # Save the SVG
     dwg.save()
 ```
+
+<p align="center">
+  <img src="docs/source/usage/example/18024015401L.svg" alt="Footprint" width="400"/>
+  <img src="docs/source/usage/example/WPME-CDIP_SOIC-16WB.svg" alt="Symbol" width="400"/>
+</p>
