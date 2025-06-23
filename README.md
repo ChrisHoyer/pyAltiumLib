@@ -10,6 +10,15 @@ PyAltiumLib is a tool to read Altium Designer library files. The included compon
 
 See full documentation here: [ReadTheDocs](https://pyaltiumlib.readthedocs.io/)
 
+This tool is created based on the details given in several open-source repositories:
+
+- `Altium-Schematic-Parser <https://github.com/a3ng7n/Altium-Schematic-Parser>`_
+- `Altium Library Parsing <https://github.com/fierst/AltiumLibParser>`_
+- `Altium schematic file format <https://github.com/vadmium/python-altium/blob/master/format.md>`_
+- `AltiumParser <https://github.com/bugadani/AltiumParser>`_
+- `python-altium <https://github.com/matthiasbock/python-altium>`_
+- `AltiumSharp <https://github.com/issus/AltiumSharp>`_
+- 
 ## Example - Read the File and Retrieve Components
 
 Load the file and retrieve the list of components.
