@@ -9,6 +9,7 @@ class PCBLayerDefinition:
         self.svg_layer = name.replace(' ', '_')
         self.drawing_order = drawing_order
         self.color = ParameterColor(color)
+        self.layer_type = 0
 
     def __repr__(self):
         return f"{self.id}, {self.name}, {self.color.to_hex()}"        
@@ -103,6 +104,22 @@ class PCBLayerDefinition:
             (80, "Visible Grid 2", 100, 9467537),
             (81, "Pad Holes", 1, 9473792),
             (82, "Via Holes", 1, 24961),
+            (83, "Mechanical 17", 14, 16711935),
+            (84, "Mechanical 18", 14, 8388736),
+            (85, "Mechanical 19", 14, 32768),
+            (86, "Mechanical 20", 14, 8421376),
+            (87, "Mechanical 21", 14, 16711935),
+            (88, "Mechanical 22", 14, 8388736),
+            (89, "Mechanical 23", 14, 32768),
+            (90, "Mechanical 24", 14, 8421376),
+            (91, "Mechanical 25", 14, 16711935),
+            (92, "Mechanical 26", 14, 8388736),
+            (93, "Mechanical 27", 14, 32768),
+            (94, "Mechanical 28", 14, 8421376),
+            (95, "Mechanical 29", 14, 16711935),
+            (96, "Mechanical 30", 14, 8388736),
+            (97, "Mechanical 31", 14, 32768),
+            (98, "Mechanical 32", 14, 8421376),
         ]
 
 
