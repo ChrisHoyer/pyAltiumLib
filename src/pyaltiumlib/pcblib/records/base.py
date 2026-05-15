@@ -183,7 +183,7 @@ class GenericPCBRecord:
             end = (bbox[1] * zoom) + offset
             
             lower_left_x = min(start.x, end.x)
-            lower_left_y = min(start.x, end.y)
+            lower_left_y = min(start.y, end.y)
             insert = CoordinatePoint( Coordinate(lower_left_x), Coordinate(lower_left_y) )
             
             size = start - end
