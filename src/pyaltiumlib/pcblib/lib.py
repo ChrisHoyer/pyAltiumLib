@@ -116,7 +116,9 @@ class PcbLib(GenericLibFile):
                 if not (17 <= mech_num <= 32):
                     logger.debug(f"LayerKindMapping: unexpected extended mech number {mech_num}, skipping")
                     continue
-                layer_id = 66 + mech_num  # Mechanical 17-32 → IDs 83-98
+                # IDs 73-82 are occupied (Drill Drawing, Multi-Layer, etc.),
+                # so Mech 17-32 map to IDs 83-98: 66 + mech_num
+                layer_id = 66 + mech_num
 
             if layer_id in layer_by_id:
                 if kind in PCBLayerKind._map:

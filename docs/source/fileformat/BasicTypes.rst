@@ -230,6 +230,36 @@ PCB Text Justification
 - 8: MiddleLeft
 - 9: TopLeft
 
+.. _PCBLayerKind:
+
+PCB Layer Kind
+-----------------------
+Defines the functional purpose of a mechanical layer, as stored in ``Library/LayerKindMapping/Data``, using :ref:`UInt32`
+
+- 0x00: Unspecified
+- 0x01: TopAssembly
+- 0x02: BottomAssembly
+- 0x03: AssemblyNotes
+- 0x04: BoardOutline
+- 0x05: TopConformalCoating
+- 0x06: BottomConformalCoating
+- 0x07: TopComponentCenter
+- 0x08: BottomComponentCenter
+- 0x09: TopComponentOutline
+- 0x0A: BottomComponentOutline
+- 0x0B: TopCourtyard
+- 0x0C: BottomCourtyard
+- 0x0D: TopDesignator
+- 0x0E: BottomDesignator
+- 0x13: TopGlue
+- 0x14: BottomGlue
+- 0x17: TopComponentValue
+- 0x18: BottomComponentValue
+- 0x19: VCutScoring
+- 0x1A: Top3DBody
+- 0x1B: Bottom3DBody
+- 0x1C: RoutingToolPaths
+
 :topic: Data types Schematic
 
 Schematic Data Types

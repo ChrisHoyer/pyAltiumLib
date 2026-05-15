@@ -625,9 +625,48 @@ Represents a footprint region primitive. Contains only one :ref:`Block` with the
 ID 12 - Component Body
 -----------------------
 
-Represents a footprint component body primitive.
+Represents a footprint 3D component body. Unlike other PCB primitives this record does **not** use
+the standard :ref:`PCBPrimitveHeader`. Instead it consists of two :ref:`Block` entries:
 
+#. Main data block: a binary prefix followed by pipe-delimited text parameters (see below)
+#. Trailing block: empty; advance the stream past it
 
+The binary prefix of the main block begins with the ASCII text ``.Designator`` followed by
+approximately 24 bytes of binary fields (not fully decoded). The pipe-delimited text parameters
+that follow include:
+
+.. list-table::
+   :header-rows: 1
+   :widths: auto
+
+   * - **Parameter**
+     - **Comment**
+   * - V7_LAYER
+     - Mechanical layer: ``MECHANICAL{N}`` where N is 1–32. This is the authoritative layer field.
+   * - NAME
+     - Body name (may be empty)
+   * - KIND
+     - Body kind (0 = generic)
+   * - OVERALLHEIGHT
+     - Total height including body and standoff, as a dimension string (e.g. ``39.3701mil``)
+   * - STANDOFFHEIGHT
+     - Standoff height above board surface
+   * - BODYCOLOR3D
+     - 3D body colour as a packed RGB integer
+   * - BODYOPACITY3D
+     - Opacity (0.0–1.0)
+   * - MODEL.NAME
+     - Embedded 3D model filename (e.g. ``HMC712LP3CE.stp``)
+   * - MODEL.EMBED
+     - ``TRUE`` if the 3D model binary is embedded in the file
+   * - MODEL.CHECKSUM
+     - CRC of the embedded model
+
+**Layer encoding:** ``V7_LAYER=MECHANICAL{N}`` maps to pyAltiumLib internal layer IDs as follows:
+N ≤ 16 → ID = 56 + N (IDs 57–72); N = 17–32 → ID = 66 + N (IDs 83–98).
+Extended mechanical layers (17–32) can only appear in this record type; standard binary primitives
+such as tracks and fills are limited to single-byte layer IDs and cannot reference layers beyond
+Mechanical 16.
 
 
 .. _SchPrimitives:

@@ -104,6 +104,7 @@ class PCBLayerDefinition:
             (80, "Visible Grid 2", 100, 9467537),
             (81, "Pad Holes", 1, 9473792),
             (82, "Via Holes", 1, 24961),
+            # Mechanical 17-32 use IDs 83-98; IDs 73-82 are occupied by non-mechanical layers
             (83, "Mechanical 17", 14, 16711935),
             (84, "Mechanical 18", 14, 8388736),
             (85, "Mechanical 19", 14, 32768),
