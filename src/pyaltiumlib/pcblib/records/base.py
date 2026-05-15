@@ -36,7 +36,7 @@ class GenericPCBRecord:
             logger.error("PCB reecord common parameters array length is not 13!")
         
         self.layer = byte_array[0]
-                
+
         self.unlocked = bool( byte_array[1] & 0x04 ) 
         self.tenting_top = bool( byte_array[1] & 0x20 ) 
         self.tenting_bottom = bool( byte_array[1] & 0x40 ) 
@@ -63,6 +63,21 @@ class GenericPCBRecord:
         return None
 
         
+    def _apply_extended_layer(self, remaining: bytes):
+        """Override self.layer for Mech 17–32 records.
+
+        Binary records on extended mechanical layers store 72 (Mech 16) in the
+        common header. The true layer N appears as a single byte immediately
+        before the marker \\x00\\x02\\x01 in the trailing bytes of the block.
+        """
+        if self.layer != 72:
+            return
+        idx = remaining.find(b'\x00\x02\x01')
+        if idx > 0:
+            n = remaining[idx - 1]
+            if 17 <= n <= 32:
+                self.layer = 66 + n
+
     def get_svg_arc_path(self, center, radius_x, radius_y, angle_start, angle_end):
         """
         This function returns the svg path data for an arc.

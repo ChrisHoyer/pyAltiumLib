@@ -68,6 +68,8 @@ class PcbString(GenericPCBRecord):
                     self.font_inverted_rect_text_offset = block.read_int32() 
                     
                     
+            self._apply_extended_layer(block.data[block.offset:])
+
             if string.has_content():
                 self.text = string.read_string_block()
                 
