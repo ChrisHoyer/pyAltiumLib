@@ -304,6 +304,14 @@ class PcbPad(GenericPCBRecord):
                                             )
           
             
+        elif shape.to_int() == 9:
+            path = self.get_svg_rounded_rect_path(start, size, plot_layer,
+                                              self.corner_radius_percentage[ref_layer-1] if self.corner_radius_percentage else 25)
+            drawing_primitive = dwg.path(d=path,
+                                         fill=layer.color.to_hex(),
+                                         transform=f"rotate(-{self.rotation} {center.x} {center.y})"
+                                         )
+
         else:
             print(f"Unknown pad shape: {shape}")
             
