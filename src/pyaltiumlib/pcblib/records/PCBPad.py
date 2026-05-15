@@ -282,21 +282,22 @@ class PcbPad(GenericPCBRecord):
                                          )
     
         elif shape.to_int() == 3:
-            
-            edge_length =  min(size.y, size.x) / 2
-            diagonal_offset = int(edge_length / 2)
-            
+
+            w = size.x
+            h = size.y
+            chamfer = min(w, h) / 4
+
             vertices = [
-                (int(center.x - diagonal_offset), int(center.y - edge_length)),
-                (int(center.x + diagonal_offset), int(center.y - edge_length)),
-                (int(center.x + edge_length), int(center.y - diagonal_offset)),
-                (int(center.x + edge_length), int(center.y + diagonal_offset)),
-                (int(center.x + diagonal_offset), int(center.y + edge_length)),
-                (int(center.x - diagonal_offset), int(center.y + edge_length)),
-                (int(center.x - edge_length), int(center.y + diagonal_offset)),
-                (int(center.x - edge_length), int(center.y - diagonal_offset)),
+                (int(center.x - w/2 + chamfer), int(center.y - h/2)),
+                (int(center.x + w/2 - chamfer), int(center.y - h/2)),
+                (int(center.x + w/2),            int(center.y - h/2 + chamfer)),
+                (int(center.x + w/2),            int(center.y + h/2 - chamfer)),
+                (int(center.x + w/2 - chamfer), int(center.y + h/2)),
+                (int(center.x - w/2 + chamfer), int(center.y + h/2)),
+                (int(center.x - w/2),            int(center.y + h/2 - chamfer)),
+                (int(center.x - w/2),            int(center.y - h/2 + chamfer)),
             ]
-                
+
             drawing_primitive = dwg.polygon(points = vertices,
                                             fill = layer.color.to_hex(),
                                             transform=f"rotate(-{self.rotation} {center.x} {center.y})"
