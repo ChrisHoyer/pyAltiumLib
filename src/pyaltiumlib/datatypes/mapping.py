@@ -32,8 +32,22 @@ class MappingBase:
     def to_int(self):
         """
         Returns the integer value of the mapped object.
-        
+
         :return: The integer representation.
         :rtype: int
         """
         return self.value
+
+    @classmethod
+    def from_name(cls, name: str):
+        """
+        Construct an instance by name string instead of integer value.
+
+        :param str name: The name string as it appears in the mapping.
+        :return: An instance of the class, or None if not found.
+        """
+        for value, mapped in cls._map.items():
+            n = mapped if isinstance(mapped, str) else mapped.get("name", "")
+            if n == name:
+                return cls(value)
+        logger.error(f"Failed to find name '{name}' in {cls.__name__}")

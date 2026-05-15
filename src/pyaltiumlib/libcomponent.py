@@ -70,7 +70,8 @@ class LibComponent:
        
       
     def draw_svg(self, graphic, size_x: float, size_y: float,
-                 draw_bbox: bool = False, draw_designator: bool = False) -> None:
+                 draw_bbox: bool = False, draw_designator: bool = False,
+                 layer_kinds=None) -> None:
         """
         Draw all drawable and initialized records the component to an svg drawing.
         All records are autoscaled to fit the given drawing object size.
@@ -125,8 +126,20 @@ class LibComponent:
             for obj in validObj:
                     obj.draw_bounding_box( graphic, offset, zoom)
             
+        # Build layer lookup for kind-based filtering
+        layer_map = {}
+        if hasattr(self, 'LibFile') and hasattr(self.LibFile, 'Layers'):
+            layer_map = {l.id: l for l in self.LibFile.Layers}
+
+        if layer_kinds is not None:
+            kind_values = {k.value if hasattr(k, 'value') else int(k) for k in layer_kinds}
+
         # Draw Primitives
         for obj in validObj:
+            if layer_kinds is not None and hasattr(obj, 'layer'):
+                lyr = layer_map.get(obj.layer)
+                if lyr and lyr.layer_type != 0 and lyr.layer_type.value not in kind_values:
+                    continue
             obj.draw_svg( graphic, offset, zoom)
           
 

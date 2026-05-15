@@ -27,6 +27,33 @@ class PCBLayerKind(MappingBase):
         0x1C: "RoutingToolPaths",
     }
 
+    # Values are in BGR (0xBBGGRR) — ParameterColor stores blue in the high byte.
+    # Comments show the resulting screen colour as #RRGGBB.
+    _colors = {
+        0x01: 0xC09020,  # TopAssembly            — #2090C0 blue
+        0x02: 0xC0C020,  # BottomAssembly         — #20C0C0 teal
+        0x03: 0x80FFFF,  # AssemblyNotes          — #FFFF80 light yellow
+        0x04: 0x00C0E0,  # BoardOutline           — #E0C000 yellow
+        0x05: 0x80FF80,  # TopConformalCoating    — #80FF80 light green
+        0x06: 0x008000,  # BottomConformalCoating — #008000 green
+        0x07: 0xFF00FF,  # TopComponentCenter     — #FF00FF magenta
+        0x08: 0xFF80FF,  # BottomComponentCenter  — #FF80FF lighter magenta
+        0x09: 0xC0C000,  # TopComponentOutline    — #00C0C0 cyan
+        0x0A: 0x808000,  # BottomComponentOutline — #008080 dark cyan
+        0x0B: 0x00CCFF,  # TopCourtyard           — #FFCC00 amber
+        0x0C: 0x60E0FF,  # BottomCourtyard        — #FFE060 lighter amber
+        0x0D: 0xFFFFFF,  # TopDesignator          — #FFFFFF white
+        0x0E: 0xC0C0C0,  # BottomDesignator       — #C0C0C0 light grey
+        0x13: 0x0000C0,  # TopGlue                — #C00000 red
+        0x14: 0x000080,  # BottomGlue             — #800000 dark red
+        0x17: 0xFFFFFF,  # TopComponentValue      — #FFFFFF white
+        0x18: 0xC0C0C0,  # BottomComponentValue   — #C0C0C0 light grey
+        0x19: 0xFFFF00,  # VCutScoring            — #00FFFF cyan
+        0x1A: 0x808080,  # Top3DBody              — #808080 grey
+        0x1B: 0x404040,  # Bottom3DBody           — #404040 dark grey
+        0x1C: 0x0080FF,  # RoutingToolPaths       — #FF8000 orange
+    }
+
 class PCBPadShape(MappingBase):
     _map = {
         0: "None",

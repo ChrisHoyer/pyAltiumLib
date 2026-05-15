@@ -1,5 +1,5 @@
 from pyaltiumlib.base import GenericLibFile
-from pyaltiumlib.datatypes import BinaryReader, ParameterCollection, PCBLayerDefinition, PCBLayerKind
+from pyaltiumlib.datatypes import BinaryReader, ParameterCollection, ParameterColor, PCBLayerDefinition, PCBLayerKind
 from pyaltiumlib.pcblib.footprint import PcbLibFootprint
 
 # Set up logging
@@ -123,6 +123,8 @@ class PcbLib(GenericLibFile):
             if layer_id in layer_by_id:
                 if kind in PCBLayerKind._map:
                     layer_by_id[layer_id].layer_type = PCBLayerKind(kind)
+                    if kind in PCBLayerKind._colors:
+                        layer_by_id[layer_id].color = ParameterColor(PCBLayerKind._colors[kind])
                 else:
                     logger.debug(f"LayerKindMapping: unknown kind {kind:#04x} for layer {layer_id}")
             else:
