@@ -130,3 +130,36 @@ class PcbLib(GenericLibFile):
             else:
                 logger.debug(f"LayerKindMapping: no layer for id {layer_id}")
 
+ # =============================================================================
+ #     Public API
+ # =============================================================================
+
+    def get_layer(self, *, kind=None, name=None, id=None):
+        """Return the layer matching the given criterion, or None if not found.
+
+        Exactly one keyword argument must be supplied.
+
+        :param str kind: Layer kind name, e.g. ``"TopCourtyard"``
+        :param str name: Layer name, e.g. ``"Mechanical 21"``
+        :param int id: Internal layer ID. Note: Mech 17–32 have IDs 83–98 (not 73–88),
+            because 73–82 are occupied by Drill Drawing, Multi-Layer, etc.
+        :rtype: PCBLayerDefinition or None
+        :raises ValueError: If not exactly one keyword argument is supplied
+        """
+        provided = sum(x is not None for x in (kind, name, id))
+        if provided != 1:
+            raise ValueError("Exactly one of kind=, name=, or id= must be supplied")
+
+        if id is not None:
+            return next((l for l in self.Layers if l.id == id), None)
+        if name is not None:
+            return next((l for l in self.Layers if l.name == name), None)
+        # kind
+        target = PCBLayerKind.from_name(kind)
+        if target is None:
+            return None
+        return next(
+            (l for l in self.Layers if l.layer_type != 0 and l.layer_type.value == target.value),
+            None
+        )
+

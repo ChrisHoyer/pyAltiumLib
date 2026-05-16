@@ -132,7 +132,17 @@ class LibComponent:
             layer_map = {l.id: l for l in self.LibFile.Layers}
 
         if layer_kinds is not None:
-            kind_values = {k.value if hasattr(k, 'value') else int(k) for k in layer_kinds}
+            from pyaltiumlib.datatypes import PCBLayerKind
+            kind_values = set()
+            for k in layer_kinds:
+                if isinstance(k, str):
+                    resolved = PCBLayerKind.from_name(k)
+                    if resolved is not None:
+                        kind_values.add(resolved.value)
+                elif hasattr(k, 'value'):
+                    kind_values.add(k.value)
+                else:
+                    kind_values.add(int(k))
 
         # Draw Primitives
         for obj in validObj:
