@@ -241,7 +241,7 @@ class SchematicPin(ParameterCollection):
         
         entry_length = data.read_int8()   
         data.read_int8() # Why?
-        record["Description"] = "" if entry_length == 0 else data.read(entry_length)decode("windows-1252") 
+        record["Description"] = "" if entry_length == 0 else data.read(entry_length).decode("windows-1252") 
         
         record["Electrical_Type"] = data.read_int8() 
         
@@ -261,10 +261,10 @@ class SchematicPin(ParameterCollection):
         record["Color"] = data.read_int32()
 
         entry_length = data.read_int8() 
-        record["Name"] = "" if entry_length == 0 else data.read(entry_length)decode("windows-1252") 
+        record["Name"] = "" if entry_length == 0 else data.read(entry_length).decode("windows-1252") 
 
         entry_length = data.read_int8() 
-        record["Designator"] = "" if entry_length == 0 else data.read(entry_length)decode("windows-1252")
+        record["Designator"] = "" if entry_length == 0 else data.read(entry_length).decode("windows-1252")
                                 
         self.num_blocks = 1
         self.collection.append(record) 
