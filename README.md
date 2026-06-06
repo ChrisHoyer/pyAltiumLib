@@ -25,6 +25,7 @@ To install `pyaltiumlib`, use the following command:
 
 ```bash
 pip install pyaltiumlib
+```
 
 Load the file and retrieve the list of components.
 
