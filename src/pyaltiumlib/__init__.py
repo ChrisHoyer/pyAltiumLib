@@ -5,9 +5,9 @@ implemented in Python.
 
 AUTHOR_NAME = 'Chris Hoyer'
 AUTHOR_EMAIL = 'info@chrishoyer.de'
-CYEAR = '2024-2025'
+CYEAR = '2024-2026'
 
-__version__ = "0.6.2"
+__version__ = "0.7"
 __author__ = "Chris Hoyer <info@chrishoyer.de>"
 
 import os

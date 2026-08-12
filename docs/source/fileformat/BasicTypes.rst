@@ -169,10 +169,10 @@ PCB Pad Shape
 -----------------------
 Defining the shape of the Pad on the PCB using :ref:`Byte`
 
-- 1: Round
-- 2: Rectangular
-- 3: Octogonal
-- 9: Rounded Rectangle
+- `0x01`: Round
+- `0x02`: Rectangular
+- `0x03`: Octogonal
+- `0x09`: Rounded Rectangle
 
 .. _PCBStackMode:
 
@@ -180,9 +180,9 @@ PCB Stack Mode
 -----------------------
 Defining the stack mode on the PCB using :ref:`Byte`
 
-- 1: Simple
-- 2: TopMiddleBottom
-- 3: FullStack
+- `0x01`: Simple
+- `0x02`: TopMiddleBottom
+- `0x03`: FullStack
 
 .. _PCBHoleShape:
 
@@ -190,9 +190,9 @@ PCB Hole Shape
 -----------------------
 Defining the hole shape of the Pad on the PCB using :ref:`Byte`
 
-- 0: Round
-- 1: Square
-- 2: Slot
+- `0x00`: Round
+- `0x01`: Square
+- `0x02`: Slot
 
 .. _PCBTextKind:
 
@@ -200,9 +200,9 @@ PCB Text Kind
 -----------------------
  Defining the kind of the PCB text using :ref:`Int16`
 
-- 0: Stroke
-- 1: TrueType
-- 2: BarCode
+- `0x00`: Stroke
+- `0x01`: TrueType
+- `0x02`: BarCode
 
 .. _PCBTextStrokeFont:
 
@@ -210,9 +210,9 @@ PCB Text Stroke Font
 -----------------------
  Defining the stroke of the PCB text using :ref:`Byte`
 
-- 0: Default
-- 1: SansSerif
-- 2: Serif
+- `0x00`: Default
+- `0x01`: SansSerif
+- `0x02`: Serif
 
 .. _PCBTextJustification:
 
@@ -220,15 +220,15 @@ PCB Text Justification
 -----------------------
  Defining the justification of the PCB text using :ref:`Byte`
 
-- 1: BottomRight
-- 2: MiddleRight
-- 3: TopRight
-- 4: BottomCenter
-- 5: MiddleCenter
-- 6: TopCenter
-- 7: BottomLeft
-- 8: MiddleLeft
-- 9: TopLeft
+- `0x01`: BottomRight
+- `0x02`: MiddleRight
+- `0x03`: TopRight
+- `0x04`: BottomCenter
+- `0x05`: MiddleCenter
+- `0x06`: TopCenter
+- `0x07`: BottomLeft
+- `0x08`: MiddleLeft
+- `0x09`: TopLeft
 
 .. _PCBLayerKind:
 
@@ -236,29 +236,29 @@ PCB Layer Kind
 -----------------------
 Defines the functional purpose of a mechanical layer, as stored in ``Library/LayerKindMapping/Data``, using :ref:`UInt32`
 
-- 0x00: Unspecified
-- 0x01: TopAssembly
-- 0x02: BottomAssembly
-- 0x03: AssemblyNotes
-- 0x04: BoardOutline
-- 0x05: TopConformalCoating
-- 0x06: BottomConformalCoating
-- 0x07: TopComponentCenter
-- 0x08: BottomComponentCenter
-- 0x09: TopComponentOutline
-- 0x0A: BottomComponentOutline
-- 0x0B: TopCourtyard
-- 0x0C: BottomCourtyard
-- 0x0D: TopDesignator
-- 0x0E: BottomDesignator
-- 0x13: TopGlue
-- 0x14: BottomGlue
-- 0x17: TopComponentValue
-- 0x18: BottomComponentValue
-- 0x19: VCutScoring
-- 0x1A: Top3DBody
-- 0x1B: Bottom3DBody
-- 0x1C: RoutingToolPaths
+- `0x00`: Unspecified
+- `0x01`: TopAssembly
+- `0x02`: BottomAssembly
+- `0x03`: AssemblyNotes
+- `0x04`: BoardOutline
+- `0x05`: TopConformalCoating
+- `0x06`: BottomConformalCoating
+- `0x07`: TopComponentCenter
+- `0x08`: BottomComponentCenter
+- `0x09`: TopComponentOutline
+- `0x0A`: BottomComponentOutline
+- `0x0B`: TopCourtyard
+- `0x0C`: BottomCourtyard
+- `0x0D`: TopDesignator
+- `0x0E`: BottomDesignator
+- `0x13`: TopGlue
+- `0x14`: BottomGlue
+- `0x17`: TopComponentValue
+- `0x18`: BottomComponentValue
+- `0x19`: VCutScoring
+- `0x1A`: Top3DBody
+- `0x1B`: Bottom3DBody
+- `0x1C`: RoutingToolPaths
 
 :topic: Data types Schematic
 

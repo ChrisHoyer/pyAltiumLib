@@ -313,7 +313,7 @@ class PcbPad(GenericPCBRecord):
                                          )
 
         else:
-            print(f"Unknown pad shape: {shape}")
+            logger.warning(f"Unknown pad shape: {shape}")
             
         self.Footprint._graphic_layers[plot_layer].add( drawing_primitive )
 

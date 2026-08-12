@@ -151,7 +151,7 @@ Container Library/LayerKindMapping
 ------------------------------------
 
 Maps each mechanical layer to a functional type (Assembly, Courtyard, etc.). This stream uses a
-custom binary format, **not** a :ref:`ParameterCollection`.
+custom binary format.
 
 - Structure of :code:`Library/LayerKindMapping/Data`:
    #. Version block size as :ref:`UInt32` (value = 8)
