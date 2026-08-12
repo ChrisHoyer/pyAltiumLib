@@ -26,7 +26,8 @@ class PcbFill(GenericPCBRecord):
                 self.corner1 = block.read_bin_coord()
                 self.corner2 = block.read_bin_coord()
                 self.rotation = block.read_double()
-                
+                self._apply_extended_layer(block.data[block.offset:])
+
             if self.layer > 0: self.is_drawable = True
                 
         except Exception as e:

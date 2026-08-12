@@ -75,7 +75,7 @@ The coverage of containers of the Altium library file format is shown below:
      - Not implemented
    * - PCB Library
      - Library/LayerKindMapping/Data
-     - Not implemented
+     - Implemented
    * - PCB Library
      - Library/Models/Header
      - Not implemented
@@ -227,7 +227,7 @@ The coverage of records/primitives of the Altium library file format is shown be
      - Implemented
    * - PCB Primitives
      - Component Body
-     - Not Implemented
+     - Key features implemented
 
 
 Open points

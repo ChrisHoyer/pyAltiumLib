@@ -85,19 +85,25 @@ class PcbLibFootprint(LibComponent):
 
         except Exception as e:
             logger.error(f"Failed to read data of '{self.Name}'. Exception: {e}")
-            raise                
+            raise
 
+# =============================================================================
+#     Public API
+# =============================================================================
 
-               
+    def get_records(self, *, kind=None, name=None, id=None):
+        """Return all records on the layer matching the given criterion.
 
-                
+        Accepts the same keyword arguments as :py:meth:`PcbLib.get_layer`.
+        Exactly one must be supplied. Returns an empty list if the layer is
+        not found or has no records on it.
 
-                
-
-        
-                
-        
-                   
-                
-        
-            
+        :param str kind: Layer kind name, e.g. ``"TopCourtyard"``
+        :param str name: Layer name, e.g. ``"Mechanical 21"``
+        :param int id: Internal layer ID
+        :rtype: list
+        """
+        layer = self.LibFile.get_layer(kind=kind, name=name, id=id)
+        if layer is None:
+            return []
+        return [r for r in self.Records if hasattr(r, 'layer') and r.layer == layer.id]

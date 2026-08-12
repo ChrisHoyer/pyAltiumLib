@@ -28,7 +28,8 @@ class PcbTrack(GenericPCBRecord):
                 self.start = block.read_bin_coord()
                 self.end = block.read_bin_coord()
                 self.linewidth = Coordinate.parse_bin(block.read(4))
-                
+                self._apply_extended_layer(block.data[block.offset:])
+
             if self.layer > 0: self.is_drawable = True
                 
         except Exception as e:

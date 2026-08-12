@@ -147,6 +147,22 @@ Contains name, description, height and pad count of each footprint.
 - Structure of :code:`Library/ComponentParamsTOC/Data`:
    #. Parameter of each component as :ref:`ParameterCollection`
 
+Container Library/LayerKindMapping
+------------------------------------
+
+Maps each mechanical layer to a functional type (Assembly, Courtyard, etc.). This stream uses a
+custom binary format, **not** a :ref:`ParameterCollection`.
+
+- Structure of :code:`Library/LayerKindMapping/Data`:
+   #. Version block size as :ref:`UInt32` (value = 8)
+   #. Version string as 8 bytes UTF-16LE (``"1.0\0"``)
+   #. *Unknown* as 4 bytes (skip)
+   #. Entry count as :ref:`UInt32`
+   #. For each entry:
+
+      #. Layer ID as :ref:`UInt32` — plain values 57–72 for Mechanical 1–16; ``0x04000000 + N`` for Mechanical N where N = 17–32
+      #. Kind as :ref:`UInt32` — see :ref:`PCBLayerKind`
+
 Container Library/Models
 -------------------------
 

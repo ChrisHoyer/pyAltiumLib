@@ -28,7 +28,7 @@ class PcbRegion(GenericPCBRecord):
                 block.read_byte() # Unknown
 
                 self.parameter = ParameterCollection( block.read_string_block(size_string = 4))
-                
+
                 self.num_vertices = block.read_int32()                
                 self.vertices = [ block.read_bin_coord( double=True ) for i in range(self.num_vertices)] 
                     

@@ -19,8 +19,9 @@ from .schematicmapping import (
 
 # PCB related
 from .pcblayerdefinition import PCBLayerDefinition
-from .pcbmapping import ( PCBPadShape, PCBHoleShape, PCBStackMode, 
-                         PCBTextJustification, PCBStrokeFont, PCBTextKind
+from .pcbmapping import ( PCBPadShape, PCBHoleShape, PCBStackMode,
+                         PCBTextJustification, PCBStrokeFont, PCBTextKind,
+                         PCBLayerKind
                          )
 
 
@@ -46,4 +47,5 @@ __all__ = [
     "PCBTextJustification",
     "PCBStrokeFont",
     "PCBTextKind",
+    "PCBLayerKind",
 ]
