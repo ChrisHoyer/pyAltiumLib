@@ -61,13 +61,22 @@ class PcbString(GenericPCBRecord):
                     
                     block.read_int32() # Unknown
                     
-                    self.font_inverted_rect = block.read_byte()
+                    self.font_inverted_rect = bool( block.read_int8() )
                     self.font_inverted_rect_width = Coordinate.parse_bin(block.read(4))
                     self.font_inverted_rect_height = Coordinate.parse_bin(block.read(4))
                     self.font_inverted_rect_justification = PCBTextJustification( block.read_int8() )              
                     self.font_inverted_rect_text_offset = block.read_int32() 
                     
                     
+                else:
+                    # Short records carry no font information
+                    self.text_kind = PCBTextKind(0)
+                    self.font_name = ""
+                    self.font_inverted_rect = False
+                    self.font_inverted_rect_width = Coordinate(0)
+                    self.font_inverted_rect_height = Coordinate(0)
+                    self.font_inverted_rect_justification = PCBTextJustification(5)
+
             self._apply_extended_layer(block.data[block.offset:])
 
             if string.has_content():
@@ -90,6 +99,32 @@ class PcbString(GenericPCBRecord):
         :rtype: tuple with :ref:`DataTypeCoordinatePoint`
         """
         try:
+            if not self.font_inverted_rect:
+                # Without the inverted rectangle its width, height and justification
+                # may hold stale values. corner1 is then the bottom left corner of the
+                # text, which is rotated around it, and the text width is estimated.
+                self.alignment = {
+                    "vertical": "text-after-edge",
+                    "horizontal": "start",
+                    "rotation": -self.rotation,
+                    "anchor": self.corner1.copy()
+                }
+
+                width = self.height * len(self.text) * 0.6
+                corners = [
+                    CoordinatePoint(self.corner1.x, self.corner1.y),
+                    CoordinatePoint(self.corner1.x + width, self.corner1.y),
+                    CoordinatePoint(self.corner1.x + width, self.corner1.y - self.height),
+                    CoordinatePoint(self.corner1.x, self.corner1.y - self.height),
+                ]
+                rotated_corners = [corner.rotate(self.corner1, -self.rotation) for corner in corners]
+
+                xs = [corner.x for corner in rotated_corners]
+                ys = [corner.y for corner in rotated_corners]
+
+                return [CoordinatePoint(min(xs), min(ys)),
+                        CoordinatePoint(max(xs), max(ys))]
+
             self.alignment = {
                 "vertical": self.font_inverted_rect_justification.get_vertical(),
                 "horizontal": self.font_inverted_rect_justification.get_horizontal(),

@@ -416,6 +416,8 @@ Represents a footprint string primitive. Structured as:
 
 If the variable :code:`WideStringsIndex` is set, read WideStrings
 
+The :code:`FontInvertedRect*` values are only used if :code:`FontInvertedRect` is set; otherwise they may hold stale values, and :code:`Corner` is the bottom left corner of the text, rotated by :code:`Rotation` around it.
+
 The information are structured as follows:
 
 .. list-table:: 
