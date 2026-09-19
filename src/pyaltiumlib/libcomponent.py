@@ -102,6 +102,14 @@ class LibComponent:
         validObj = []
         for obj in self.Records:
             if hasattr(obj, 'draw_svg') and callable(getattr(obj, 'draw_svg')):
+                
+                # The PCB .Designator string is a placeholder that Altium only resolves
+                # once the part is placed on a board; treat it like SchDesignator.
+                pcb_designator = type(obj).__name__ == "PcbString" and \
+                    str(getattr(obj, "text", "")).strip().lower() == ".designator"
+                if pcb_designator and not draw_designator:
+                    continue
+
                 if obj.is_drawable and not any(x in type(obj).__name__ for x in supressed_elements):
                     validObj.append(obj)
                 else:

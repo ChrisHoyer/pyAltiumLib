@@ -2,6 +2,7 @@ from pyaltiumlib.pcblib.records.base import GenericPCBRecord
 from pyaltiumlib.datatypes import BinaryReader, Coordinate, CoordinatePoint
 
 from typing import Tuple
+import math
 
 # Configure logging
 import logging
@@ -46,7 +47,6 @@ class PcbArc(GenericPCBRecord):
 #     Drawing related
 # ============================================================================= 
 
-
     def get_bounding_box(self) -> Tuple[CoordinatePoint, CoordinatePoint]:
         """
         Generates and returns a bounding box for this record
@@ -54,17 +54,41 @@ class PcbArc(GenericPCBRecord):
         :return: List with two coordinate entries 
         :rtype: tuple with :ref:`DataTypeCoordinatePoint`
         """
-        start_x = self.location.x - self.radius
-        start_y = self.location.y - self.radius
-        end_x = self.location.x + self.radius
-        end_y = self.location.y + self.radius
-
-        min_x = min(self.location.x, start_x, end_x)
-        max_x = max(self.location.x, start_x, end_x)
-        min_y = min(self.location.y, start_y, end_y)
-        max_y = max(self.location.y, start_y, end_y)
-        
-        return [CoordinatePoint(min_x, min_y), CoordinatePoint(max_x, max_y)]
+    
+        def get_point(angle):
+            angle = math.radians(angle)
+    
+            return CoordinatePoint(
+                self.location.x + self.radius * math.cos(angle),
+                self.location.y - self.radius * math.sin(angle)
+            )
+    
+        start = self.angle_start % 360
+        end = self.angle_end % 360
+    
+        points = [ get_point(start), get_point(end) ]
+    
+        # Check whether an angle lies on the arc.
+        # The SVG implementation sweeps from start to end
+        # in increasing angle direction.
+        def angle_is_on_arc(angle):
+            if start <= end:
+                return start <= angle <= end
+            else:
+                # Arc crosses 0°
+                return angle >= start or angle <= end
+    
+        # The extrema of a circle can only occur at these angles.
+        for angle in (0, 90, 180, 270):
+            if angle_is_on_arc(angle):
+                points.append(get_point(angle))
+    
+        min_x = min(point.x for point in points)
+        max_x = max(point.x for point in points)
+        min_y = min(point.y for point in points)
+        max_y = max(point.y for point in points)
+    
+        return [CoordinatePoint(min_x, min_y),  CoordinatePoint(max_x, max_y)]
 
     def draw_svg(self, dwg, offset, zoom) -> None:
         """

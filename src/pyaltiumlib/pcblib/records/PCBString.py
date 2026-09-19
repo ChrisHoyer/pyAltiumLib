@@ -61,7 +61,7 @@ class PcbString(GenericPCBRecord):
                     
                     block.read_int32() # Unknown
                     
-                    self.font_inverted_rect = block.read_byte()
+                    self.font_inverted_rect = bool( block.read_int8() )
                     self.font_inverted_rect_width = Coordinate.parse_bin(block.read(4))
                     self.font_inverted_rect_height = Coordinate.parse_bin(block.read(4))
                     self.font_inverted_rect_justification = PCBTextJustification( block.read_int8() )              
