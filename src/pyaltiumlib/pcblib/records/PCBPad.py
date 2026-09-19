@@ -199,8 +199,17 @@ class PcbPad(GenericPCBRecord):
             
 
         center = (self.location.copy() * zoom) + offset 
+        # Size the designator to fit inside the pad. The text is rotated with
+        # the pad, so its baseline runs along the pad x axis.
+        pad_size = self.size_bottom if self.layer == 32 else self.size_top
+        across = abs(float(pad_size.x)) * zoom
+        along = abs(float(pad_size.y)) * zoom
+        digits = max(len(self.designator), 1)
+        font_size = min(along * 0.8, across * 0.85 / (digits * 0.6))
+
         drawing_primitive = dwg.text(self.designator,
                                      insert = center.to_int_tuple(),
+                                     font_size = round(font_size, 1),
                                      fill = "white",
                                      dominant_baseline="central", text_anchor="middle",
                                      transform=f"rotate(-{self.rotation % 180} {center.x} {center.y})"
